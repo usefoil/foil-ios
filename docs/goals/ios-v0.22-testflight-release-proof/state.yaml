@@ -61,13 +61,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-22-testflight-release-proof/"
     command: "npx goalbuddy board docs/goals/ios-v0.22-testflight-release-proof"
 
-active_task: T001
+active_task: T004
 
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Assess whether v0.18-v0.21 are ready to package and identify the exact next build number and release proof path."
     inputs:
@@ -85,11 +85,27 @@ tasks:
       - "Next build number recommendation."
       - "Archive/export/upload/install proof plan."
       - "Candidate Worker slice with allowed_files and verify commands."
+    receipt:
+      result: done
+      note: "notes/T001-scout.md"
+      summary: "v0.18-v0.21 are source-ready for packaging; current metadata is 0.1.0 build 10; next build should be 0.1.0 build 11; iPhone-preview is visible and WDA is merely down; App Store Connect upload is blocked until API key ID and issuer ID are restored without printing secrets."
+      current_metadata:
+        marketing_version: "0.1.0"
+        build: "10"
+      next_build: "11"
+      release_readiness:
+        v0_18: done
+        v0_19: done
+        v0_20: done
+        v0_21: done
+      blockers:
+        - "Full TestFlight validation/upload cannot proceed because altool has no API key ID/issuer ID in the current environment or repo docs."
+      candidate_worker: T003
 
   - id: T002
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Decide whether to release the next TestFlight build or require one blocker fix first."
     inputs:
@@ -104,25 +120,89 @@ tasks:
       - "allowed_files"
       - "verify commands"
       - "stop_if conditions"
+    receipt:
+      result: done
+      decision: local_prep_approved
+      note: "notes/T002-judge.md"
+      summary: "Full release is not approved yet because App Store Connect authentication parameters are missing, but local build-11 release prep is approved as the largest safe useful slice."
+      full_outcome_complete: false
+      worker_task: T003
+      blocked_until:
+        - "Restore App Store Connect API key ID and issuer ID through a safe local source before upload."
 
   - id: T003
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     reasoning_hint: high
-    objective: "Produce, upload, attach, install, and physically smoke-test the approved TestFlight build."
+    objective: "Prepare build 11 locally: bump metadata, regenerate project, run focused tests, archive/export IPA, and prove app plus keyboard metadata before upload."
     allowed_files:
       - "FoiliOS/project.yml"
       - "FoiliOS/FoilIOS.xcodeproj/**"
       - "docs/goals/ios-v0.22-testflight-release-proof/**"
     verify:
       - "cd FoiliOS && xcodegen generate --spec project.yml"
-      - "xcodebuild archive/export for the approved build"
+      - "Focused simulator tests for FoilIOSTests"
+      - "xcodebuild archive/export for build 11"
       - "IPA metadata inspection for app and keyboard version/build"
+      - "git diff --check"
+      - "Targeted secret/raw-content scan over touched files"
+    stop_if:
+      - "Credentials are missing or would need to be printed."
+      - "Archive/export requires interactive Apple account action."
+      - "IPA metadata does not show app and keyboard 0.1.0 build 11."
+    receipt:
+      result: done
+      task_id: T003
+      note: "notes/T003-worker.md"
+      summary: "Bumped Foil iOS to build 11, regenerated the Xcode project, ran focused simulator tests, archived/exported the Release IPA, and proved both the containing app and keyboard extension have version 0.1.0 build 11."
+      changed_files:
+        - "FoiliOS/project.yml"
+        - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+        - "docs/goals/ios-v0.22-testflight-release-proof/state.yaml"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/T003-worker.md"
+      artifacts:
+        archive: "/tmp/FoilIOS-v022-build11.xcarchive"
+        export: "/tmp/FoilIOS-v022-build11-export"
+        ipa: "/tmp/FoilIOS-v022-build11-export/Foil iOS.ipa"
+        ipa_sha256: "dac9c7f904302ac3d33b8fd1788b17f11aff5ad92a5365d18018c0c081f20a55"
+      metadata:
+        marketing_version: "0.1.0"
+        build: "11"
+        app_bundle_id: "com.neonwatty.FoilIOS"
+        keyboard_bundle_id: "com.neonwatty.FoilIOS.Keyboard"
+      evidence:
+        - "FoiliOS/project.yml changed CURRENT_PROJECT_VERSION from 10 to 11."
+        - "XcodeGen regenerated the project and generated build settings show CURRENT_PROJECT_VERSION 11 / MARKETING_VERSION 0.1.0."
+        - "Focused simulator tests passed: 21 tests, 0 failures."
+        - "Release archive succeeded at /tmp/FoilIOS-v022-build11.xcarchive."
+        - "Export succeeded to /tmp/FoilIOS-v022-build11-export/Foil iOS.ipa."
+        - "IPA metadata inspection showed app and keyboard version 0.1.0 build 11."
+      commands:
+        - cmd: "cd FoiliOS && xcodegen generate --spec project.yml"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS"
+          status: pass
+        - cmd: "xcodebuild archive -project FoilIOS.xcodeproj -scheme FoilIOS"
+          status: pass
+        - cmd: "xcodebuild -exportArchive -archivePath /tmp/FoilIOS-v022-build11.xcarchive"
+          status: pass
+        - cmd: "IPA metadata inspection for app and keyboard Info.plist"
+          status: pass
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: active
+    reasoning_hint: high
+    objective: "After App Store Connect authentication is available, validate/upload/attach build 11, install/update it through TestFlight on iPhone-preview, and run the physical live smoke."
+    allowed_files:
+      - "docs/goals/ios-v0.22-testflight-release-proof/**"
+    verify:
       - "altool validate/upload/build-status"
       - "App Store Connect export-compliance and beta-group attachment checks"
       - "TestFlight install/update on iPhone-preview"
-      - "devicectl installed app metadata confirms the new build"
+      - "devicectl installed app metadata confirms build 11"
       - "Physical live transcription and exact-once insertion smoke"
       - "git diff --check"
       - "Targeted secret/raw-content scan over touched files"
@@ -131,6 +211,30 @@ tasks:
       - "The phone needs unlock/install/user action."
       - "Build processing remains unavailable after a reasonable documented wait."
       - "The installed build metadata does not match the uploaded build."
+    receipt:
+      result: blocked
+      task_id: T004
+      note: "notes/T004-release-progress.md"
+      summary: "Validated, uploaded, export-compliance-cleared, and attached build 11 to Foil Internal Testers. Physical TestFlight install/update and live smoke are blocked because iPhone-preview is locked and CoreDevice cannot mount the developer disk image."
+      completed:
+        - "altool validation reported VERIFY SUCCEEDED with no errors."
+        - "altool upload reported UPLOAD SUCCEEDED with no errors."
+        - "altool build-status reported VALID / VALID / is-on-app-store-connect true."
+        - "App Store Connect REST found build 11, patched usesNonExemptEncryption=false, and confirmed READY_FOR_BETA_TESTING / READY_FOR_BETA_SUBMISSION."
+        - "App Store Connect REST attached build 11 to Foil Internal Testers and verified group membership contains build 11."
+      app_store_connect:
+        delivery_id: "12ba179e-cc4d-4685-920f-ccc3bc916fa9"
+        build_id: "12ba179e-cc4d-4685-920f-ccc3bc916fa9"
+        beta_group_id: "bcca568d-167d-44cb-b952-a410e9c9e10f"
+        processing_state: "VALID"
+        internal_build_state: "READY_FOR_BETA_TESTING"
+        external_build_state: "READY_FOR_BETA_SUBMISSION"
+        uses_non_exempt_encryption: false
+        group_contains_build11: true
+      blocked_on:
+        - "iPhone-preview is visible and paired, but devicectl reports kAMDMobileImageMounterDeviceLocked while mounting the developer disk image."
+        - "WDA is not listening at http://127.0.0.1:8100/status."
+      next_action_after_unblock: "Unlock iPhone-preview, then install/update Foil Dictation build 11 through TestFlight, confirm installed bundle metadata, and run the physical live transcription plus keyboard insertion smoke."
 
   - id: T999
     type: judge
