@@ -1,0 +1,35 @@
+# Xcode
+DerivedData/
+*.xcuserstate
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Build artifacts
+*.ipa
+*.xcarchive
+*.profraw
+*.result
+*.xcresult
+build/
+dist/
+
+# GoalBuddy local board/runtime state
+docs/goals/**/.goalbuddy-board/
+docs/goals/**/notes/visual/
+
+# Local automation caches
+.playwright-cli/
+node_modules/
+
+# Local secrets and generated credentials
+.env
+.env.*
+!.env.example
+*.p8
+*.mobileprovision
+*.cer
+*.p12
+
+# OS/editor noise
+.DS_Store
+*.swp
