@@ -1,0 +1,27 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 21,
+      "textSha256": "41a2f34afae094bc"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 18,
+      "textSha256": "8e228200ce95fac3"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-after-transcribe.json",
+    "nodeCount": 92,
+    "sha256": "dad6ecb2cfd81939990d7bbe3645277b554144fcd25a767fcce1916ab8feed45"
+  },
+  "target": "build11-foil-after-transcribe"
+}
