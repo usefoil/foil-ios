@@ -8,7 +8,7 @@ goal:
   slug: "ios-preview-device-smoke"
   kind: existing_plan
   tranche: "Prove or narrowly block the physical iPhone-preview install, keyboard enablement, recording/transcription, and host-app insertion path for the existing iOS prototype."
-  status: complete
+  status: done
   oracle:
     signal: "A physical-device smoke transcript proves or blocks install/signing, keyboard enablement, containing-app recording/transcription, and text insertion through the custom keyboard on iPhone-preview."
     cadence: "after each Worker package and at final audit"

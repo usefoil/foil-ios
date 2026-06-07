@@ -8,7 +8,7 @@ goal:
   slug: "ios-keyboard-state-and-target-matrix"
   kind: specific
   tranche: "Fix keyboard reset persistence, prove state agreement on iPhone-preview, and expand the privacy-safe host-app insertion/rejection matrix."
-  status: complete
+  status: done
   oracle:
     signal: "After one physical-device insertion through Foil Keyboard, host text changes exactly once and keyboard UI, UserDefaults-derived app state, and canonical App Group file all show idle/no transcript; then target-app matrix rows are recorded without private content."
     cadence: "after each Worker package and at final audit"

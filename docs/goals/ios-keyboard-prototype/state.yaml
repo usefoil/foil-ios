@@ -5,7 +5,7 @@ goal:
   slug: "ios-keyboard-prototype"
   kind: existing_plan
   tranche: "Complete the first overnight feasibility tranche for an iOS containing app plus custom keyboard prototype, including simulator and preview-iPhone evidence."
-  status: active
+  status: done
   oracle:
     signal: "A prototype branch with merged phase PRs proves or falsifies the keyboard handoff, physical-iPhone microphone recording, transcription, and cross-app insertion path."
     cadence: "after each Worker package and at final audit"
@@ -67,7 +67,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-keyboard-prototype/"
     command: "npx goalbuddy board docs/goals/ios-keyboard-prototype"
 
-active_task: T009
+active_task: null
 
 tasks:
   - id: T001
@@ -593,7 +593,7 @@ tasks:
   - id: T009
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: high
     objective: "When iPhone-preview is online, or iPhone-prod is unlocked and approved as fallback, run physical-device install, recording, transcription, keyboard enablement, and insertion proof."
     allowed_files:
@@ -616,7 +616,67 @@ tasks:
       - "iPhone-preview remains offline and iPhone-prod is locked/unavailable."
       - "Physical-device signing or App Group provisioning blocks install."
       - "Testing would expose private messages, contacts, or recordings."
-    receipt: null
+    receipt:
+      result: done
+      task_id: T009
+      note: "notes/T009-physical-proof-closeout.md"
+      summary: "Closed the original physical-preview blocker using the stronger later conveyor receipts. iPhone-preview now has TestFlight build 0.1.0 (11), and v0.22 receipts prove physical install metadata, recording, Groq transcription, Foil Keyboard insertion into Notes, and idle/no-transcript cleanup."
+      changed_files:
+        - "docs/goals/ios-keyboard-prototype/state.yaml"
+        - "docs/goals/ios-keyboard-prototype/notes/T009-physical-proof-closeout.md"
+        - "docs/goals/ios-keyboard-prototype/notes/T010-final-audit.md"
+      evidence:
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-installed-metadata.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-foil-before-record.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-foil-after-record-start.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-foil-after-record-stop.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-foil-after-transcribe.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-app-group-after-transcribe.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-notes-before-insert.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-notes-after-insert.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-app-group-after-insert.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-app-group-cleanup.json"
+      commands:
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-v0.22-testflight-release-proof/state.yaml"
+          status: pass
+        - cmd: "ruby -ryaml status scan over docs/goals/*/state.yaml"
+          status: pass
+        - cmd: "Direct JSON inspection of v0.22 installed metadata, Notes insertion, App Group insert cleanup, and final cleanup receipts"
+          status: pass
+
+  - id: T010
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Final audit of the original overnight keyboard prototype queue after later conveyor boards burned down the physical proof blocker."
+    inputs:
+      - "T001-T009 receipts"
+      - "v0.18-v0.22 GoalBuddy receipts"
+      - "docs/ios-keyboard-host-app-matrix.md"
+    constraints:
+      - "Do not mark complete on simulator-only proof."
+      - "Name residual closed-beta risks separately from the original prototype feasibility oracle."
+    expected_output:
+      - "full_outcome_complete: true | false"
+      - "Strongest realistic failure mode"
+      - "Evidence that rules it out or exact follow-up"
+    receipt:
+      result: done
+      task_id: T010
+      decision: complete
+      full_outcome_complete: true
+      note: "notes/T010-final-audit.md"
+      summary: "The overnight iOS keyboard prototype queue is complete. The original simulator-only and offline-device gaps were later closed by physical iPhone receipts, culminating in TestFlight build 11 install, live transcription, keyboard insertion, and cleanup proof."
+      strongest_realistic_failure_mode:
+        claim: "The parent board could be closed while relying on simulator-only proof for physical iPhone microphone, transcription, or keyboard insertion."
+        evidence_that_rules_it_out:
+          - "v0.22 installed metadata proves iPhone-preview is running com.neonwatty.FoilIOS 0.1.0 bundle version 11."
+          - "v0.22 WDA receipts prove physical recording, saved recording, Groq transcript ready, and complete App Group transcript state."
+          - "v0.22 Notes receipts prove Foil Keyboard active, Insert latest enabled before insertion, sterile phrase count increased from 3 to 4, and Insert latest disabled afterward."
+          - "v0.22 App Group receipts prove post-insert and final cleanup returned to idle/no transcript."
+      residual_risk:
+        - "Closed beta still needs broader host-app matrix and tester onboarding/product hardening, tracked outside this parent feasibility queue."
 
 checks:
   dirty_fingerprint: "initial branch includes pre-existing unrelated untracked docs/goals/youtube-volume-ptt-fix/ and docs/superpowers/plans/2026-06-03-foil-marketing-landing-page.md"
