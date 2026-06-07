@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.22-testflight-release-proof"
   kind: existing_plan
   tranche: "Ship the next TestFlight build after v0.18-v0.21 and prove it on the preview iPhone."
-  status: active
+  status: done
   oracle:
     signal: "A new TestFlight build containing the completed tranche is uploaded, attached, installed on iPhone-preview, confirmed by device metadata, and passes a physical live transcription plus keyboard insertion smoke."
     cadence: "after release readiness Scout, after upload, after install, after physical smoke, and at final audit"
@@ -61,7 +61,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-22-testflight-release-proof/"
     command: "npx goalbuddy board docs/goals/ios-v0.22-testflight-release-proof"
 
-active_task: T004
+active_task: null
 
 tasks:
   - id: T001
@@ -193,7 +193,7 @@ tasks:
   - id: T004
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: high
     objective: "After App Store Connect authentication is available, validate/upload/attach build 11, install/update it through TestFlight on iPhone-preview, and run the physical live smoke."
     allowed_files:
@@ -212,16 +212,35 @@ tasks:
       - "Build processing remains unavailable after a reasonable documented wait."
       - "The installed build metadata does not match the uploaded build."
     receipt:
-      result: blocked
+      result: done
       task_id: T004
-      note: "notes/T004-release-progress.md"
-      summary: "Validated, uploaded, export-compliance-cleared, and attached build 11 to Foil Internal Testers. Physical TestFlight install/update and live smoke are blocked because iPhone-preview is locked and CoreDevice cannot mount the developer disk image."
+      note: "notes/T004-physical-smoke.md"
+      summary: "Validated, uploaded, export-compliance-cleared, attached, installed, and physically smoke-tested build 11. iPhone-preview reports Foil iOS 0.1.0 bundle version 11; build 11 recorded/transcribed a sterile phrase, Foil Keyboard inserted it into Notes, Insert latest disabled after insertion, and App Group state returned to idle/no transcript."
+      changed_files:
+        - "docs/goals/ios-v0.22-testflight-release-proof/state.yaml"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/T004-physical-smoke.md"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/T999-final-audit.md"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-installed-metadata.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-status-live.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-app-group-before.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-foil-before-record.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-foil-after-record-start.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-foil-after-record-stop.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-foil-after-transcribe.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-app-group-after-transcribe.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-notes-before-insert.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-notes-after-insert.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-app-group-after-insert.json"
+        - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts/build11-app-group-cleanup.json"
       completed:
         - "altool validation reported VERIFY SUCCEEDED with no errors."
         - "altool upload reported UPLOAD SUCCEEDED with no errors."
         - "altool build-status reported VALID / VALID / is-on-app-store-connect true."
         - "App Store Connect REST found build 11, patched usesNonExemptEncryption=false, and confirmed READY_FOR_BETA_TESTING / READY_FOR_BETA_SUBMISSION."
         - "App Store Connect REST attached build 11 to Foil Internal Testers and verified group membership contains build 11."
+        - "TestFlight showed Foil Dictation VERSION 0.1.0 Build 11 and the operator approved replacing the existing build 10 app."
+        - "devicectl installed-app metadata reported Foil iOS 0.1.0 bundle version 11."
+        - "WDA live smoke recorded a sterile phrase through Foil iOS, transcribed through Groq, exposed a complete App Group transcript, inserted through Foil Keyboard in Notes, and cleared App Group state."
       app_store_connect:
         delivery_id: "12ba179e-cc4d-4685-920f-ccc3bc916fa9"
         build_id: "12ba179e-cc4d-4685-920f-ccc3bc916fa9"
@@ -231,15 +250,60 @@ tasks:
         external_build_state: "READY_FOR_BETA_SUBMISSION"
         uses_non_exempt_encryption: false
         group_contains_build11: true
-      blocked_on:
-        - "iPhone-preview is visible and paired, but devicectl reports kAMDMobileImageMounterDeviceLocked while mounting the developer disk image."
-        - "WDA is not listening at http://127.0.0.1:8100/status."
-      next_action_after_unblock: "Unlock iPhone-preview, then install/update Foil Dictation build 11 through TestFlight, confirm installed bundle metadata, and run the physical live transcription plus keyboard insertion smoke."
+      installed_device:
+        name: "iPhone-preview"
+        bundle_id: "com.neonwatty.FoilIOS"
+        version: "0.1.0"
+        bundle_version: "11"
+      physical_smoke:
+        wda_url: "http://192.168.1.40:8100"
+        provider: "Groq"
+        target_app: "Notes"
+        app_group_after_transcribe:
+          phase: "complete"
+          has_transcript: true
+          transcript_length: 24
+        notes_phrase_count_before: 3
+        notes_phrase_count_after: 4
+        insert_latest_after_insert_enabled: false
+        app_group_after_insert:
+          phase: "idle"
+          has_transcript: false
+      receipts:
+        - "notes/receipts/build11-installed-metadata.json"
+        - "notes/receipts/build11-status-live.json"
+        - "notes/receipts/build11-app-group-before.json"
+        - "notes/receipts/build11-foil-before-record.json"
+        - "notes/receipts/build11-foil-after-record-start.json"
+        - "notes/receipts/build11-foil-after-record-stop.json"
+        - "notes/receipts/build11-foil-after-transcribe.json"
+        - "notes/receipts/build11-app-group-after-transcribe.json"
+        - "notes/receipts/build11-notes-before-insert.json"
+        - "notes/receipts/build11-notes-after-insert.json"
+        - "notes/receipts/build11-app-group-after-insert.json"
+        - "notes/receipts/build11-app-group-cleanup.json"
+      commands:
+        - cmd: "xcrun devicectl device info apps --device 5320F5AD-2A71-50AC-94FE-207B544B6247"
+          status: pass
+        - cmd: "xcodebuild WebDriverAgentRunner-nodebug against iPhone-preview"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py reset-transcript"
+          status: pass
+        - cmd: "WDA click start-recording-button, play sterile phrase with say, click stop-recording-button, click transcribe-latest-button"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py app-group-summary"
+          status: pass
+        - cmd: "WDA element-click foil-keyboard-insert-latest"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py receipt for Notes pre/post insert"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py reset-transcript final cleanup"
+          status: pass
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Final audit: try to disprove that the physical smoke ran against the new TestFlight build."
     inputs:
@@ -253,3 +317,19 @@ tasks:
       - "full_outcome_complete: true | false"
       - "Strongest realistic failure mode"
       - "Evidence that rules it out or exact follow-up"
+    receipt:
+      result: done
+      task_id: T999
+      decision: complete
+      full_outcome_complete: true
+      note: "notes/T999-final-audit.md"
+      summary: "The v0.22 TestFlight release proof is complete: build 11 is uploaded, beta-ready, attached to Foil Internal Testers, installed on iPhone-preview, confirmed by device metadata, and passed the live app transcription plus Foil Keyboard insertion smoke."
+      strongest_realistic_failure_mode:
+        claim: "The smoke could have run against build 10, a debug install, or stale shared state rather than installed TestFlight build 11."
+        evidence_that_rules_it_out:
+          - "TestFlight presented Foil Dictation VERSION 0.1.0 Build 11 before install."
+          - "After replacement, devicectl reported com.neonwatty.FoilIOS version 0.1.0 bundle version 11."
+          - "The live smoke launched com.neonwatty.FoilIOS after the installed-build metadata check."
+          - "The smoke started from App Group idle/no transcript, produced a fresh complete transcript, inserted through Foil Keyboard, and returned App Group state to idle/no transcript."
+      residual_risk:
+        - "This smoke proves Notes insertion only; broader host-app coverage remains in the target-app matrix boards."

@@ -1,0 +1,36 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "transcribe-latest-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "true",
+      "identifier": "transcribe-latest-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "true"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 15,
+      "textSha256": "b81274bafb79c42c"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-after-record-stop.json",
+    "nodeCount": 81,
+    "sha256": "58b9c8c4fe2d67e27bee25348ef21ec1cb584b5ef9b7f803f58c1e05dc81f5f6"
+  },
+  "target": "build11-foil-after-record-stop"
+}

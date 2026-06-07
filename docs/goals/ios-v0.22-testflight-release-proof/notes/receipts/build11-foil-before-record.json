@@ -1,0 +1,26 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "start-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 19,
+      "textSha256": "98c03410a34a2376"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-before-record.json",
+    "nodeCount": 82,
+    "sha256": "6fee6e8e1b49e88c9f64826929f5b8073bd1b62a847bb372c34c9f983a251ddb"
+  },
+  "target": "build11-foil-before-record"
+}

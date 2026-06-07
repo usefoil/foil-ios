@@ -1,0 +1,36 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "stop-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "true",
+      "identifier": "stop-recording-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "true"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 9,
+      "textSha256": "80e8dd1a5a05f707"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-after-record-start.json",
+    "nodeCount": 84,
+    "sha256": "a2d9147a71452fe7b283f1aea0f1e511d24e1379ab1efe1c4cb4a9c73d3d865e"
+  },
+  "target": "build11-foil-after-record-start"
+}

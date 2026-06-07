@@ -1,0 +1,13 @@
+{
+  "bundleId": "com.neonwatty.FoilIOS",
+  "bundleVersion": "11",
+  "device": "iPhone-preview",
+  "deviceId": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+  "expectedBundleVersion": "11",
+  "found": true,
+  "name": "Foil iOS",
+  "passed": true,
+  "rawLineSha256": "dc4550e6a4237f6d",
+  "schema": "foil.iosPhysicalInstalledMetadata.v1",
+  "version": "0.1.0"
+}
