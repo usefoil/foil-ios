@@ -1,0 +1,17 @@
+{
+  "bytes": 37927,
+  "needlePresence": {
+    "Dictate in Foil": true,
+    "Messages": true,
+    "No transcript yet": true,
+    "Text Message": false,
+    "foil-keyboard-insert-latest": true,
+    "foil-keyboard-root": true,
+    "iMessage": true
+  },
+  "printedRawSource": false,
+  "privateContentPrinted": false,
+  "schema": "foil.iosV028.messagesSterilePrecheck.v1",
+  "sourceSha256": "d2cc7af1ced12fe8a5d9da14886f0c0291c999b3170c8cb14234e813e51bf1e8",
+  "textInputNodeCount": 3
+}
