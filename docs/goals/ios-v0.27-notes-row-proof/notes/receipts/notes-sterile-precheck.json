@@ -1,0 +1,16 @@
+{
+  "bytes": 31997,
+  "needlePresence": {
+    "Dictate in Foil": true,
+    "No transcript yet": true,
+    "Note": true,
+    "Notes": true,
+    "foil-keyboard-insert-latest": true,
+    "foil-keyboard-root": true
+  },
+  "printedRawSource": false,
+  "privateContentPrinted": false,
+  "schema": "foil.iosV027.notesSterilePrecheck.v1",
+  "sourceSha256": "44aed58e6ec7841fdfec22c3650d2dac0ddd41a6812a23bb8d220896b62d4344",
+  "textInputNodeCount": 1
+}

@@ -1,0 +1,114 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.27 Notes Row Proof"
+  slug: "ios-v0.27-notes-row-proof"
+  kind: recovery
+  tranche: "Complete the Notes host-app matrix row after operator sterile setup."
+  status: done
+  oracle:
+    signal: "Sanitized WDA/App Group receipts prove one exact Notes insertion and cleanup."
+    cadence: "after insertion and cleanup"
+    final_proof: "Notes precheck, stage, before-insert, after-insert retry, and App Group cleanup receipts pass."
+  intake:
+    original_request: "notes open / done"
+    interpreted_outcome: "Use the operator-opened blank Notes editor to run the Notes insertion row."
+    input_shape: recovery
+    audience: "Foil owner/developer preparing closed beta"
+    authority: approved
+    proof_type: demo
+    completion_proof: "Notes value count exactly one and App Group idle/no transcript."
+    likely_misfire: "Treating a consumed transcript as insertion proof when the Notes field did not mutate."
+    blind_spots_considered:
+      - "Keyboard coordinates differ across host apps."
+      - "Raw Notes content must not be committed."
+      - "App Group cleanup alone is insufficient."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-27-notes-row-proof/"
+    command: "npx goalbuddy board docs/goals/ios-v0.27-notes-row-proof"
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Run the Notes sterile insertion row."
+    allowed_files:
+      - "docs/goals/ios-v0.27-notes-row-proof/**"
+    verify:
+      - "WDA ready through direct URL."
+      - "Operator-opened sterile Notes editor with Foil Keyboard visible."
+      - "Stage sterile transcript."
+      - "Verify Insert latest enabled before insertion."
+      - "Tap visible Insert latest."
+      - "Verify value count exactly one and App Group idle/no transcript."
+    stop_if:
+      - "Notes opens to private list or private note."
+      - "Raw Notes source/screenshot would need to be committed."
+    expected_output:
+      - "notes/T001-notes-proof.md"
+      - "Sanitized receipts under notes/receipts/"
+    acceptance_criteria:
+      - "Pre-insert receipt passes."
+      - "Post-insert receipt proves sterile value count exactly one."
+      - "App Group cleanup receipt proves idle/no transcript."
+    receipt:
+      result: done
+      task_id: T001
+      note: "notes/T001-notes-proof.md"
+      summary: "Notes insertion passed after using the visible Notes keyboard button coordinate; the first missed tap is preserved as a failure-mode receipt."
+      evidence:
+        precheck: "notes/receipts/notes-sterile-precheck.json"
+        staged: "notes/receipts/notes-stage-transcript.json"
+        before_insert: "notes/receipts/notes-before-insert.json"
+        failed_first_tap: "notes/receipts/notes-after-insert.json"
+        successful_retry: "notes/receipts/notes-after-insert-retry.json"
+        cleanup: "notes/receipts/notes-app-group-after-insert-retry.json"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit Notes row proof."
+    inputs:
+      - "T001 receipts"
+      - "docs/acceptance-evidence.md"
+    constraints:
+      - "Do not claim Messages or Mail."
+    expected_output:
+      - "notes/T999-final-audit.md"
+    acceptance_criteria:
+      - "Strongest realistic failure mode is named and ruled out."
+      - "Receipt parsing, board rendering, git diff check, and privacy scan pass."
+    receipt:
+      result: notes_row_pass
+      task_id: T999
+      decision: notes_row_pass
+      note: "notes/T999-final-audit.md"
+      full_outcome_complete: true
+      summary: "Notes row passed with exact-once insertion and App Group cleanup."
