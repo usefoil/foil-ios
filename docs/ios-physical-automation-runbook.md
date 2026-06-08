@@ -95,7 +95,15 @@ To print this command from the harness:
 scripts/ios-physical-harness.py wda-command
 ```
 
-Then poll:
+Then poll the URL printed by WDA. When the log includes a line like
+`ServerURLHere->http://192.168.1.40:8100<-ServerURLHere`, use that direct
+device URL:
+
+```bash
+curl -sS --max-time 2 http://192.168.1.40:8100/status
+```
+
+If a local tunnel/forward is active, localhost may also work:
 
 ```bash
 curl -sS --max-time 2 http://127.0.0.1:8100/status
@@ -104,6 +112,14 @@ curl -sS --max-time 2 http://127.0.0.1:8100/status
 If WDA reports ready, later WDA HTTP calls can use `http://127.0.0.1:8100`.
 Older receipts also used `http://192.168.1.40:8100`; prefer localhost when a
 tunnel/forward is active.
+
+If localhost fails but the direct `ServerURLHere` URL succeeds, pass it to the
+harness explicitly:
+
+```bash
+scripts/ios-physical-harness.py status --wda-url http://192.168.1.40:8100
+scripts/ios-physical-harness.py session --wda-url http://192.168.1.40:8100
+```
 
 ## Known Automation-Mode Timeout
 
@@ -116,9 +132,12 @@ Timed out while enabling automation mode.
 ```
 
 This failure boundary is after local build/signing and before WDA starts
-serving on port 8100. A fresh local DerivedData path reproduced the same
-failure, so do not spend more time on Foil product code or stale build products
-until the device-side automation state is checked.
+serving. A fresh local DerivedData path reproduced the same failure, so do not
+spend more time on Foil product code or stale build products until the
+device-side automation state is checked. After the operator confirmed the device
+looked healthy, WDA recovered and printed `ServerURLHere` for
+`http://192.168.1.40:8100`; localhost remained unavailable, but the direct URL
+accepted status, session, source, and tap commands.
 
 Operator-side recovery checklist:
 

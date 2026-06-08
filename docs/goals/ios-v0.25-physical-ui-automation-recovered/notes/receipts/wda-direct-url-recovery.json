@@ -1,0 +1,31 @@
+{
+  "directUrlReady": true,
+  "hostAppInsertionProven": false,
+  "localhostReady": false,
+  "nextStep": "Open a sterile host-app text field and rerun the Apple app insertion matrix using --wda-url http://192.168.1.40:8100.",
+  "privateContentCommitted": false,
+  "schema": "foil.iosPhysicalAutomation.recovered.v1",
+  "sessionCreated": true,
+  "sessionIdHash": "526052a0a19be8a1",
+  "sourceFetch": {
+    "bytes": 22415,
+    "foilUiNeedlesPresent": {
+      "Foil": true,
+      "Microphone": true,
+      "Provider": true,
+      "Record": true,
+      "Transcribe": true
+    },
+    "outputPath": "/tmp/foil-ios-wda-foil-source.json",
+    "printedRawSource": false,
+    "sha256": "c323d38cd68afd23da6d0ba6b2bb11a139901ea81bc4d361bfdab22b7a3709dc"
+  },
+  "tapProof": {
+    "coordinateSurface": "Foil-owned visible surface",
+    "endpoint": "/session/<session>/wda/tap",
+    "responseBytes": 76,
+    "returnedSuccess": true
+  },
+  "timestampLocal": "2026-06-08T11:45:00-07:00",
+  "wdaUrl": "http://192.168.1.40:8100"
+}
