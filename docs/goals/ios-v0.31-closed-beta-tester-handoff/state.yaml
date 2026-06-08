@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.31-closed-beta-tester-handoff"
   kind: specific
   tranche: "Fresh tester-facing handoff for build 11 narrow internal beta."
-  status: live
+  status: done
   oracle:
     signal: "Tester handoff doc is current, actionable, privacy-safe, and caveated."
     cadence: "after copy draft and final scan"
@@ -30,13 +30,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-31-closed-beta-tester-handoff/"
     command: "npx goalbuddy board docs/goals/ios-v0.31-closed-beta-tester-handoff"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Inventory stale tester handoff copy and current proof boundaries."
     allowed_files:
       - "docs/ios-testflight-feedback-v0.7.md"
@@ -50,11 +50,14 @@ tasks:
       - "Note lists stale copy, current replacement facts, and recommended doc action."
     expected_output:
       - "notes/T001-copy-inventory.md"
+    receipt:
+      result: done
+      note: "notes/T001-copy-inventory.md inventories stale build-7 copy and maps current v0.30/v0.31 claim boundaries."
 
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Write the fresh closed-beta tester handoff."
     allowed_files:
       - "docs/ios-closed-beta-tester-handoff.md"
@@ -73,11 +76,14 @@ tasks:
     expected_output:
       - "docs/ios-closed-beta-tester-handoff.md"
       - "notes/T002-handoff-worker.md"
+    receipt:
+      result: done
+      note: "Fresh build-11 handoff written, old v0.7 doc marked superseded, and caveats/feedback template included."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Audit tester handoff for stale or unsafe claims."
     verify:
       - "Run rg scans for build 7, Messages not tested, arbitrary app support, Mail pass, delivery proof, and private screenshot requests."
@@ -88,3 +94,9 @@ tasks:
     expected_output:
       - "notes/T999-final-audit.md"
       - "notes/receipts/copy-scan.json"
+    receipt:
+      result: done
+      strongest_failure_mode: "Tester follows stale build-7 or overbroad support copy."
+      evidence:
+        - "docs/goals/ios-v0.31-closed-beta-tester-handoff/notes/receipts/copy-scan.json"
+        - "docs/goals/ios-v0.31-closed-beta-tester-handoff/notes/T999-final-audit.md"
