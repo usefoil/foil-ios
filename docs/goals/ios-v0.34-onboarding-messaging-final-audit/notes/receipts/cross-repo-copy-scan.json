@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "foil_ios": {
+    "repo": "/Users/neonwatty/Desktop/foil-ios",
+    "current_copy_hits": {
+      "superseded_build_7_doc": "docs/ios-testflight-feedback-v0.7.md retains historical build-7 copy but begins with a superseded notice pointing to docs/ios-closed-beta-tester-handoff.md.",
+      "safe_current_docs": "README.md, docs/ios-closed-beta-tester-handoff.md, and docs/ios-keyboard-host-app-matrix.md contain only bounded claims or anti-claims: no arbitrary app support, no Mail support, no Messages delivery/private-thread claim, and draft-only Messages proof."
+    },
+    "open_prs": 0,
+    "blocking_issues": [],
+    "accepted_caveats": [
+      "https://github.com/mean-weasel/foil-ios/issues/12"
+    ]
+  },
+  "foil": {
+    "repo": "/Users/neonwatty/Desktop/foil",
+    "current_copy_hits": {
+      "expected_public_ios_rows": "Competitor public iOS app rows remain comparison context.",
+      "bounded_foil_copy": "Foil copy says closed iPhone preview, custom keyboard, Full Access, verified host-app rows, Mail deferred, and not public App Store availability.",
+      "anti_claims": "works everywhere and iOS keyboard works everywhere appear only as anti-claims or quoted claims to avoid."
+    },
+    "open_prs": 0,
+    "merged_cleanup_prs": [
+      "https://github.com/mean-weasel/foil/pull/283",
+      "https://github.com/mean-weasel/foil/pull/284"
+    ]
+  },
+  "private_media_scan": {
+    "passed": true,
+    "result": "No .mov, .mp4, or ScreenRecording* artifacts found under current onboarding/messaging board directories."
+  },
+  "strongest_failure_checked": "Current tester/public copy overclaims Foil iOS readiness beyond closed preview, custom-keyboard setup, verified host-app rows, and accepted Mail/Messages caveats."
+}

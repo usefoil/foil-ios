@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.31-onboarding-messaging-conveyor"
   kind: existing_plan
   tranche: "Prepare a conveyor for iOS beta tester handoff, onboarding polish, landing-page messaging, and final copy audit."
-  status: live
+  status: done
   oracle:
     signal: "All child boards complete or precisely blocked; final audit proves no overclaiming."
     cadence: "after each child board and at final audit"
@@ -49,7 +49,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-31-onboarding-messaging-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.31-onboarding-messaging-conveyor"
 
-active_task: T004
+active_task: null
 
 tasks:
   - id: T001
@@ -136,7 +136,7 @@ tasks:
   - id: T004
     type: judge
     assignee: Judge
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Run the final onboarding/messaging copy audit child board."
     allowed_files:
@@ -156,5 +156,7 @@ tasks:
       - "Both repos are clean/synced or list exact PRs/blockers."
       - "Next action after the conveyor is clear."
     receipt:
-      result: pending
+      result: done
       child_board: "docs/goals/ios-v0.34-onboarding-messaging-final-audit/goal.md"
+      decision: "go_after_fresh_testflight_build_and_narrow_physical_smoke"
+      note: "Final audit passed copy/docs/onboarding consistency. Next closed-beta action is a fresh TestFlight build with v0.32 onboarding polish, then narrow physical smoke before widening testers."

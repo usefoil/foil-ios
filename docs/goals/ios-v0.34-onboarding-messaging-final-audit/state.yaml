@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.34-onboarding-messaging-final-audit"
   kind: audit
   tranche: "Final cross-repo audit for iOS onboarding and messaging readiness."
-  status: live
+  status: done
   oracle:
     signal: "Cross-repo copy, docs, app onboarding, and PR state are internally consistent."
     cadence: "after all previous child boards"
@@ -30,13 +30,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-34-onboarding-messaging-final-audit/"
     command: "npx goalbuddy board docs/goals/ios-v0.34-onboarding-messaging-final-audit"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: judge
     assignee: Judge
-    status: active
+    status: done
     objective: "Audit child board completion and repo/PR state."
     verify:
       - "Check v0.31, v0.32, and v0.33 board statuses."
@@ -47,11 +47,14 @@ tasks:
       - "Open PRs are merged, queued, or explicitly blocking."
     expected_output:
       - "notes/T001-board-and-pr-audit.md"
+    receipt:
+      result: done
+      note: "Prerequisite boards are done, open PR count is zero in both repos, and only accepted follow-up issues remain."
 
   - id: T002
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Run cross-repo stale-copy and overclaim scans."
     allowed_files:
       - "/Users/neonwatty/Desktop/foil-ios/**"
@@ -64,11 +67,14 @@ tasks:
     expected_output:
       - "notes/receipts/cross-repo-copy-scan.json"
       - "notes/T002-copy-scan.md"
+    receipt:
+      result: done
+      note: "Cross-repo scans found only expected caveats, historical superseded context, competitor context, or explicit anti-claims."
 
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Make the next closed-beta action recommendation."
     verify:
       - "Compare final state against v0.30 readiness caveats."
@@ -78,3 +84,7 @@ tasks:
       - "Strongest realistic failure mode is named and ruled out or accepted as caveat."
     expected_output:
       - "notes/T999-final-audit.md"
+    receipt:
+      result: done
+      decision: "go_after_fresh_testflight_build_and_narrow_physical_smoke"
+      note: "Copy prep is complete; next action is a fresh TestFlight build containing onboarding polish, followed by narrow physical smoke before widening testers."
