@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.33-foil-landing-ios-preview-messaging"
   kind: specific
   tranche: "Add honest iOS preview messaging to the main Foil landing page."
-  status: live
+  status: done
   oracle:
     signal: "Landing page/browser proof and copy scans show accurate iOS preview messaging."
     cadence: "after implementation and browser verification"
@@ -30,13 +30,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-33-foil-landing-ios-preview-messaging/"
     command: "npx goalbuddy board docs/goals/ios-v0.33-foil-landing-ios-preview-messaging"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Inventory iOS references on the main Foil public site."
     allowed_files:
       - "/Users/neonwatty/Desktop/foil/site/**"
@@ -51,11 +51,14 @@ tasks:
       - "Scout note names exact files, current copy gaps, and proposed section outline."
     expected_output:
       - "notes/T001-public-copy-inventory.md"
+    receipt:
+      result: done
+      note: "Public-site inventory identified the landing-page insertion point, blog copy gaps, and bounded iOS preview claim matrix."
 
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Implement accurate landing-page iOS preview messaging."
     allowed_files:
       - "/Users/neonwatty/Desktop/foil/site/index.html"
@@ -76,11 +79,16 @@ tasks:
     expected_output:
       - "notes/T002-landing-worker.md"
       - "notes/receipts/browser-proof.json"
+    receipt:
+      result: done
+      main_repo_pr: "https://github.com/mean-weasel/foil/pull/283"
+      main_repo_merge_commit: "f8e83915111d505997b84ae27a2c4125f2e44b7b"
+      note: "Landing page and comparison copy updated; desktop/mobile browser proof passed with no iPhone preview section overflow."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Audit public iOS messaging for overclaiming and visual regressions."
     verify:
       - "Scan public site for broad iOS support, public app availability, Mail pass, and delivery claims."
@@ -91,3 +99,6 @@ tasks:
       - "PR/commit path is explicit for the main Foil repo."
     expected_output:
       - "notes/T999-final-audit.md"
+    receipt:
+      result: done
+      note: "Audit ruled out public/broad iOS overclaims using merged-site copy scan, browser proof, CI/merge evidence, and screenshot receipts."

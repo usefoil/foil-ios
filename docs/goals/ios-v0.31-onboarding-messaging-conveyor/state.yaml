@@ -49,7 +49,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-31-onboarding-messaging-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.31-onboarding-messaging-conveyor"
 
-active_task: T003
+active_task: T004
 
 tasks:
   - id: T001
@@ -107,7 +107,7 @@ tasks:
   - id: T003
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Run the landing-page iOS preview messaging child board."
     allowed_files:
@@ -127,13 +127,16 @@ tasks:
       - "CTA routes to request/join beta or docs without claiming public availability."
       - "Blog/comparison copy remains consistent with the v0.30 claim boundary."
     receipt:
-      result: pending
+      result: done
       child_board: "docs/goals/ios-v0.33-foil-landing-ios-preview-messaging/goal.md"
+      main_repo_pr: "https://github.com/mean-weasel/foil/pull/283"
+      main_repo_merge_commit: "f8e83915111d505997b84ae27a2c4125f2e44b7b"
+      note: "Main Foil landing page now has bounded iPhone preview messaging; comparison copy updated; desktop/mobile browser proof and copy scan passed."
 
   - id: T004
     type: judge
     assignee: Judge
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Run the final onboarding/messaging copy audit child board."
     allowed_files:

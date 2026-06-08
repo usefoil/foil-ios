@@ -1,0 +1,48 @@
+{
+  "url": "http://127.0.0.1:41738/",
+  "checks": [
+    {
+      "name": "desktop",
+      "screenshot": "/Users/neonwatty/Desktop/foil-ios/docs/goals/ios-v0.33-foil-landing-ios-preview-messaging/notes/receipts/landing-ios-preview-desktop.png",
+      "visibleTexts": [
+        "Foil for iPhone is a closed internal beta that uses a custom keyboard, not a public iOS app yet.",
+        "Closed beta preview",
+        "Allow Full Access",
+        "Notes blank editor insertion",
+        "Safari normal text fields",
+        "Messages fake-recipient draft insertion, without sending",
+        "Mail compose is deferred",
+        "Secure fields should reject the custom keyboard",
+        "\n              This is not broad iPhone app support or public App Store availability.\n              Beta access should follow the verified host-app matrix and current\n              TestFlight instructions.\n            "
+      ],
+      "layout": {
+        "innerWidth": 1440,
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "sectionOverflow": []
+      }
+    },
+    {
+      "name": "mobile",
+      "screenshot": "/Users/neonwatty/Desktop/foil-ios/docs/goals/ios-v0.33-foil-landing-ios-preview-messaging/notes/receipts/landing-ios-preview-mobile.png",
+      "visibleTexts": [
+        "Foil for iPhone is a closed internal beta that uses a custom keyboard, not a public iOS app yet.",
+        "Closed beta preview",
+        "Allow Full Access",
+        "Notes blank editor insertion",
+        "Safari normal text fields",
+        "Messages fake-recipient draft insertion, without sending",
+        "Mail compose is deferred",
+        "Secure fields should reject the custom keyboard",
+        "\n              This is not broad iPhone app support or public App Store availability.\n              Beta access should follow the verified host-app matrix and current\n              TestFlight instructions.\n            "
+      ],
+      "layout": {
+        "innerWidth": 390,
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "sectionOverflow": []
+      }
+    }
+  ],
+  "passed": true
+}

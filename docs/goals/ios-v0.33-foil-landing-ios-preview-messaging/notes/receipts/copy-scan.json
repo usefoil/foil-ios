@@ -1,0 +1,11 @@
+{
+  "repo": "/Users/neonwatty/Desktop/foil",
+  "command": "rg -n \"iOS|iPhone|TestFlight|Mail|Messages|Full Access|public iOS|works everywhere|arbitrary app|App Store|keyboard\" site README.md docs/superpowers 2>/dev/null || true",
+  "passed": true,
+  "summary": {
+    "landing_page": "Contains bounded iPhone preview copy: closed internal beta, custom keyboard, Allow Full Access, verified Notes/Safari/Messages draft rows, Mail deferred, secure-field caveat, and no public App Store claim.",
+    "comparison_blogs": "Foil iOS references now describe a closed iPhone preview and verified host-app rows only; competitor public iOS references remain comparison context.",
+    "legacy_docs": "Remaining keyboard hits under docs/superpowers are macOS keyboard-event design notes, not public iOS availability claims."
+  },
+  "strongest_failure_checked": "Broad or public iOS support overclaim in public-site copy."
+}
