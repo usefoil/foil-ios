@@ -35,52 +35,8 @@ struct ContentView: View {
                         transcriptReviewPanel(transcriptReviewPresentation)
                     }
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Keyboard setup")
-                            .font(.headline)
-
-                        setupRow(
-                            title: "Add Foil Keyboard",
-                            detail: "Settings > General > Keyboard > Keyboards",
-                            systemImage: "keyboard"
-                        )
-                        setupRow(
-                            title: "Allow Full Access",
-                            detail: "Required so Foil Keyboard can read and clear dictation state",
-                            systemImage: "checkmark.shield"
-                        )
-                        setupRow(
-                            title: "Microphone",
-                            detail: microphonePermissionSummary,
-                            systemImage: "mic"
-                        )
-                        setupRow(
-                            title: "Provider",
-                            detail: transcription.credentialSummary,
-                            systemImage: transcription.hasConfiguredAPIKey ? "key.fill" : "key"
-                        )
-                        providerCredentialEditor
-                        setupRow(
-                            title: "Keyboard health",
-                            detail: keyboardHealthSummary,
-                            systemImage: keyboardHealth.fullAccessState == .enabled ? "checkmark.circle" : "exclamationmark.circle"
-                        )
-                        setupRow(
-                            title: "Shared state",
-                            detail: storageHealthSummary,
-                            systemImage: "externaldrive"
-                        )
-
-                        Button {
-                            bridge.reset()
-                            refresh()
-                        } label: {
-                            Label("Reset shared state", systemImage: "arrow.counterclockwise")
-                        }
-                        .buttonStyle(.bordered)
-                        .accessibilityIdentifier("setup-reset-shared-state-button")
-                    }
-                    .font(.callout)
+                    setupChecklistPanel
+                    betaGuidancePanel
 
                     if let handoffGuidance {
                         VStack(alignment: .leading, spacing: 10) {
@@ -375,6 +331,91 @@ struct ContentView: View {
             }
         }
         .accessibilityElement(children: .contain)
+    }
+
+    private var setupChecklistPanel: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Closed beta setup")
+                    .font(.headline)
+                Text("Complete these once, then use Foil from the keyboard in a safe text field.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(FoilDictationLoopPresenter.setupChecklistPresentation()) { item in
+                    setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
+                }
+            }
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Current status")
+                    .font(.callout.weight(.semibold))
+
+                setupRow(
+                    title: "Microphone",
+                    detail: microphonePermissionSummary,
+                    systemImage: "mic"
+                )
+                setupRow(
+                    title: "Provider",
+                    detail: transcription.credentialSummary,
+                    systemImage: transcription.hasConfiguredAPIKey ? "key.fill" : "key"
+                )
+                providerCredentialEditor
+                setupRow(
+                    title: "Keyboard health",
+                    detail: keyboardHealthSummary,
+                    systemImage: keyboardHealth.fullAccessState == .enabled ? "checkmark.circle" : "exclamationmark.circle"
+                )
+                setupRow(
+                    title: "Shared state",
+                    detail: storageHealthSummary,
+                    systemImage: "externaldrive"
+                )
+
+                Button {
+                    bridge.reset()
+                    refresh()
+                } label: {
+                    Label("Reset shared state", systemImage: "arrow.counterclockwise")
+                }
+                .buttonStyle(.bordered)
+                .accessibilityIdentifier("setup-reset-shared-state-button")
+            }
+        }
+        .font(.callout)
+        .padding(14)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(.secondary.opacity(0.18))
+        )
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("closed-beta-setup-checklist")
+    }
+
+    private var betaGuidancePanel: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Where to test")
+                .font(.headline)
+
+            ForEach(FoilDictationLoopPresenter.betaGuidancePresentation()) { item in
+                setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
+            }
+        }
+        .font(.callout)
+        .padding(14)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(.secondary.opacity(0.18))
+        )
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("closed-beta-target-guidance")
     }
 
     @ViewBuilder

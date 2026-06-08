@@ -2,6 +2,43 @@ import XCTest
 @testable import FoilIOS
 
 final class FoilDictationLoopPresentationTests: XCTestCase {
+    func testSetupChecklistCoversClosedBetaJourneyInOrder() {
+        let items = FoilDictationLoopPresenter.setupChecklistPresentation()
+
+        XCTAssertEqual(
+            items.map(\.title),
+            [
+                "Provider key",
+                "Microphone",
+                "Add Foil Keyboard",
+                "Allow Full Access",
+                "Record in Foil",
+                "Return and insert",
+                "Reset when stale"
+            ]
+        )
+        XCTAssertTrue(items[0].detail.contains("Save"))
+        XCTAssertTrue(items[1].detail.contains("Allow microphone"))
+        XCTAssertTrue(items[2].detail.contains("Settings > General > Keyboard"))
+        XCTAssertTrue(items[3].detail.contains("read and clear shared dictation state"))
+        XCTAssertTrue(items[4].detail.contains("Create transcript"))
+        XCTAssertTrue(items[5].detail.contains("Insert latest once"))
+        XCTAssertTrue(items[6].detail.contains("Reset shared state"))
+    }
+
+    func testBetaGuidanceNamesSafeTargetsAndClaimBoundaries() {
+        let items = FoilDictationLoopPresenter.betaGuidancePresentation()
+        let combined = items.map { "\($0.title) \($0.detail)" }.joined(separator: " ")
+
+        XCTAssertTrue(combined.contains("Notes"))
+        XCTAssertTrue(combined.contains("Safari"))
+        XCTAssertTrue(combined.contains("Messages draft"))
+        XCTAssertTrue(combined.contains("Do not send"))
+        XCTAssertTrue(combined.contains("Mail is deferred"))
+        XCTAssertTrue(combined.contains("Secure fields should reject Foil Keyboard"))
+        XCTAssertTrue(combined.contains("not broad iPhone app support"))
+    }
+
     func testAppReadyStateTellsUserToRecordInFoilAndReturnToKeyboard() {
         let presentation = FoilDictationLoopPresenter.appPresentation(
             snapshot: .initial,

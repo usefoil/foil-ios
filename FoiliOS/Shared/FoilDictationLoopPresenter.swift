@@ -92,7 +92,88 @@ struct FoilTranscriptReviewPresentation: Equatable {
     var canRetryRecording: Bool
 }
 
+struct FoilSetupChecklistItem: Equatable, Identifiable {
+    var title: String
+    var detail: String
+    var systemImage: String
+
+    var id: String { title }
+}
+
+struct FoilBetaGuidanceItem: Equatable, Identifiable {
+    var title: String
+    var detail: String
+    var systemImage: String
+
+    var id: String { title }
+}
+
 enum FoilDictationLoopPresenter {
+    static func setupChecklistPresentation() -> [FoilSetupChecklistItem] {
+        [
+            FoilSetupChecklistItem(
+                title: "Provider key",
+                detail: "Save your Groq provider key once so Foil can create transcripts.",
+                systemImage: "key"
+            ),
+            FoilSetupChecklistItem(
+                title: "Microphone",
+                detail: "Allow microphone access when prompted before recording.",
+                systemImage: "mic"
+            ),
+            FoilSetupChecklistItem(
+                title: "Add Foil Keyboard",
+                detail: "Settings > General > Keyboard > Keyboards > Add New Keyboard.",
+                systemImage: "keyboard"
+            ),
+            FoilSetupChecklistItem(
+                title: "Allow Full Access",
+                detail: "Enable Allow Full Access so Foil Keyboard can read and clear shared dictation state.",
+                systemImage: "checkmark.shield"
+            ),
+            FoilSetupChecklistItem(
+                title: "Record in Foil",
+                detail: "Record in Foil, finish recording, then Create transcript.",
+                systemImage: "record.circle"
+            ),
+            FoilSetupChecklistItem(
+                title: "Return and insert",
+                detail: "Return to a safe text field and tap Insert latest once in Foil Keyboard.",
+                systemImage: "arrow.turn.down.left"
+            ),
+            FoilSetupChecklistItem(
+                title: "Reset when stale",
+                detail: "Use Reset shared state if the keyboard shows stale or incorrect text.",
+                systemImage: "arrow.counterclockwise"
+            )
+        ]
+    }
+
+    static func betaGuidancePresentation() -> [FoilBetaGuidanceItem] {
+        [
+            FoilBetaGuidanceItem(
+                title: "Safe targets",
+                detail: "Use blank Notes, Safari normal text fields, or a Messages draft with safe test text.",
+                systemImage: "checkmark.circle"
+            ),
+            FoilBetaGuidanceItem(
+                title: "Messages draft only",
+                detail: "Messages is for draft insertion testing only. Do not send test messages.",
+                systemImage: "message"
+            ),
+            FoilBetaGuidanceItem(
+                title: "Deferred targets",
+                detail: "Mail is deferred, and Secure fields should reject Foil Keyboard.",
+                systemImage: "exclamationmark.triangle"
+            ),
+            FoilBetaGuidanceItem(
+                title: "Narrow beta",
+                detail: "This tests the record, return, and insert loop; it is not broad iPhone app support.",
+                systemImage: "scope"
+            )
+        ]
+    }
+
     static func transcriptReviewPresentation(
         snapshot: FoilKeyboardSnapshot,
         hasSavedRecording: Bool

@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.32-ios-app-onboarding-polish"
   kind: specific
   tranche: "Polish in-app setup and onboarding for closed beta testers."
-  status: live
+  status: done
   oracle:
     signal: "Swift tests and UI proof show a coherent first-run/setup checklist and recovery path."
     cadence: "after implementation and visual/test verification"
@@ -30,13 +30,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-32-ios-app-onboarding-polish/"
     command: "npx goalbuddy board docs/goals/ios-v0.32-ios-app-onboarding-polish"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Inventory current iOS onboarding/setup surfaces and test coverage."
     allowed_files:
       - "FoiliOS/FoilIOSApp/ContentView.swift"
@@ -50,11 +50,14 @@ tasks:
       - "Scout note names the smallest safe implementation slice and exact files."
     expected_output:
       - "notes/T001-onboarding-inventory.md"
+    receipt:
+      result: done
+      note: "notes/T001-onboarding-inventory.md maps current setup surfaces, beta journey gaps, and the smallest safe implementation slice."
 
   - id: T002
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Approve a bounded onboarding implementation slice."
     verify:
       - "Choose whether this board touches only presenter/copy or also SwiftUI layout/actions."
@@ -63,11 +66,14 @@ tasks:
       - "Worker has allowed files, stop conditions, and test commands."
     expected_output:
       - "notes/T002-slice-approval.md"
+    receipt:
+      result: done
+      note: "notes/T002-slice-approval.md approves presenter-plus-SwiftUI layout with TDD and simulator proof."
 
   - id: T003
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Implement the approved onboarding polish slice."
     allowed_files:
       - "FoiliOS/FoilIOSApp/**"
@@ -88,14 +94,23 @@ tasks:
     expected_output:
       - "notes/T003-worker.md"
       - "notes/receipts/test-output.json"
+    receipt:
+      result: done
+      note: "notes/T003-worker.md and notes/receipts/test-output.json record red/green TDD, full tests, simulator build, and UI screenshot proof."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Audit onboarding polish against beta-user confusion."
     acceptance_criteria:
       - "Final audit names and rules out the strongest setup-confusion failure mode."
       - "Residual risks and next build/TestFlight needs are explicit."
     expected_output:
       - "notes/T999-final-audit.md"
+    receipt:
+      result: done
+      strongest_failure_mode: "Polished UI still leaves tester setup-confused or overclaims host-app support."
+      evidence:
+        - "docs/goals/ios-v0.32-ios-app-onboarding-polish/notes/T999-final-audit.md"
+        - "docs/goals/ios-v0.32-ios-app-onboarding-polish/notes/receipts/test-output.json"

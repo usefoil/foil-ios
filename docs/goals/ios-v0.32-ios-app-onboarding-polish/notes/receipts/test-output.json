@@ -1,0 +1,60 @@
+{
+  "schema": "foil.iosV032.onboardingPolish.testOutput.v1",
+  "red": {
+    "command": "xcodebuild test -project FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests",
+    "exitCode": 65,
+    "expectedFailure": true,
+    "failureSummary": [
+      "Type 'FoilDictationLoopPresenter' has no member 'setupChecklistPresentation'",
+      "Type 'FoilDictationLoopPresenter' has no member 'betaGuidancePresentation'"
+    ],
+    "xcresult": "/Users/neonwatty/Library/Developer/Xcode/DerivedData/FoilIOS-calveemrtlizwkdcmikuofkcutqp/Logs/Test/Test-FoilIOS-2026.06.08_16-00-53--0700.xcresult"
+  },
+  "green": {
+    "focusedPresentationTests": {
+      "command": "xcodebuild test -project FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests",
+      "exitCode": 0,
+      "tests": 15,
+      "failures": 0,
+      "xcresult": "/Users/neonwatty/Library/Developer/Xcode/DerivedData/FoilIOS-calveemrtlizwkdcmikuofkcutqp/Logs/Test/Test-FoilIOS-2026.06.08_16-01-54--0700.xcresult"
+    },
+    "fullTests": {
+      "command": "xcodebuild test -project FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'",
+      "exitCode": 0,
+      "tests": 23,
+      "failures": 0,
+      "xcresult": "/Users/neonwatty/Library/Developer/Xcode/DerivedData/FoilIOS-calveemrtlizwkdcmikuofkcutqp/Logs/Test/Test-FoilIOS-2026.06.08_16-02-22--0700.xcresult"
+    },
+    "simulatorBuild": {
+      "command": "xcodebuild build -project FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'",
+      "exitCode": 0,
+      "summary": "** BUILD SUCCEEDED **"
+    },
+    "xcodeBuildMCPBuildRun": {
+      "status": "SUCCEEDED",
+      "warnings": 0,
+      "errors": 0,
+      "simulatorId": "8C27AB74-4C3D-4E95-8D5F-837BC8FE4CEF",
+      "buildLogPath": "/Users/neonwatty/Library/Developer/XcodeBuildMCP/workspaces/foil-fc4876127f01/logs/build_run_sim_2026-06-08T23-02-53-350Z_pid99907_f558a242.log"
+    }
+  },
+  "uiProof": {
+    "semanticSnapshotVisibleText": [
+      "Closed beta setup",
+      "Provider key",
+      "Add Foil Keyboard",
+      "Allow Full Access",
+      "Return and insert",
+      "Reset when stale",
+      "Where to test",
+      "Messages draft only",
+      "Mail is deferred",
+      "Secure fields should reject Foil Keyboard"
+    ],
+    "screenshots": [
+      "docs/goals/ios-v0.32-ios-app-onboarding-polish/notes/receipts/onboarding-setup-top-sim.jpg",
+      "docs/goals/ios-v0.32-ios-app-onboarding-polish/notes/receipts/onboarding-guidance-sim.jpg"
+    ]
+  },
+  "passed": true
+}

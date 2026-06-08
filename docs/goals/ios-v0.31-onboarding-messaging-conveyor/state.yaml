@@ -49,7 +49,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-31-onboarding-messaging-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.31-onboarding-messaging-conveyor"
 
-active_task: T002
+active_task: T003
 
 tasks:
   - id: T001
@@ -82,7 +82,7 @@ tasks:
   - id: T002
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Run the iOS app onboarding polish child board."
     allowed_files:
@@ -100,13 +100,14 @@ tasks:
       - "Recovery copy covers stale keyboard and Full Access-off states."
       - "Tests cover each new presenter/copy state."
     receipt:
-      result: pending
+      result: done
       child_board: "docs/goals/ios-v0.32-ios-app-onboarding-polish/goal.md"
+      note: "iOS app onboarding polish complete with presenter-tested checklist/guidance, simulator tests/build, and UI screenshots."
 
   - id: T003
     type: worker
     assignee: Worker
-    status: queued
+    status: active
     reasoning_hint: medium
     objective: "Run the landing-page iOS preview messaging child board."
     allowed_files:
