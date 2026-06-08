@@ -1,0 +1,10 @@
+{
+  "appUrlHash": "105329e58eaceb5f",
+  "builtByDeveloper": true,
+  "bundleIdentifier": "com.neonwatty.FoilIOS",
+  "bundleVersion": "11",
+  "deviceIdentifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+  "name": "Foil iOS",
+  "schema": "foil.iosV023TestFlight.installedBuild.v1",
+  "version": "0.1.0"
+}

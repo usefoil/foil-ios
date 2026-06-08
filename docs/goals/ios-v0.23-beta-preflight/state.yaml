@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.23-beta-preflight"
   kind: existing_plan
   tranche: "Prove the preview iPhone and local automation state are safe for closed-beta rehearsal."
-  status: active
+  status: done
   oracle:
     signal: "Device, WDA, TestFlight-installed build metadata, provider/key presence, microphone permission, App Group state, and keyboard/full-access state are known before full rehearsal."
     cadence: "before TestFlight rehearsal and again after any operator action"
@@ -49,7 +49,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-23-beta-preflight/"
     command: "npx goalbuddy board docs/goals/ios-v0.23-beta-preflight"
 
-active_task: T999
+active_task: null
 
 tasks:
   - id: T001
@@ -149,7 +149,7 @@ tasks:
   - id: T999
     type: judge
     assignee: Judge
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Close the preflight board only after disproving the strongest realistic failure mode."
     inputs:
@@ -161,3 +161,123 @@ tasks:
     acceptance_criteria:
       - "Audit specifically rules out stale/debug build, missing provider key, unavailable WDA, denied microphone, and unknown keyboard state, or records them as blockers."
       - "GoalBuddy state checker passes."
+    receipt:
+      result: done
+      task_id: T999
+      decision: command_mailbox_worker_approved
+      full_outcome_complete: false
+      note: "notes/T999-command-mailbox-approval.md"
+      summary: "WDA remains unavailable, but a narrow sterile CoreDevice payload-url slice is approved to prove the missing provider/key and microphone preflight fields without inspecting private UI."
+      worker_task: T003
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Use CoreDevice payload URLs to run a sterile reset/start/stop/transcribe command-mailbox proof and verify current provider/key plus microphone readiness without WDA."
+    allowed_files:
+      - "docs/goals/ios-v0.23-beta-preflight/**"
+    verify:
+      - "scripts/ios-physical-harness.py reset-transcript"
+      - "xcrun devicectl device process launch --payload-url foilios://start com.neonwatty.FoilIOS"
+      - "macOS say plays a sterile phrase while the phone records"
+      - "xcrun devicectl device process launch --payload-url foilios://stop com.neonwatty.FoilIOS"
+      - "xcrun devicectl device process launch --payload-url foilios://transcribe com.neonwatty.FoilIOS"
+      - "scripts/ios-physical-harness.py app-group-summary shows phase complete and hasTranscript true"
+      - "scripts/ios-physical-harness.py reset-transcript final cleanup"
+      - "git diff --check"
+      - "Targeted secret/private-content scan over touched v0.23 preflight files"
+    stop_if:
+      - "The phone locks, disconnects, or presents a permission/trust/install/credential prompt."
+      - "The phrase cannot be kept sterile."
+      - "The App Group transcript remains missing or enters failure/recovery state after transcribe."
+      - "Any transcript body, provider key, private screen content, or raw WDA source would need to be committed."
+    expected_output:
+      - "notes/T003-command-mailbox-worker.md"
+      - "Sanitized receipts for reset, launch commands, after-transcribe App Group state, and cleanup."
+    acceptance_criteria:
+      - "App Group starts idle/no transcript after reset."
+      - "Start/stop/transcribe commands launch successfully through CoreDevice payload URLs."
+      - "After transcribe, App Group is complete with hasTranscript true and transcript length/hash only."
+      - "Final cleanup returns App Group to idle/no transcript."
+      - "WDA remains recorded as unavailable, so this does not claim host-app UI automation."
+    receipt:
+      result: done
+      task_id: T003
+      note: "notes/T003-command-mailbox-worker.md"
+      summary: "CoreDevice payload-url commands reset, recorded a sterile phrase, stopped, transcribed, produced a fresh complete App Group transcript, and cleaned up to idle/no transcript."
+      changed_files:
+        - "docs/goals/ios-v0.23-beta-preflight/notes/T003-command-mailbox-worker.md"
+        - "docs/goals/ios-v0.23-beta-preflight/notes/receipts/command-mailbox-proof.json"
+        - "docs/goals/ios-v0.23-beta-preflight/state.yaml"
+      commands:
+        - cmd: "scripts/ios-physical-harness.py reset-transcript"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py app-group-summary before"
+          status: pass
+        - cmd: "xcrun devicectl device process launch --payload-url foilios://start com.neonwatty.FoilIOS"
+          status: pass
+        - cmd: "macOS say sterile phrase"
+          status: pass
+        - cmd: "xcrun devicectl device process launch --payload-url foilios://stop com.neonwatty.FoilIOS"
+          status: pass
+        - cmd: "xcrun devicectl device process launch --payload-url foilios://transcribe com.neonwatty.FoilIOS"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py app-group-summary after transcribe"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py reset-transcript final cleanup"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py app-group-summary after cleanup"
+          status: pass
+      receipt: "notes/receipts/command-mailbox-proof.json"
+      proof:
+        provider_and_microphone_current_readiness_proven: true
+        started_idle_no_transcript: true
+        after_transcribe_phase: complete
+        after_transcribe_has_transcript: true
+        transcript_length: 75
+        cleanup_idle_no_transcript: true
+        wda_ready: false
+      residual_risk:
+        - "Does not prove host-app insertion or keyboard UI automation."
+        - "Does not prove Messages/Mail/Safari matrix behavior."
+
+  - id: T004
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Final preflight audit after the command-mailbox proof."
+    inputs:
+      - "T001-T003 receipts"
+    constraints:
+      - "Do not claim WDA is restored unless status proves it."
+      - "Do not proceed to the Apple app matrix without WDA or another host-app insertion proof route."
+    expected_output:
+      - "notes/T004-final-audit.md"
+      - "decision: proceed_to_testflight_rehearsal | wda_still_blocks_matrix | operator_needed"
+    acceptance_criteria:
+      - "Audit specifically states which preflight fields are now proven and which remain blocked."
+      - "GoalBuddy state checker passes."
+    receipt:
+      result: done
+      task_id: T004
+      decision: complete
+      full_outcome_complete: true
+      note: "notes/T004-final-audit.md"
+      summary: "Preflight is complete with a WDA limitation: device/build/App Group/keyboard/provider/microphone state are known or proven, while physical UI automation remains unavailable for later host-app matrix work."
+      proceed_to: "docs/goals/ios-v0.23-testflight-rehearsal/goal.md"
+      proven_fields:
+        installed_build: "0.1.0 (11)"
+        app_group_state: "idle/no transcript after cleanup"
+        keyboard_full_access_state: enabled
+        provider_key_current_readiness: proven_by_command_mailbox_transcription
+        microphone_permission_current_readiness: proven_by_command_mailbox_transcription
+      blocked_fields:
+        wda_ready: false
+      strongest_realistic_failure_mode:
+        claim: "Command-mailbox proof could be mistaken for host-app keyboard insertion proof."
+        evidence_that_rules_it_out:
+          - "notes/receipts/command-mailbox-proof.json records wdaStillUnavailable=true."
+          - "notes/T004-final-audit.md explicitly limits the proof to app-side TestFlight rehearsal and excludes Apple app matrix insertion."

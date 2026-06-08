@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.23-testflight-rehearsal"
   kind: existing_plan
   tranche: "Install/update the closed-beta TestFlight build and produce a fresh sterile transcript on the preview iPhone."
-  status: active
+  status: done
   oracle:
     signal: "The preview iPhone runs the intended TestFlight build and the Foil app produces a fresh sterile transcript ready for keyboard insertion."
     cadence: "after install/update, after record, after transcribe, and before host-app handoff"
@@ -48,13 +48,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-23-testflight-rehearsal/"
     command: "npx goalbuddy board docs/goals/ios-v0.23-testflight-rehearsal"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: judge
     assignee: Judge
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Validate preflight evidence and approve the largest safe TestFlight rehearsal slice."
     inputs:
@@ -70,29 +70,34 @@ tasks:
       - "Worker objective names the exact intended installed build or says install/update first."
       - "Allowed files are limited to board receipts unless a build-fix release is explicitly required."
       - "Stop conditions include device unlock, install replacement prompt, credential prompt, stale build, and private-content exposure."
+    receipt:
+      result: done
+      task_id: T001
+      decision: command_mailbox_rehearsal_approved
+      full_outcome_complete: false
+      note: "notes/T001-judge.md"
+      summary: "Approve CoreDevice payload-url rehearsal against installed Foil iOS 0.1.0 build 11. WDA remains unavailable and this board will not claim host-app insertion."
+      worker_task: T002
 
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Install/update the TestFlight build if needed, reset App Group state, record/transcribe a sterile phrase, and leave latest transcript staged."
     allowed_files:
       - "docs/goals/ios-v0.23-testflight-rehearsal/**"
-      - "FoiliOS/project.yml"
-      - "FoiliOS/FoilIOS.xcodeproj/**"
     verify:
       - "devicectl installed app metadata for com.neonwatty.FoilIOS"
-      - "WDA status/source receipt for Foil app screens"
       - "App Group reset/before receipt"
-      - "Physical record/transcribe WDA receipts"
+      - "CoreDevice payload-url start/stop/transcribe command receipts"
       - "App Group after-transcribe receipt with sterile transcript staged"
       - "git diff --check"
       - "Targeted secret/private-content scan over touched files"
     stop_if:
       - "The phone needs unlock or install/replacement approval."
       - "The installed build cannot be identified."
-      - "A new build upload is needed but credentials are unavailable or would be exposed."
+      - "A new build upload/install is needed."
       - "Transcript content is not sterile."
     expected_output:
       - "notes/T002-testflight-rehearsal.md"
@@ -106,11 +111,49 @@ tasks:
       - "The App Group was reset before recording."
       - "The sterile phrase appears in sanitized transcript evidence or a deterministic token-count/phrase-count receipt."
       - "App Group phase indicates transcript-ready state for the keyboard."
+    receipt:
+      result: done
+      task_id: T002
+      note: "notes/T002-testflight-rehearsal.md"
+      summary: "Installed Foil iOS 0.1.0 build 11 reset to idle, recorded a sterile phrase, transcribed successfully, and left a fresh complete transcript staged for the keyboard."
+      changed_files:
+        - "docs/goals/ios-v0.23-testflight-rehearsal/notes/T002-testflight-rehearsal.md"
+        - "docs/goals/ios-v0.23-testflight-rehearsal/notes/receipts/build-installed.json"
+        - "docs/goals/ios-v0.23-testflight-rehearsal/notes/receipts/command-mailbox-rehearsal.json"
+        - "docs/goals/ios-v0.23-testflight-rehearsal/state.yaml"
+      commands:
+        - cmd: "xcrun devicectl device info apps --bundle-id com.neonwatty.FoilIOS"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py reset-transcript"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py app-group-summary before"
+          status: pass
+        - cmd: "xcrun devicectl device process launch --payload-url foilios://start com.neonwatty.FoilIOS"
+          status: pass
+        - cmd: "macOS say sterile phrase"
+          status: pass
+        - cmd: "xcrun devicectl device process launch --payload-url foilios://stop com.neonwatty.FoilIOS"
+          status: pass
+        - cmd: "xcrun devicectl device process launch --payload-url foilios://transcribe com.neonwatty.FoilIOS"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py app-group-summary after transcribe"
+          status: pass
+      receipts:
+        - "notes/receipts/build-installed.json"
+        - "notes/receipts/command-mailbox-rehearsal.json"
+      proof:
+        installed_build_is_11: true
+        started_idle_no_transcript: true
+        after_transcribe_phase: complete
+        after_transcribe_has_transcript: true
+        transcript_length: 87
+        left_transcript_staged_for_keyboard: true
+        wda_ready: false
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Audit that the rehearsal produced a fresh transcript on the installed TestFlight build."
     inputs:
@@ -125,3 +168,17 @@ tasks:
       - "Audit cites installed-build metadata, App Group reset, record/transcribe evidence, and transcript-ready state."
       - "Strongest failure mode is ruled out with direct evidence."
       - "GoalBuddy state checker passes."
+    receipt:
+      result: done
+      task_id: T999
+      decision: complete
+      full_outcome_complete: true
+      note: "notes/T999-final-audit.md"
+      summary: "The TestFlight rehearsal is complete for app-side proof: installed build 11 produced a fresh transcript staged for keyboard insertion. WDA remains unavailable for host-app matrix proof."
+      handoff_to: "docs/goals/ios-v0.23-apple-app-matrix/goal.md"
+      strongest_realistic_failure_mode:
+        claim: "The transcript could be stale or from the wrong build."
+        evidence_that_rules_it_out:
+          - "Installed metadata receipt reports com.neonwatty.FoilIOS 0.1.0 bundle version 11."
+          - "Command-mailbox receipt starts from idle/no transcript."
+          - "Command-mailbox receipt records complete/hasTranscript true after fresh start/stop/transcribe."

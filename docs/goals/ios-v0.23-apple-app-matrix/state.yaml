@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.23-apple-app-matrix"
   kind: existing_plan
   tranche: "Prove keyboard insertion in Notes, Messages/iMessage, Mail, and Safari/text fields on the preview iPhone."
-  status: active
+  status: done
   oracle:
     signal: "Each Apple baseline app row has sanitized physical evidence for keyboard availability, insert action, exact-once text mutation or honest blocker, and App Group cleanup."
     cadence: "after each app row and at matrix audit"
@@ -49,13 +49,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-23-apple-app-matrix/"
     command: "npx goalbuddy board docs/goals/ios-v0.23-apple-app-matrix"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Design the sanitized Apple app row protocol and identify which rows require operator setup before touching private apps."
     inputs:
@@ -73,11 +73,29 @@ tasks:
       - "Each row has a named sterile target, before receipt, insert action receipt, after receipt, cleanup receipt, and stop_if condition."
       - "Private-content boundaries are explicit for Messages, Mail, and Safari."
       - "Matrix can proceed row by row without ambiguity."
+    receipt:
+      result: done
+      task_id: T001
+      note: "notes/T001-matrix-protocol.md"
+      summary: "Defined row-specific sterile targets, proof shape, privacy boundaries, and current blockers. All fresh v0.23 Apple app rows require WDA or equivalent physical UI automation, which is currently unavailable."
+      current_wda_ready: false
+      staged_transcript:
+        source: "docs/goals/ios-v0.23-testflight-rehearsal/notes/receipts/command-mailbox-rehearsal.json"
+        phase: complete
+        has_transcript: true
+        transcript_length: 87
+      row_status:
+        notes: blocked_wda_unavailable
+        messages: blocked_wda_unavailable_and_operator_sterile_thread_required
+        mail: blocked_wda_unavailable_and_private_surface_risk
+        safari_text: blocked_wda_unavailable
+        safari_secure: blocked_wda_unavailable
+      recommendation: "Do not run T002-T005 until WDA or equivalent physical UI-control route is restored."
 
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Run the Notes row as the control row and prove exact-once insertion."
     allowed_files:
@@ -99,11 +117,22 @@ tasks:
       - "The inserted sterile text appears exactly once in the target field."
       - "Insert latest is disabled or App Group has no staged transcript after insertion."
       - "Receipts do not include private Notes content."
+    blocker:
+      reason: "WDA/equivalent physical UI automation is unavailable, so Notes cannot be focused, keyboard state inspected, Insert latest tapped, or text mutation verified."
+      next_action: "Restore WDA at http://127.0.0.1:8100/status or provide another physical UI-control route."
+    receipt:
+      result: blocked
+      task_id: T002
+      summary: "Notes row blocked before opening Notes because WDA/equivalent UI automation is unavailable."
+      note: "notes/T001-matrix-protocol.md"
+      evidence:
+        - "scripts/ios-physical-harness.py status reports wda.ready=false."
+        - "T001 protocol requires UI control to focus Notes, activate Foil Keyboard, tap Insert latest, and verify value count."
 
   - id: T003
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Run the Messages/iMessage row in a sterile thread without sending private content."
     allowed_files:
@@ -126,11 +155,22 @@ tasks:
       - "The sterile transcript appears in the compose field exactly once, or blocker records the missing sterile thread/operator action."
       - "No private conversation content is committed."
       - "No real message is sent without explicit approval receipt."
+    blocker:
+      reason: "WDA is unavailable, and Messages must not be inspected until an operator-opened sterile thread is focused."
+      next_action: "Restore WDA/equivalent UI control and have the operator confirm the sterile Messages thread input is focused."
+    receipt:
+      result: blocked
+      task_id: T003
+      summary: "Messages row blocked before opening Messages because WDA is unavailable and no operator-confirmed sterile focused thread is available in this run."
+      note: "notes/T001-matrix-protocol.md"
+      evidence:
+        - "scripts/ios-physical-harness.py status reports wda.ready=false."
+        - "T001 protocol prohibits inspecting Messages unless an operator-opened sterile thread input is focused."
 
   - id: T004
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Run the Mail compose row using a sterile draft target."
     allowed_files:
@@ -153,11 +193,22 @@ tasks:
       - "Sterile transcript appears exactly once in the Mail compose body or row records exact blocker."
       - "No email is sent unless explicitly approved."
       - "Draft cleanup state is recorded."
+    blocker:
+      reason: "WDA/equivalent UI automation is unavailable, and Mail must not be opened or inspected without a sterile compose path."
+      next_action: "Restore WDA/equivalent UI control and use a sterile compose draft path that avoids inbox/account/private content."
+    receipt:
+      result: blocked
+      task_id: T004
+      summary: "Mail row blocked before opening Mail because WDA/equivalent UI automation is unavailable and private inbox/account surfaces must not be inspected."
+      note: "notes/T001-matrix-protocol.md"
+      evidence:
+        - "scripts/ios-physical-harness.py status reports wda.ready=false."
+        - "T001 protocol requires a sterile compose draft path and no private Mail content inspection."
 
   - id: T005
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Run Safari normal text-field and secure-field limitation rows."
     allowed_files:
@@ -178,11 +229,22 @@ tasks:
       - "Normal Safari text field receives the sterile transcript exactly once."
       - "Secure field proves custom keyboard absence or no insertion as expected."
       - "Receipts distinguish expected secure-field limitation from app failure."
+    blocker:
+      reason: "WDA/equivalent UI automation is unavailable, so Safari fields cannot be focused, keyboard state inspected, or value counts verified."
+      next_action: "Restore WDA/equivalent UI control, then use a sterile local fixture for normal and secure-field rows."
+    receipt:
+      result: blocked
+      task_id: T005
+      summary: "Safari rows blocked because WDA/equivalent UI automation is unavailable to focus fixture fields, inspect keyboard state, and verify value counts."
+      note: "notes/T001-matrix-protocol.md"
+      evidence:
+        - "scripts/ios-physical-harness.py status reports wda.ready=false."
+        - "T001 protocol requires a sterile local fixture plus UI control for normal and secure-field assertions."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Audit the Apple app matrix and route any beta-blocking friction to the recovery/UX board."
     inputs:
@@ -197,3 +259,24 @@ tasks:
       - "Every Apple baseline app row is represented in the final matrix."
       - "Any failure has a concrete recovery/UX task or external-blocker owner."
       - "GoalBuddy state checker passes."
+    receipt:
+      result: done
+      task_id: T999
+      decision: complete
+      full_outcome_complete: true
+      matrix_decision: external_blocker
+      note: "notes/T999-matrix-audit.md"
+      summary: "All Apple baseline rows are represented and honestly blocked by unavailable WDA/equivalent physical UI automation. No private host-app content was opened or committed."
+      row_results:
+        notes: blocked_wda_unavailable
+        messages: blocked_wda_unavailable_and_operator_sterile_thread_required
+        mail: blocked_wda_unavailable_and_private_surface_risk
+        safari_text: blocked_wda_unavailable
+        safari_secure: blocked_wda_unavailable
+      strongest_realistic_failure_mode:
+        claim: "Command-mailbox TestFlight proof could be mistaken for Apple host-app insertion proof."
+        evidence_that_rules_it_out:
+          - "T001 records wda.ready=false."
+          - "T002-T005 are blocked before opening host apps or inspecting private content."
+          - "No Apple app row claims insertion."
+      handoff_to: "docs/goals/ios-v0.23-beta-recovery-ux/goal.md"

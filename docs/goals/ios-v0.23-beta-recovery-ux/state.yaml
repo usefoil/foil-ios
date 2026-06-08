@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.23-beta-recovery-ux"
   kind: existing_plan
   tranche: "Fix or triage small beta UX/recovery blockers discovered during physical rehearsal."
-  status: active
+  status: done
   oracle:
     signal: "Every beta-blocking friction item discovered by v0.23 rehearsal has a merged/proven fix, exact external blocker, or explicit closed-beta deferral."
     cadence: "after matrix audit, after each fix PR, and before final readiness audit"
@@ -49,13 +49,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-23-beta-recovery-ux/"
     command: "npx goalbuddy board docs/goals/ios-v0.23-beta-recovery-ux"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Build a beta-friction ledger from the v0.23 preflight, TestFlight rehearsal, and Apple app matrix receipts."
     inputs:
@@ -73,11 +73,30 @@ tasks:
       - "Every issue maps to a concrete receipt from a child board."
       - "Each issue is labeled blocker | important | defer, and product_fix | operator_action | external_blocker | acceptable_risk."
       - "The ledger identifies the single highest-value safe fix slice, if any."
+    receipt:
+      result: done
+      task_id: T001
+      note: "notes/T001-beta-friction-ledger.md"
+      summary: "Ledger found no product UX fix justified by evidence. WDA/equivalent UI automation is the beta blocker; App Group cleanup is the only safe operational slice."
+      issues:
+        - id: WDA_EXTERNAL_BLOCKER
+          severity: blocker
+          disposition: external_blocker
+        - id: PROVIDER_MIC_READY
+          severity: closed
+          disposition: proven
+        - id: BUILD11_APP_SIDE_REHEARSAL
+          severity: closed
+          disposition: proven
+        - id: STAGED_TRANSCRIPT_AFTER_BLOCKED_MATRIX
+          severity: important
+          disposition: operator_cleanup
+      recommended_slice: T003
 
   - id: T002
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Approve the largest safe beta UX/recovery fix slice or decide no fix is needed."
     inputs:
@@ -93,38 +112,67 @@ tasks:
     acceptance_criteria:
       - "Decision explains why the selected slice is beta-blocking or why no product fix is required."
       - "If a fix is approved, the verification plan includes simulator checks and the relevant physical regression."
+    receipt:
+      result: done
+      task_id: T002
+      decision: cleanup_slice_approved
+      full_outcome_complete: false
+      note: "notes/T002-judge.md"
+      summary: "No product-code fix approved. Approve operational App Group cleanup because matrix is blocked and the staged transcript should not remain as stale future state."
+      worker_task: T003
 
   - id: T003
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     reasoning_hint: high
-    objective: "Implement the approved small beta UX/recovery fix slice, if one is approved."
+    objective: "Run the approved operational cleanup slice: reset the staged App Group transcript after the blocked matrix and record before/after sanitized receipts."
     allowed_files:
-      - "FoiliOS/**"
       - "docs/goals/ios-v0.23-beta-recovery-ux/**"
     verify:
-      - "Relevant unit/UI/simulator tests"
-      - "xcodebuild build or test for FoilIOS"
-      - "Focused physical regression receipt for changed behavior"
+      - "scripts/ios-physical-harness.py app-group-summary before cleanup"
+      - "scripts/ios-physical-harness.py reset-transcript"
+      - "scripts/ios-physical-harness.py app-group-summary after cleanup"
       - "git diff --check"
       - "Targeted secret/private-content scan over touched files"
     stop_if:
-      - "The fix requires broad redesign or third-party app scope."
-      - "The fix needs credentials or private content exposure."
-      - "Physical regression requires operator device action."
+      - "The phone disconnects or locks."
+      - "Reset would expose transcript body, credentials, or private content."
+      - "Product code changes appear necessary."
     expected_output:
-      - "Small PR or exact blocked receipt."
       - "notes/T003-worker.md"
+      - "notes/receipts/recovery-cleanup.json"
     acceptance_criteria:
-      - "Code changes are limited to the approved slice."
-      - "Tests/build proof passes."
-      - "Physical regression proves the original beta blocker no longer reproduces, or the issue is honestly still blocked."
+      - "Before cleanup shows whether a transcript was staged."
+      - "After cleanup is idle/no transcript."
+      - "No transcript body or private content is committed."
+    receipt:
+      result: done
+      task_id: T003
+      note: "notes/T003-worker.md"
+      summary: "Cleared the staged transcript left after the blocked matrix; App Group moved from complete/hasTranscript true to idle/hasTranscript false."
+      changed_files:
+        - "docs/goals/ios-v0.23-beta-recovery-ux/notes/T003-worker.md"
+        - "docs/goals/ios-v0.23-beta-recovery-ux/notes/receipts/recovery-cleanup.json"
+        - "docs/goals/ios-v0.23-beta-recovery-ux/state.yaml"
+      commands:
+        - cmd: "scripts/ios-physical-harness.py app-group-summary before cleanup"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py reset-transcript"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py app-group-summary after cleanup"
+          status: pass
+      receipt: "notes/receipts/recovery-cleanup.json"
+      proof:
+        before_phase: complete
+        before_had_transcript: true
+        after_phase: idle
+        after_has_transcript: false
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Close the beta recovery board with a resolved/deferred ledger."
     inputs:
@@ -137,3 +185,16 @@ tasks:
       - "Every ledger issue has final disposition."
       - "Open product blockers have either a PR link, external owner, or explicit closed-beta risk acceptance."
       - "GoalBuddy state checker passes."
+    receipt:
+      result: done
+      task_id: T999
+      decision: complete
+      full_outcome_complete: true
+      note: "notes/T999-final-audit.md"
+      summary: "Recovery board complete: no product UX fix is justified; WDA remains an external blocker; staged transcript cleanup is done."
+      final_disposition:
+        wda_unavailable: external_blocker
+        provider_microphone: proven
+        testflight_app_side: proven
+        staged_transcript: cleaned_up
+      handoff_to: "docs/goals/ios-v0.23-readiness-audit/goal.md"

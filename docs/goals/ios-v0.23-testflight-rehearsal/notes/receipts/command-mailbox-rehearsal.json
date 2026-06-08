@@ -1,0 +1,161 @@
+{
+  "appGroup": {
+    "afterStop": {
+      "appGroup": "group.com.neonwatty.FoilIOS",
+      "copyFrom": {
+        "returncode": 0,
+        "stderrBytes": 0,
+        "stderrSha256": null,
+        "stdoutBytes": 263,
+        "stdoutSha256": "7d783854e678e6d6"
+      },
+      "deviceId": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+      "schema": "foil.iosPhysicalHarness.appGroupSummary.v1",
+      "source": "Library/foil-keyboard-snapshot.json",
+      "summary": {
+        "file": "foil-keyboard-snapshot.json",
+        "hasTranscript": false,
+        "messageHash": "66d8697273339c00",
+        "phase": "processing",
+        "sha256": "ec4db7e28037da5885f9b2a441a9ee7e09b7d164ee5b31d9c4e5220c751e5a80"
+      }
+    },
+    "afterTranscribe": {
+      "appGroup": "group.com.neonwatty.FoilIOS",
+      "copyFrom": {
+        "returncode": 0,
+        "stderrBytes": 0,
+        "stderrSha256": null,
+        "stdoutBytes": 263,
+        "stdoutSha256": "ae136af617512993"
+      },
+      "deviceId": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+      "schema": "foil.iosPhysicalHarness.appGroupSummary.v1",
+      "source": "Library/foil-keyboard-snapshot.json",
+      "summary": {
+        "file": "foil-keyboard-snapshot.json",
+        "hasTranscript": true,
+        "messageHash": "460d8d9a759fc9cc",
+        "phase": "complete",
+        "sha256": "12ab02c420334bb6578dbaf789cfb8de3d21dc5976b36fadd07d8fe6eb6fd92e",
+        "transcriptHash": "1210c267a9cf2826",
+        "transcriptLength": 87
+      }
+    },
+    "before": {
+      "appGroup": "group.com.neonwatty.FoilIOS",
+      "copyFrom": {
+        "returncode": 0,
+        "stderrBytes": 0,
+        "stderrSha256": null,
+        "stdoutBytes": 263,
+        "stdoutSha256": "6b7b03be4927daa8"
+      },
+      "deviceId": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+      "schema": "foil.iosPhysicalHarness.appGroupSummary.v1",
+      "source": "Library/foil-keyboard-snapshot.json",
+      "summary": {
+        "file": "foil-keyboard-snapshot.json",
+        "hasTranscript": false,
+        "messageHash": "5fa7aac5375c5815",
+        "phase": "idle",
+        "sha256": "fc1fff1083ffd83a4739044ccd6ef10d84ba69e4239d9ef7394431e9901e7314"
+      }
+    },
+    "resetBefore": {
+      "appGroup": "group.com.neonwatty.FoilIOS",
+      "copyFrom": {
+        "returncode": 0,
+        "stderrBytes": 0,
+        "stderrSha256": null,
+        "stdoutBytes": 272,
+        "stdoutSha256": "9d3a85998bf0d8d7"
+      },
+      "copyTo": {
+        "returncode": 0,
+        "stderrBytes": 0,
+        "stderrSha256": null,
+        "stdoutBytes": 446,
+        "stdoutSha256": "31aff76b634d8d28"
+      },
+      "destination": "Library/foil-keyboard-snapshot.json",
+      "deviceId": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+      "operation": "reset-transcript",
+      "readbackSummary": {
+        "file": "foil-keyboard-snapshot-readback.json",
+        "hasTranscript": false,
+        "messageHash": "5fa7aac5375c5815",
+        "phase": "idle",
+        "sha256": "fc1fff1083ffd83a4739044ccd6ef10d84ba69e4239d9ef7394431e9901e7314"
+      },
+      "schema": "foil.iosPhysicalHarness.appGroupWrite.v1",
+      "writtenSummary": {
+        "file": "foil-keyboard-snapshot.json",
+        "hasTranscript": false,
+        "messageHash": "5fa7aac5375c5815",
+        "phase": "idle",
+        "sha256": "fc1fff1083ffd83a4739044ccd6ef10d84ba69e4239d9ef7394431e9901e7314"
+      }
+    }
+  },
+  "commands": [
+    {
+      "action": "foilios://start",
+      "bundleIdentifier": "com.neonwatty.FoilIOS",
+      "commandType": "devicectl.device.process.launch",
+      "deviceIdentifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+      "executableHash": "87e16f450443cbe5",
+      "outcome": "success",
+      "processIdentifier": 2859,
+      "processIdentifierPresent": true,
+      "rawOutputCommitted": false,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "ee694bbb449364229051c71d5d52e3f8f5c57871de7d4cd49eb9312683e555dd"
+    },
+    {
+      "action": "foilios://stop",
+      "bundleIdentifier": "com.neonwatty.FoilIOS",
+      "commandType": "devicectl.device.process.launch",
+      "deviceIdentifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+      "executableHash": "87e16f450443cbe5",
+      "outcome": "success",
+      "processIdentifier": 2859,
+      "processIdentifierPresent": true,
+      "rawOutputCommitted": false,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "01d351ac73c37de34f4578b43b5b6ba49235488f29e7aa85a735bc0f17232a95"
+    },
+    {
+      "action": "foilios://transcribe",
+      "bundleIdentifier": "com.neonwatty.FoilIOS",
+      "commandType": "devicectl.device.process.launch",
+      "deviceIdentifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+      "executableHash": "87e16f450443cbe5",
+      "outcome": "success",
+      "processIdentifier": 2859,
+      "processIdentifierPresent": true,
+      "rawOutputCommitted": false,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "b044d59a5c9cd327ffd029bd15e480ca997a3c772b0e3ba8e6586b80d62a5e1c"
+    }
+  ],
+  "installedBuild": {
+    "bundleIdentifier": "com.neonwatty.FoilIOS",
+    "bundleVersion": "11",
+    "version": "0.1.0"
+  },
+  "proof": {
+    "afterTranscribeComplete": true,
+    "afterTranscribeHasTranscript": true,
+    "installedBuildIs11": true,
+    "leftTranscriptStagedForKeyboard": true,
+    "rawTranscriptCommitted": false,
+    "startedIdleNoTranscript": true,
+    "transcriptHash": "1210c267a9cf2826",
+    "transcriptLength": 87,
+    "wdaStillUnavailable": true
+  },
+  "schema": "foil.iosV023TestFlight.commandMailboxRehearsal.v1",
+  "sterilePhraseHash": "616f2c7ed37e56b8",
+  "sterilePhraseLength": 95
+}

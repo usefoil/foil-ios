@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.23-readiness-audit"
   kind: audit
   tranche: "Audit closed-beta physical rehearsal evidence and make the go/no-go decision."
-  status: active
+  status: done
   oracle:
     signal: "The audit can trace every closed-beta readiness claim back to receipts and can disprove or name the strongest remaining failure modes."
     cadence: "after all prior v0.23 child boards close"
@@ -49,13 +49,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-23-readiness-audit/"
     command: "npx goalbuddy board docs/goals/ios-v0.23-readiness-audit"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Index all v0.23 receipts and map them to the parent closed-beta readiness acceptance criteria."
     inputs:
@@ -74,11 +74,21 @@ tasks:
     acceptance_criteria:
       - "Every parent acceptance criterion is marked proven, weak, missing, blocked, or not applicable."
       - "Receipt paths and PR links are listed when available."
+    receipt:
+      result: done
+      task_id: T001
+      note: "notes/T001-receipt-index.md"
+      summary: "Mapped every parent readiness criterion to receipts. App-side build 11 transcription is proven; all fresh Apple app insertion rows are blocked by unavailable WDA/equivalent UI automation."
+      missing_or_weak_proof:
+        - "Fresh v0.23 Notes insertion proof."
+        - "Fresh v0.23 Messages/iMessage insertion proof."
+        - "Fresh v0.23 Mail insertion proof."
+        - "Fresh v0.23 Safari normal and secure-field proof."
 
   - id: T002
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Perform the final closed-beta go/no-go audit."
     inputs:
@@ -98,11 +108,20 @@ tasks:
       - "Audit includes GitHub PR/CI state."
       - "Audit includes secret/private-content scan command and result."
       - "Go/no-go decision follows the evidence, not optimism."
+    receipt:
+      result: done
+      task_id: T002
+      decision: not_ready
+      full_outcome_complete: false
+      note: "notes/T002-go-no-go.md"
+      summary: "Closed beta is not ready. App-side TestFlight proof is good, but all required Apple app insertion rows are blocked by unavailable physical UI automation."
+      github_pr_state: "No open PRs before audit note creation."
+      next_board: "ios-v0.24-physical-ui-automation-recovery"
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Close the readiness audit and update the parent conveyor with the final decision."
     inputs:
@@ -115,3 +134,12 @@ tasks:
     acceptance_criteria:
       - "GoalBuddy state checker passes for all v0.23 boards."
       - "Parent conveyor's likely misfire is explicitly ruled out or recorded as not ready."
+    receipt:
+      result: done
+      task_id: T999
+      decision: complete
+      full_outcome_complete: true
+      final_decision: not_ready
+      note: "notes/T999-final-audit.md"
+      summary: "Readiness audit complete: v0.23 is an evidence-backed no-go for closed beta, with exact next board ios-v0.24-physical-ui-automation-recovery."
+      parent_update: "Mark parent conveyor done with final_decision: not_ready and next_board: ios-v0.24-physical-ui-automation-recovery."
