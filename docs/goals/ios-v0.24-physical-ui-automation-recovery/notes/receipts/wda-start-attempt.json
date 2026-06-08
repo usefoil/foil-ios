@@ -1,0 +1,20 @@
+{
+  "command": "xcodebuild WebDriverAgentRunner-nodebug test; see wda-command.txt",
+  "failureStage": "xctest_automation_mode_enablement",
+  "logBytes": 5386,
+  "logPath": "/tmp/foil-ios-v0.24-wda-attempt.log",
+  "logSha256": "74b18650595808a41296219e030953532ea6f90feb9ec3218a20295490c5a195",
+  "patterns": {
+    "automationModeTimeout": true,
+    "deviceSupportWarning": true,
+    "devicectlDiagnoseWarning": true,
+    "runningTestsReached": true,
+    "testFailed": true
+  },
+  "privateContentCommitted": false,
+  "rawLogCommitted": false,
+  "returncode": 65,
+  "schema": "foil.iosPhysicalAutomation.wdaStartAttempt.v1",
+  "timestampLocal": "2026-06-08T08:49:17-07:00",
+  "xcresultPath": "/Users/neonwatty/Library/Developer/Xcode/DerivedData/WebDriverAgent-hhcaekviohfkrlbgpzmtsblbasrm/Logs/Test/Test-WebDriverAgentRunner-nodebug-2026.06.08_08-48-08--0700.xcresult"
+}

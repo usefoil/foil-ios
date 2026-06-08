@@ -1,0 +1,10 @@
+xcodebuild \
+  -project /Users/neonwatty/.appium/node_modules/appium-xcuitest-driver/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj \
+  -scheme WebDriverAgentRunner-nodebug \
+  -destination 'id=00008030-001A0C980A33C02E' \
+  -configuration Debug \
+  DEVELOPMENT_TEAM=B3A6AN2HA4 \
+  CODE_SIGN_STYLE=Automatic \
+  PRODUCT_BUNDLE_IDENTIFIER=com.neonwatty.WebDriverAgentRunner \
+  -allowProvisioningUpdates \
+  test 2>&1 | tee /tmp/foil-ios-wda.log

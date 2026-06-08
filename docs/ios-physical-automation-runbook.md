@@ -105,6 +105,35 @@ If WDA reports ready, later WDA HTTP calls can use `http://127.0.0.1:8100`.
 Older receipts also used `http://192.168.1.40:8100`; prefer localhost when a
 tunnel/forward is active.
 
+## Known Automation-Mode Timeout
+
+The v0.24 recovery board reproduced a physical-device WDA failure where the
+runner builds, signs, installs, and reaches `Running tests`, but XCTest exits
+with:
+
+```text
+Timed out while enabling automation mode.
+```
+
+This failure boundary is after local build/signing and before WDA starts
+serving on port 8100. A fresh local DerivedData path reproduced the same
+failure, so do not spend more time on Foil product code or stale build products
+until the device-side automation state is checked.
+
+Operator-side recovery checklist:
+
+- In Xcode, open Devices and Simulators and confirm `iPhone-preview` is paired,
+  trusted, and prepared with no outstanding warning.
+- On the phone, confirm Developer Mode remains enabled in Settings > Privacy &
+  Security. Apple documents Developer Mode as required for running apps on a
+  real device from Xcode:
+  <https://developer.apple.com/documentation/Xcode/enabling-developer-mode-on-a-device>.
+- If the phone shows any developer, trust, or automation prompt, approve it on
+  device and rerun `scripts/ios-physical-harness.py status` before starting WDA.
+- After any Xcode/device pairing change, rerun the WDA command from this
+  runbook and require `curl -sS --max-time 2 http://127.0.0.1:8100/status` to
+  return JSON before host-app matrix testing resumes.
+
 ## Cleanup
 
 Before handing off or ending a run, stop WDA and any sterile local test server:

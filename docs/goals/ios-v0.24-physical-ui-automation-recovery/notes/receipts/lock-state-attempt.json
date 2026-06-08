@@ -1,0 +1,22 @@
+{
+  "jsonBytes": 576,
+  "jsonExists": true,
+  "jsonSha256": "8f2b65519402ed9ea1a345865898e86aa33f8e77a0dd8c7630871afbfcfbbfe6",
+  "mentionsLocked": true,
+  "mentionsUnlocked": true,
+  "operatorUnlockRequired": false,
+  "passcodeRequired": false,
+  "rawJsonCommitted": false,
+  "schema": "foil.iosPhysicalAutomation.lockStateAttempt.v1",
+  "stderrBytes": 0,
+  "stderrExists": true,
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdoutBytes": 226,
+  "stdoutExists": true,
+  "stdoutSha256": "1f2303b90f22c315bf9e884e40fdb62b82e7a553215c0d5dee4d71fe12ab74d5",
+  "topLevelKeys": [
+    "info",
+    "result"
+  ],
+  "unlockedSinceBoot": true
+}

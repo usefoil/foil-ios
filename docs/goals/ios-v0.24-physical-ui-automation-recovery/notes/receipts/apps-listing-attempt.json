@@ -1,0 +1,17 @@
+{
+  "com.neonwatty.FoilIOS": true,
+  "com.neonwatty.FoilIOS.Keyboard": false,
+  "com.neonwatty.WebDriverAgentRunner": true,
+  "com.neonwatty.WebDriverAgentRunner.xctrunner": true,
+  "jsonBytes": 4072,
+  "jsonExists": true,
+  "jsonSha256": "ae7ea036d47f76950d4f066eba4167d977663246bedb1e4c7a6af546c8cfa5ac",
+  "rawJsonCommitted": false,
+  "schema": "foil.iosPhysicalAutomation.appsListingAttempt.v1",
+  "stderrBytes": 0,
+  "stderrExists": true,
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdoutBytes": 1131,
+  "stdoutExists": true,
+  "stdoutSha256": "e30ca547dbb220811d363cbd7987048dae6c184e140c8d44dce2fb5638d2d5de"
+}

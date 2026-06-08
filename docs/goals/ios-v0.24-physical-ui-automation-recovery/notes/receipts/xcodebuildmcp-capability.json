@@ -1,0 +1,11 @@
+{
+  "currentProfile": "(default)",
+  "deviceIdConfigured": false,
+  "note": "Available XcodeBuildMCP UI tools in this session are not configured for physical iPhone control; WDA/CoreDevice remains the recovery route.",
+  "physicalUiControlProven": false,
+  "projectPathConfigured": false,
+  "schema": "foil.iosPhysicalAutomation.xcodebuildmcpCapability.v1",
+  "schemeConfigured": false,
+  "sessionDefaultsChecked": true,
+  "simulatorConfigured": false
+}

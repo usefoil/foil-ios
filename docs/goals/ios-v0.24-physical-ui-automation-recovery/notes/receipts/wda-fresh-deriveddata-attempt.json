@@ -1,0 +1,22 @@
+{
+  "command": "xcodebuild WebDriverAgentRunner-nodebug test with -derivedDataPath /tmp/foil-ios-v0.24-wda-deriveddata",
+  "derivedDataPath": "/tmp/foil-ios-v0.24-wda-deriveddata",
+  "failureStage": "xctest_automation_mode_enablement",
+  "logBytes": 2865164,
+  "logPath": "/tmp/foil-ios-v0.24-wda-fresh-attempt.log",
+  "logSha256": "8fb9bc46b01896b19687b314289b95a090051d1bc2345a18437b9bb5b69674ea",
+  "patterns": {
+    "automationModeTimeout": true,
+    "buildAndSigningReached": true,
+    "devicectlDiagnoseWarning": true,
+    "freshDerivedDataUsed": true,
+    "runningTestsReached": true,
+    "testFailed": true
+  },
+  "privateContentCommitted": false,
+  "rawLogCommitted": false,
+  "returncode": 65,
+  "schema": "foil.iosPhysicalAutomation.wdaFreshDerivedDataAttempt.v1",
+  "timestampLocal": "2026-06-08T08:53:41-07:00",
+  "xcresultPath": "/tmp/foil-ios-v0.24-wda-deriveddata/Logs/Test/Test-WebDriverAgentRunner-nodebug-2026.06.08_08-52-07--0700.xcresult"
+}

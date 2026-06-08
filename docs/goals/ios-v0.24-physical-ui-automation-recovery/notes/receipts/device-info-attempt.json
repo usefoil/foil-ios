@@ -1,0 +1,15 @@
+{
+  "jsonBytes": 7716,
+  "jsonExists": true,
+  "jsonSha256": "16572ab6b21e46f426220c00e91afc3d25edb6969bc2966f121fda299d8d4584",
+  "rawJsonCommitted": false,
+  "schema": "foil.iosPhysicalAutomation.deviceInfoAttempt.v1",
+  "stderrBytes": 0,
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdoutBytes": 4824,
+  "stdoutSha256": "fa4ef4446cdb74d2f2c1f147cfad220ee269a560dc3130bc5c09feb4021888ed",
+  "topLevelKeys": [
+    "info",
+    "result"
+  ]
+}

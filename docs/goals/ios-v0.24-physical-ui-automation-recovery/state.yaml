@@ -1,0 +1,219 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.24 Physical UI Automation Recovery"
+  slug: "ios-v0.24-physical-ui-automation-recovery"
+  kind: recovery
+  tranche: "Recover physical iPhone tap/snapshot control for closed-beta host-app insertion proof."
+  status: done
+  oracle:
+    signal: "WDA or equivalent physical-device automation can create a session, fetch a sanitized current-app source/snapshot from a sterile surface, and perform one safe interaction on iPhone-preview."
+    cadence: "after every recovery attempt and before any host-app matrix rerun"
+    final_proof: "Sanitized receipts for device readiness, WDA/equivalent startup, session creation, source/snapshot fetch, safe tap, cleanup, and final blocker if recovery fails."
+  intake:
+    original_request: "Do this next: recover the physical UI automation blocker so iOS closed-beta testing can continue."
+    interpreted_outcome: "Restore or precisely diagnose the physical iPhone automation path that v0.23 could not use for Apple app insertion testing."
+    input_shape: recovery
+    audience: "Foil owner/developer preparing a closed beta"
+    authority: approved
+    proof_type: demo
+    completion_proof: "Physical UI control is proven against a sterile target, or an exact external blocker and operator/vendor action is recorded."
+    likely_misfire: "Treating CoreDevice command-mailbox app control as equivalent to host-app UI control."
+    blind_spots_considered:
+      - "WDA can build but fail at XCTest automation-mode enablement."
+      - "Tunnels, pairing, Developer Mode, or XCTest runner install state may be broken outside repo code."
+      - "A current-app source fetch can expose private content if the active app is not sterile."
+      - "Simulator-only XcodeBuildMCP UI tools do not prove physical-phone control."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-24-physical-ui-automation-recovery/"
+    command: "npx goalbuddy board docs/goals/ios-v0.24-physical-ui-automation-recovery"
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: high
+    objective: "Collect baseline physical automation evidence and classify the WDA failure boundary before making recovery changes."
+    inputs:
+      - "docs/ios-physical-automation-runbook.md"
+      - "docs/goals/ios-v0.23-readiness-audit/notes/T999-final-audit.md"
+      - "docs/goals/ios-v0.23-apple-app-matrix/notes/T999-matrix-audit.md"
+      - "scripts/ios-physical-harness.py"
+    constraints:
+      - "Read-only except writing sanitized notes/receipts under this board."
+      - "Do not open or inspect private host apps."
+      - "Do not print raw WDA source, screenshots, transcripts, keys, contacts, phone numbers, or private URLs."
+      - "Do not uninstall or reinstall device apps during the scout phase."
+    expected_output:
+      - "notes/T001-baseline-scout.md"
+      - "notes/receipts/status-baseline.json"
+      - "notes/receipts/wda-command.txt"
+      - "notes/receipts/wda-start-attempt.json"
+    acceptance_criteria:
+      - "Device reachability and WDA readiness are recorded with the repo harness."
+      - "The exact WDA command and failure stage are recorded without private content."
+      - "A single root-cause hypothesis boundary is stated for Judge review."
+    receipt:
+      result: done
+      task_id: T001
+      note: "notes/T001-baseline-scout.md"
+      summary: "Fresh WDA attempt reproduced the XCTest automation-mode timeout after runner launch; physical UI control remains unavailable."
+      evidence:
+        status_baseline: "notes/receipts/status-baseline.json"
+        wda_command: "notes/receipts/wda-command.txt"
+        wda_start_attempt: "notes/receipts/wda-start-attempt.json"
+        status_after_wda_attempt: "notes/receipts/status-after-wda-attempt.json"
+        device_info_attempt: "notes/receipts/device-info-attempt.json"
+        xcodebuildmcp_capability: "notes/receipts/xcodebuildmcp-capability.json"
+      failure_boundary: "XCTest automation-mode enablement on the physical device."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Approve the safest recovery plan from the baseline evidence."
+    inputs:
+      - "T001 receipt"
+      - "docs/ios-physical-automation-runbook.md"
+    constraints:
+      - "Reject product-code changes unless T001 proves the blocker is caused by product code."
+      - "Require explicit operator action for device unlock, trust prompts, Developer Mode prompts, or private app setup."
+    expected_output:
+      - "notes/T002-recovery-judge.md"
+    acceptance_criteria:
+      - "Decision names one recovery route at a time and why it is safe."
+      - "Allowed files/commands for the Worker are bounded."
+      - "Stop conditions include private content, credentials, destructive device operations, and repeated XCTest timeout."
+    receipt:
+      result: done
+      task_id: T002
+      decision: approve_non_destructive_wda_recovery
+      note: "notes/T002-recovery-judge.md"
+      summary: "Approved one stale-process/device-state cleanup pass and one fresh WDA attempt; product changes are rejected without Foil-code evidence."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Execute the approved non-destructive recovery route for physical UI automation."
+    allowed_files:
+      - "docs/goals/ios-v0.24-physical-ui-automation-recovery/**"
+      - "docs/ios-physical-automation-runbook.md"
+      - "scripts/ios-physical-harness.py"
+    verify:
+      - "scripts/ios-physical-harness.py status"
+      - "curl -sS --max-time 2 http://127.0.0.1:8100/status"
+      - "scripts/ios-physical-harness.py session"
+      - "scripts/ios-physical-harness.py fetch-source <session> --output /tmp/foil-ios-v0.24-current-source.json"
+      - "scripts/ios-physical-harness.py delete-session <session>"
+    stop_if:
+      - "The phone locks, disconnects, or presents a prompt requiring operator approval."
+      - "Any recovery step would require erasing, resetting, or deleting user data."
+      - "Raw private screen content would need to be inspected or committed."
+      - "The same XCTest automation-mode timeout repeats after two distinct non-destructive recovery attempts."
+    expected_output:
+      - "notes/T003-recovery-worker.md"
+      - "Sanitized receipts under notes/receipts/"
+    acceptance_criteria:
+      - "WDA/equivalent status becomes ready, or the exact remaining blocker is recorded with logs."
+      - "If ready, a session is created and deleted cleanly."
+      - "If source/snapshot is fetched, raw content stays in /tmp only and only hashes/booleans are committed."
+    receipt:
+      result: external_blocker
+      task_id: T003
+      note: "notes/T003-recovery-worker.md"
+      summary: "Clean local DerivedData WDA rebuild reproduced the same XCTest automation-mode timeout; localhost WDA remains unavailable."
+      evidence:
+        lock_state: "notes/receipts/lock-state-attempt.json"
+        apps_listing: "notes/receipts/apps-listing-attempt.json"
+        fresh_deriveddata_attempt: "notes/receipts/wda-fresh-deriveddata-attempt.json"
+        status_after_attempt: "notes/receipts/status-after-fresh-deriveddata-attempt.json"
+      ruled_out:
+        - "stale local DerivedData"
+        - "missing WDA project"
+        - "early signing/build failure"
+      remaining_blocker: "XCTest cannot enable automation mode on the physical device."
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: blocked
+    reasoning_hint: high
+    objective: "Prove one sterile physical UI interaction without touching private host-app content."
+    allowed_files:
+      - "docs/goals/ios-v0.24-physical-ui-automation-recovery/**"
+      - "scripts/ios-physical-harness.py"
+    verify:
+      - "Launch or focus a sterile Foil-owned surface."
+      - "Fetch sanitized source/snapshot."
+      - "Perform one safe tap or equivalent interaction."
+      - "Fetch sanitized source/snapshot after the interaction."
+      - "Delete WDA session and verify cleanup."
+    stop_if:
+      - "The active app is Messages, Mail, Safari history, Notes with private text, Settings with private account data, or any private surface."
+      - "The interaction could send a message, email, purchase, delete data, or expose credentials."
+    expected_output:
+      - "notes/T004-sterile-interaction-proof.md"
+      - "Sanitized before/after receipts under notes/receipts/"
+    acceptance_criteria:
+      - "Receipt proves physical tap/snapshot control against a sterile target."
+      - "Receipt does not include raw source, screenshot pixels, transcript text, or private app content."
+    receipt:
+      result: blocked
+      task_id: T004
+      note: "notes/T004-sterile-interaction-proof.md"
+      summary: "Cannot run sterile interaction proof until WDA/equivalent physical UI control is restored."
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit whether physical UI automation is recovered enough to unblock the Apple host-app matrix."
+    inputs:
+      - "T001-T004 receipts"
+      - "docs/acceptance-evidence.md"
+    constraints:
+      - "Do not mark this board complete just because WDA builds."
+      - "Do not claim closed-beta readiness; that belongs to the next matrix board."
+    expected_output:
+      - "notes/T999-final-audit.md"
+    acceptance_criteria:
+      - "Strongest realistic failure mode is named and tested against evidence."
+      - "Decision is either recovered_for_matrix or external_blocker."
+      - "If recovered, next board is the Apple app matrix rerun with Notes, Messages/iMessage sterile thread, Mail sterile compose, Safari normal field, and Safari secure field."
+      - "GoalBuddy state checker, git diff --check, and privacy/secret scan pass."
+    receipt:
+      result: external_blocker
+      task_id: T999
+      decision: external_blocker
+      note: "notes/T999-final-audit.md"
+      full_outcome_complete: false
+      summary: "Physical UI automation is not recovered; two WDA attempts reached the runner and failed at XCTest automation-mode enablement."
+      next_owner: "operator_xcode_device_setup"
