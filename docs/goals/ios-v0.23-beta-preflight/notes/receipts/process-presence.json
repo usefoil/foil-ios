@@ -1,0 +1,9 @@
+{
+  "foilAppProcessPresent": true,
+  "foilKeyboardProcessPresent": true,
+  "processListSha256": "5b3831f24568274db04eb6ef7fa5e5c2b2bfe1c9dcbeafe4d069d758385f8452",
+  "rawOutputCommitted": false,
+  "schema": "foil.iosV023Preflight.processPresence.v1",
+  "springBoardProcessPresent": true,
+  "testFlightProcessPresent": true
+}

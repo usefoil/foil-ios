@@ -1,0 +1,163 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.23 Beta Preflight"
+  slug: "ios-v0.23-beta-preflight"
+  kind: existing_plan
+  tranche: "Prove the preview iPhone and local automation state are safe for closed-beta rehearsal."
+  status: active
+  oracle:
+    signal: "Device, WDA, TestFlight-installed build metadata, provider/key presence, microphone permission, App Group state, and keyboard/full-access state are known before full rehearsal."
+    cadence: "before TestFlight rehearsal and again after any operator action"
+    final_proof: "Sanitized receipts for device/WDA status, installed app metadata, provider/key presence without secret values, microphone permission, App Group state, keyboard settings status, and exact blocker list if any."
+  intake:
+    original_request: "Closed beta readiness, physical iPhone beta rehearsal, Apple app baseline, foil-ios repo, allow small beta UX fixes."
+    interpreted_outcome: "Create a read-only preflight board that prevents stale-build or unavailable-device false starts."
+    input_shape: existing_plan
+    audience: "Foil owner/developer running the physical rehearsal"
+    authority: approved
+    proof_type: demo
+    completion_proof: "Preflight receipt says proceed_to_testflight_rehearsal with all required state known, or records exact operator actions."
+    likely_misfire: "Starting matrix testing against a stale/debug build, offline WDA, missing provider key, denied microphone permission, or inactive keyboard."
+    blind_spots_considered:
+      - "Device may be unlocked but WDA may not be running."
+      - "Installed app metadata may not match the build intended for beta rehearsal."
+      - "Provider key presence must be checked without exposing the key."
+      - "Keyboard full access can be enabled but host app may still need keyboard refresh."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/ios-v0-23-beta-preflight/"
+    command: "npx goalbuddy board docs/goals/ios-v0.23-beta-preflight"
+
+active_task: T999
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Inventory the exact closed-beta rehearsal preflight state without modifying app code or private data."
+    inputs:
+      - "Current local repo state"
+      - "Known preview iPhone/WDA/TestFlight setup"
+      - "docs/goals/ios-v0.22-testflight-release-proof/notes/receipts"
+    constraints:
+      - "Read-only except writing sanitized notes/receipts under this board."
+      - "Do not print provider secrets, App Store Connect secrets, JWTs, or raw private screen content."
+      - "Stop for operator if device unlock, trust prompt, TestFlight replacement prompt, or private app content is encountered."
+    expected_output:
+      - "notes/T001-preflight-scout.md"
+      - "Sanitized receipts under notes/receipts/ for device status, WDA status, installed build, app-group summary, provider/key presence, microphone permission, and keyboard/full-access state when observable."
+      - "Decision recommendation: proceed_to_testflight_rehearsal | operator_needed | fix_required."
+    acceptance_criteria:
+      - "Device reachability is proven by devicectl, WDA status, or exact equivalent."
+      - "Installed Foil app version/build and bundle id are recorded."
+      - "Provider/key presence is recorded as boolean/metadata only, never raw secret."
+      - "App Group state records phase and hasTranscript without raw private transcript unless the text is sterile."
+      - "Keyboard/full-access state is known or the exact operator screen/action is documented."
+    receipt:
+      result: done
+      task_id: T001
+      note: "notes/T001-preflight-scout.md"
+      summary: "Device, build, App Group, keyboard health, and process state are known, but WDA failed twice with XCTest automation-mode timeout. Provider/key presence and microphone permission remain unknown because they require app UI automation or an explicitly approved command-mailbox rehearsal."
+      decision_recommendation: operator_needed
+      evidence:
+        device_details: "notes/receipts/device-details.json"
+        status_after_wda_retry: "notes/receipts/status-after-wda-retry.json"
+        installed_app: "notes/receipts/installed-app-metadata.json"
+        app_group_summary: "notes/receipts/app-group-summary.json"
+        app_group_files: "notes/receipts/app-group-files.json"
+        app_group_preferences: "notes/receipts/app-group-preferences.json"
+        process_presence: "notes/receipts/process-presence.json"
+        wda_failure: "notes/receipts/wda-failure.json"
+      known_state:
+        device_reachable: true
+        installed_bundle_id: "com.neonwatty.FoilIOS"
+        installed_version: "0.1.0"
+        installed_bundle_version: "11"
+        app_group_phase: idle
+        app_group_has_transcript: false
+        keyboard_full_access_state: enabled
+        foil_app_process_present: true
+        foil_keyboard_process_present: true
+        wda_ready: false
+      unknown_state:
+        - "Current provider/key presence is in keychain and not exposed through App Group receipts."
+        - "Current microphone permission requires app UI automation or live command-mailbox recording to verify."
+      strongest_realistic_failure_mode:
+        claim: "Preflight can proceed because build 11 and keyboard health look good."
+        evidence_against_claim:
+          - "Two WDA attempts failed with Timed out while enabling automation mode."
+          - "Final harness status records wda.ready=false."
+          - "Provider/key and microphone fields are not present in App Group receipts."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Decide whether preflight evidence is strong enough to start TestFlight rehearsal."
+    inputs:
+      - "T001 receipt"
+      - "Goal oracle"
+    constraints:
+      - "Reject if installed build is unknown or stale relative to intended rehearsal."
+      - "Reject if provider/key, microphone, WDA, or keyboard state is unknown without an exact blocker."
+    expected_output:
+      - "proceed_to_testflight_rehearsal | operator_needed | fix_required"
+      - "If blocked, exact next action and owner."
+    acceptance_criteria:
+      - "Decision cites every required preflight field."
+      - "If proceeding, no required state remains unknown."
+      - "If blocked, the blocker is narrow enough for a single operator or Worker action."
+    receipt:
+      result: done
+      task_id: T002
+      decision: operator_needed
+      note: "notes/T002-preflight-judge.md"
+      full_outcome_complete: false
+      summary: "Do not proceed to TestFlight rehearsal yet. WDA/physical UI automation is down, and provider/key plus microphone readiness are not currently proven."
+      exact_next_action:
+        owner: operator_or_worker
+        action: "Restore physical UI automation so WDA reports ready at http://127.0.0.1:8100/status, or explicitly revise the board to approve the command-mailbox rehearsal path."
+      blocked_fields:
+        - wda_ready
+        - provider_key_presence_current
+        - microphone_permission_current
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: active
+    reasoning_hint: high
+    objective: "Close the preflight board only after disproving the strongest realistic failure mode."
+    inputs:
+      - "T001-T002 receipts"
+    constraints:
+      - "Do not mark done just because WDA responds."
+    expected_output:
+      - "notes/T999-final-audit.md"
+    acceptance_criteria:
+      - "Audit specifically rules out stale/debug build, missing provider key, unavailable WDA, denied microphone, and unknown keyboard state, or records them as blockers."
+      - "GoalBuddy state checker passes."

@@ -1,0 +1,12 @@
+{
+  "appUrlHash": "105329e58eaceb5f",
+  "builtByDeveloper": true,
+  "bundleIdentifier": "com.neonwatty.FoilIOS",
+  "bundleVersion": "11",
+  "command": "xcrun devicectl device info apps --bundle-id com.neonwatty.FoilIOS --columns * --json-output /tmp/...",
+  "deviceIdentifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+  "name": "Foil iOS",
+  "removable": true,
+  "schema": "foil.iosV023Preflight.installedApp.v1",
+  "version": "0.1.0"
+}

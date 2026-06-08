@@ -1,0 +1,22 @@
+{
+  "attempts": [
+    {
+      "logPath": "/tmp/foil-ios-wda.log",
+      "logSha256": "c310ddea39b8ed26ef0c64dbac31115dc43cd21d634e95a8219e15c3e06a66ad",
+      "timedOutEnablingAutomationMode": true
+    },
+    {
+      "logPath": "/tmp/foil-ios-wda-retry.log",
+      "logSha256": "f3c87e63f2e0de3eda7dcef74692412daa0540ab9e1bffbc21a9773e0435e0a5",
+      "timedOutEnablingAutomationMode": true
+    }
+  ],
+  "finalWdaReady": false,
+  "iproxyNetworkTunnelResult": "no_connected_matching_device",
+  "rawLogsCommitted": false,
+  "schema": "foil.iosV023Preflight.wdaFailure.v1",
+  "xcodeResultBundlePaths": [
+    "/Users/neonwatty/Library/Developer/Xcode/DerivedData/WebDriverAgent-hhcaekviohfkrlbgpzmtsblbasrm/Logs/Test/Test-WebDriverAgentRunner-nodebug-2026.06.08_05-34-38--0700.xcresult",
+    "/Users/neonwatty/Library/Developer/Xcode/DerivedData/WebDriverAgent-hhcaekviohfkrlbgpzmtsblbasrm/Logs/Test/Test-WebDriverAgentRunner-nodebug-2026.06.08_05-39-42--0700.xcresult"
+  ]
+}

@@ -1,0 +1,117 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.23 Readiness Audit"
+  slug: "ios-v0.23-readiness-audit"
+  kind: audit
+  tranche: "Audit closed-beta physical rehearsal evidence and make the go/no-go decision."
+  status: active
+  oracle:
+    signal: "The audit can trace every closed-beta readiness claim back to receipts and can disprove or name the strongest remaining failure modes."
+    cadence: "after all prior v0.23 child boards close"
+    final_proof: "Go/no-go note, receipt index, open PR/CI state, secret/private-content scan, residual risk table, and next-board recommendation."
+  intake:
+    original_request: "Create a conveyor of boards with measurable acceptance criteria at every task."
+    interpreted_outcome: "End the conveyor with a hard evidence audit rather than a vibe-based readiness claim."
+    input_shape: audit
+    audience: "Foil owner/developer deciding whether to invite/expand closed beta"
+    authority: approved
+    proof_type: review
+    completion_proof: "Readiness audit says ready or not ready with evidence links for every claim."
+    likely_misfire: "The team moves to closed beta with unresolved install, insertion, recovery, privacy, or CI risks because the happy path felt good."
+    blind_spots_considered:
+      - "Open PRs or failing CI can undermine a locally proven fix."
+      - "Receipts can accidentally include sensitive content."
+      - "A row can be marked pass while App Group cleanup failed."
+      - "The next action should be explicit if the go/no-go is no-go."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/ios-v0-23-readiness-audit/"
+    command: "npx goalbuddy board docs/goals/ios-v0.23-readiness-audit"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    reasoning_hint: medium
+    objective: "Index all v0.23 receipts and map them to the parent closed-beta readiness acceptance criteria."
+    inputs:
+      - "docs/goals/ios-v0.23-closed-beta-conveyor/state.yaml"
+      - "docs/goals/ios-v0.23-beta-preflight/state.yaml"
+      - "docs/goals/ios-v0.23-testflight-rehearsal/state.yaml"
+      - "docs/goals/ios-v0.23-apple-app-matrix/state.yaml"
+      - "docs/goals/ios-v0.23-beta-recovery-ux/state.yaml"
+    constraints:
+      - "Read-only except this board's notes."
+      - "Do not summarize a missing receipt as proof."
+    expected_output:
+      - "notes/T001-receipt-index.md"
+      - "Acceptance criterion -> receipt mapping."
+      - "Missing/weak proof list."
+    acceptance_criteria:
+      - "Every parent acceptance criterion is marked proven, weak, missing, blocked, or not applicable."
+      - "Receipt paths and PR links are listed when available."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Perform the final closed-beta go/no-go audit."
+    inputs:
+      - "T001 receipt index"
+      - "Open PR and CI state"
+      - "Secret/private-content scan results"
+    constraints:
+      - "Do not approve closed beta if any required Apple app row is missing without accepted blocker."
+      - "Do not approve closed beta if committed receipts contain private content or credentials."
+      - "Do not approve closed beta if product-fix PRs remain unmerged or failing."
+    expected_output:
+      - "notes/T002-go-no-go.md"
+      - "decision: ready_for_closed_beta | not_ready"
+      - "Residual risk table and next board recommendation."
+    acceptance_criteria:
+      - "Audit names and tests the strongest realistic failure mode."
+      - "Audit includes GitHub PR/CI state."
+      - "Audit includes secret/private-content scan command and result."
+      - "Go/no-go decision follows the evidence, not optimism."
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Close the readiness audit and update the parent conveyor with the final decision."
+    inputs:
+      - "T001-T002 receipts"
+    constraints:
+      - "Parent conveyor can only be marked done if this board's decision is ready_for_closed_beta or if no-go is recorded with exact next board."
+    expected_output:
+      - "notes/T999-final-audit.md"
+      - "Parent conveyor state update recommendation."
+    acceptance_criteria:
+      - "GoalBuddy state checker passes for all v0.23 boards."
+      - "Parent conveyor's likely misfire is explicitly ruled out or recorded as not ready."

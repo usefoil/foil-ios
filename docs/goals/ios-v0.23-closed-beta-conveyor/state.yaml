@@ -1,0 +1,186 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.23 Closed Beta Rehearsal Conveyor"
+  slug: "ios-v0.23-closed-beta-conveyor"
+  kind: existing_plan
+  tranche: "Coordinate physical iPhone closed-beta readiness across TestFlight, provider setup, keyboard enablement, Apple app insertion, recovery, and final beta gate."
+  status: active
+  oracle:
+    signal: "Every child board either lands verified proof/PRs or records an exact blocker, and the final audit proves a real trusted tester can complete the Apple app baseline without direct hand-holding."
+    cadence: "after each child board closeout and before final conveyor completion"
+    final_proof: "Child board receipts, physical-device sanitized screenshots or WDA/app-group receipts, TestFlight installed-build metadata, host-app matrix receipts, recovery receipt, PR links, CI/check evidence, secret/private-content scans, and final readiness audit."
+  intake:
+    original_request: "Let's plan out each of these steps very carefully. We can use as many Gold Buddy prep boards as we need to to create a conveyor of boards with measurable acceptance criteria at every task on every board."
+    interpreted_outcome: "Create a GoalBuddy conveyor for Foil iOS closed-beta physical rehearsal across the Apple app baseline."
+    input_shape: existing_plan
+    audience: "Foil owner/developer and trusted closed-beta testers"
+    authority: approved
+    proof_type: demo
+    completion_proof: "The preview iPhone physically proves TestFlight install/update, dictation, insertion across Notes, Messages/iMessage, Mail, and Safari/text fields, plus one recovery/reset path, with small beta UX fixes handled if evidence demands them."
+    likely_misfire: "Marking closed beta ready after a single Notes smoke while install/update, keyboard reset, Messages/Mail/Safari, or recovery still fails for a tester."
+    blind_spots_considered:
+      - "TestFlight can show a stale or cached build if installed metadata is not checked."
+      - "Foil Keyboard may appear enabled but not be active in a host app until the user refreshes keyboards."
+      - "Messages/iMessage can expose private content and requires a sterile thread."
+      - "Mail compose and Safari text fields can differ from Notes in focus, keyboard replacement, and secure-field behavior."
+      - "Small UX fixes can balloon into product work unless constrained by beta-blocking evidence."
+      - "WDA/control receipts can prove automation without proving the human tester path unless the final audit checks both."
+    existing_plan_facts:
+      - "Build 11 has already been uploaded, attached, installed on iPhone-preview, and physically smoke-tested in Notes."
+      - "Earlier boards closed all prior active GoalBuddy prep boards in the standalone iOS repo."
+      - "The preview iPhone, WDA, TestFlight, Groq key path, and app-group inspection path have worked before."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  child_boards_must_close_before_parent_done: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/ios-v0-23-closed-beta-conveyor/"
+    command: "npx goalbuddy board docs/goals/ios-v0.23-closed-beta-conveyor"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: worker
+    assignee: Worker
+    status: active
+    reasoning_hint: medium
+    objective: "Run the beta preflight child board and decide whether the current device/build/harness state is safe for the full rehearsal."
+    allowed_files:
+      - "docs/goals/ios-v0.23-closed-beta-conveyor/**"
+      - "docs/goals/ios-v0.23-beta-preflight/**"
+    verify:
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-v0.23-beta-preflight/state.yaml"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-v0.23-closed-beta-conveyor/state.yaml"
+      - "git diff --check"
+      - "Targeted secret/private-content scan over touched v0.23 board files"
+    stop_if:
+      - "The child board requires device unlock, credentials, private content, install replacement approval, destructive cleanup, or product-code changes."
+      - "The preflight child board records operator_needed or fix_required instead of proceed_to_testflight_rehearsal."
+    inputs:
+      - "docs/goals/ios-v0.23-beta-preflight/goal.md"
+      - "docs/goals/ios-v0.22-testflight-release-proof/state.yaml"
+    constraints:
+      - "Do not edit product code from the parent task."
+      - "Do not proceed to host-app matrix if installed build, provider state, WDA, or keyboard state is unknown."
+      - "Record exact blockers instead of asking the operator unless the blocker is a sensitive/device action."
+    expected_output:
+      - "Preflight board done or blocked with exact evidence."
+      - "Decision: proceed_to_testflight_rehearsal | operator_needed | fix_required."
+    acceptance_criteria:
+      - "Installed Foil build metadata is known."
+      - "WDA status and device reachability are known."
+      - "Provider/key state is verified without printing secrets."
+      - "Keyboard extension/full-access/active-keyboard status is known or exact operator action is documented."
+    progress:
+      status: stop_condition_hit
+      note: "notes/T001-preflight-stop.md"
+      child_board: "docs/goals/ios-v0.23-beta-preflight/goal.md"
+      summary: "Preflight child board gathered device/build/App Group/keyboard evidence but recorded operator_needed because WDA is down and provider/microphone readiness remain unverified."
+      do_not_advance_to: "docs/goals/ios-v0.23-testflight-rehearsal/goal.md"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run the TestFlight rehearsal child board after preflight passes."
+    inputs:
+      - "docs/goals/ios-v0.23-testflight-rehearsal/goal.md"
+      - "T001 preflight receipt"
+    constraints:
+      - "Do not claim TestFlight proof from a debug install."
+      - "Stop for operator only on TestFlight replacement prompts, device unlock, or external App Store Connect/TestFlight blockers."
+    expected_output:
+      - "Installed-build metadata receipt."
+      - "Physical sterile dictation/transcription receipt on the installed TestFlight build."
+      - "Proceed/fix/block decision for the Apple app matrix."
+    acceptance_criteria:
+      - "Device metadata identifies the installed build under the TestFlight bundle."
+      - "Foil app records and transcribes a sterile phrase."
+      - "App Group state after transcription has a latest transcript ready for keyboard insertion."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run the Apple app baseline matrix child board."
+    inputs:
+      - "docs/goals/ios-v0.23-apple-app-matrix/goal.md"
+      - "T002 TestFlight rehearsal receipt"
+    constraints:
+      - "Use sterile content only."
+      - "Do not inspect private Messages, Mail, Safari, or Notes content."
+      - "Treat secure-field keyboard exclusion as a valid expected behavior only with evidence."
+    expected_output:
+      - "Notes, Messages/iMessage, Mail, and Safari insertion matrix receipts."
+      - "App Group before/after receipts proving exact-once insertion or honest failure state."
+      - "Matrix decision: pass | small_ux_fix_required | external_blocker."
+    acceptance_criteria:
+      - "Each target row has before, action, after, and cleanup evidence."
+      - "At least one row proves a keyboard refresh/reset if needed."
+      - "No private content appears in committed receipts."
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run the beta recovery/UX child board for blockers discovered by the rehearsal."
+    inputs:
+      - "docs/goals/ios-v0.23-beta-recovery-ux/goal.md"
+      - "T001-T003 receipts"
+    constraints:
+      - "Only implement fixes backed by physical rehearsal evidence."
+      - "Keep fixes small enough for isolated PRs."
+      - "Do not add broad new features or third-party app scope."
+    expected_output:
+      - "Merged PRs or explicit deferral notes for every discovered beta friction item."
+      - "Post-fix simulator and physical receipts for any changed behavior."
+    acceptance_criteria:
+      - "Every beta-blocking issue is fixed, externally blocked, or explicitly deferred with a closed-beta risk label."
+      - "Any product code change has tests/build proof and a physical regression receipt where relevant."
+
+  - id: T005
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Run the readiness audit child board and decide whether the closed-beta rehearsal conveyor is complete."
+    inputs:
+      - "docs/goals/ios-v0.23-readiness-audit/goal.md"
+      - "T001-T004 receipts"
+    constraints:
+      - "Do not mark parent done until all child boards are done or honestly blocked with exact next action."
+      - "Audit the likely misfire: single happy-path proof mistaken for full closed-beta readiness."
+    expected_output:
+      - "Final readiness decision."
+      - "Residual risk list."
+      - "Exact next board recommendation if not ready."
+    acceptance_criteria:
+      - "Final audit references the proof for every acceptance criterion in the parent oracle."
+      - "Secret/private-content scan over touched receipts passes."
+      - "Open PR/CI state is clean or explicitly blocked."
+      - "Parent state can be marked done only if the audit says beta rehearsal is ready."

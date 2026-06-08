@@ -1,0 +1,127 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.23 TestFlight Rehearsal"
+  slug: "ios-v0.23-testflight-rehearsal"
+  kind: existing_plan
+  tranche: "Install/update the closed-beta TestFlight build and produce a fresh sterile transcript on the preview iPhone."
+  status: active
+  oracle:
+    signal: "The preview iPhone runs the intended TestFlight build and the Foil app produces a fresh sterile transcript ready for keyboard insertion."
+    cadence: "after install/update, after record, after transcribe, and before host-app handoff"
+    final_proof: "TestFlight/build metadata receipt, physical record/transcribe receipts, App Group before/after receipts, and secret/private-content scan."
+  intake:
+    original_request: "Physical iPhone beta rehearsal with Apple app baseline."
+    interpreted_outcome: "Prove the installed TestFlight build can create the transcript the keyboard matrix will insert."
+    input_shape: existing_plan
+    audience: "Foil owner/developer and trusted beta testers"
+    authority: approved
+    proof_type: demo
+    completion_proof: "Installed-build metadata and sterile transcript-ready App Group receipt are present."
+    likely_misfire: "Recording against a debug build or reusing stale App Group transcript state."
+    blind_spots_considered:
+      - "TestFlight replacement prompts require operator approval."
+      - "Automatic updates can make build identity ambiguous without installed metadata."
+      - "A transcript can be stale unless App Group is reset before rehearsal."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/ios-v0-23-testflight-rehearsal/"
+    command: "npx goalbuddy board docs/goals/ios-v0.23-testflight-rehearsal"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: judge
+    assignee: Judge
+    status: active
+    reasoning_hint: high
+    objective: "Validate preflight evidence and approve the largest safe TestFlight rehearsal slice."
+    inputs:
+      - "docs/goals/ios-v0.23-beta-preflight/state.yaml"
+      - "Current build/version metadata"
+    constraints:
+      - "Reject debug-build proof."
+      - "Require App Group reset before a fresh transcript is produced."
+      - "Do not upload a new build unless existing installed/TestFlight build is unsuitable and credentials are safely available."
+    expected_output:
+      - "Approved Worker slice with allowed_files, verify commands, stop_if conditions, and sterile phrase."
+    acceptance_criteria:
+      - "Worker objective names the exact intended installed build or says install/update first."
+      - "Allowed files are limited to board receipts unless a build-fix release is explicitly required."
+      - "Stop conditions include device unlock, install replacement prompt, credential prompt, stale build, and private-content exposure."
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Install/update the TestFlight build if needed, reset App Group state, record/transcribe a sterile phrase, and leave latest transcript staged."
+    allowed_files:
+      - "docs/goals/ios-v0.23-testflight-rehearsal/**"
+      - "FoiliOS/project.yml"
+      - "FoiliOS/FoilIOS.xcodeproj/**"
+    verify:
+      - "devicectl installed app metadata for com.neonwatty.FoilIOS"
+      - "WDA status/source receipt for Foil app screens"
+      - "App Group reset/before receipt"
+      - "Physical record/transcribe WDA receipts"
+      - "App Group after-transcribe receipt with sterile transcript staged"
+      - "git diff --check"
+      - "Targeted secret/private-content scan over touched files"
+    stop_if:
+      - "The phone needs unlock or install/replacement approval."
+      - "The installed build cannot be identified."
+      - "A new build upload is needed but credentials are unavailable or would be exposed."
+      - "Transcript content is not sterile."
+    expected_output:
+      - "notes/T002-testflight-rehearsal.md"
+      - "notes/receipts/build-installed.json"
+      - "notes/receipts/app-group-before.json"
+      - "notes/receipts/foil-record-start.json"
+      - "notes/receipts/foil-after-transcribe.json"
+      - "notes/receipts/app-group-after-transcribe.json"
+    acceptance_criteria:
+      - "Installed app metadata matches the intended TestFlight build."
+      - "The App Group was reset before recording."
+      - "The sterile phrase appears in sanitized transcript evidence or a deterministic token-count/phrase-count receipt."
+      - "App Group phase indicates transcript-ready state for the keyboard."
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Audit that the rehearsal produced a fresh transcript on the installed TestFlight build."
+    inputs:
+      - "T001-T002 receipts"
+    constraints:
+      - "Do not accept stale transcript state."
+      - "Do not accept debug-installed metadata as beta proof."
+    expected_output:
+      - "notes/T999-final-audit.md"
+      - "handoff_to: docs/goals/ios-v0.23-apple-app-matrix/goal.md"
+    acceptance_criteria:
+      - "Audit cites installed-build metadata, App Group reset, record/transcribe evidence, and transcript-ready state."
+      - "Strongest failure mode is ruled out with direct evidence."
+      - "GoalBuddy state checker passes."

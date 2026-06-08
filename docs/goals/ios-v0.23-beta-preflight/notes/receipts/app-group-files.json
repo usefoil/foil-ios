@@ -1,0 +1,39 @@
+{
+  "domainIdentifier": "group.com.neonwatty.FoilIOS",
+  "files": [
+    {
+      "isDirectory": true,
+      "isReadable": true,
+      "isWritable": true,
+      "lastModDatePresent": true,
+      "relativePath": "Caches",
+      "size": 64
+    },
+    {
+      "isDirectory": true,
+      "isReadable": true,
+      "isWritable": true,
+      "lastModDatePresent": true,
+      "relativePath": "Preferences",
+      "size": 96
+    },
+    {
+      "isDirectory": false,
+      "isReadable": true,
+      "isWritable": true,
+      "lastModDatePresent": true,
+      "relativePath": "Preferences/group.com.neonwatty.FoilIOS.plist",
+      "size": 1138
+    },
+    {
+      "isDirectory": false,
+      "isReadable": true,
+      "isWritable": true,
+      "lastModDatePresent": true,
+      "relativePath": "foil-keyboard-snapshot.json",
+      "size": 99
+    }
+  ],
+  "schema": "foil.iosV023Preflight.appGroupFiles.v1",
+  "subdirectory": "Library"
+}

@@ -1,0 +1,44 @@
+{
+  "foil.keyboard.healthReport.v1": {
+    "bytes": 146,
+    "fullAccessState": "enabled",
+    "json": true,
+    "messageHash": "2038bb1f080f8df5",
+    "present": true,
+    "sha256": "4b1c3f29970dcd4703ad9f5ccfd0334197abc5f6bd5608ffbf08ec1b97c91bde",
+    "snapshotHasTranscript": false,
+    "snapshotPhase": "idle",
+    "type": "bytes",
+    "updatedAtPresent": true
+  },
+  "foil.keyboard.snapshot.v1": {
+    "bytes": 63,
+    "hasTranscript": false,
+    "json": true,
+    "phase": "idle",
+    "present": true,
+    "sha256": "c9c66574b7673ad8960efd436dff0def6a5a32309ad5c437edfca559409e9688",
+    "type": "bytes",
+    "updatedAtPresent": true
+  },
+  "foil.keyboard.storageReport.v1": {
+    "bytes": 765,
+    "canonicalVerificationHasTranscript": false,
+    "canonicalVerificationPhase": "idle",
+    "canonicalWriteSucceeded": true,
+    "defaultsWriteAttempted": true,
+    "hasTranscript": false,
+    "json": true,
+    "operation": "insert",
+    "phase": "idle",
+    "present": true,
+    "sha256": "ad7c00fb012593593b0185773c70ecc5ce79a4df2a1ae5241193e5c289aad984",
+    "type": "bytes"
+  },
+  "keys": [
+    "foil.keyboard.healthReport.v1",
+    "foil.keyboard.snapshot.v1",
+    "foil.keyboard.storageReport.v1"
+  ],
+  "schema": "foil.iosV023Preflight.appGroupPreferences.v1"
+}

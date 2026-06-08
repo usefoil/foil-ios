@@ -1,0 +1,199 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.23 Apple App Matrix"
+  slug: "ios-v0.23-apple-app-matrix"
+  kind: existing_plan
+  tranche: "Prove keyboard insertion in Notes, Messages/iMessage, Mail, and Safari/text fields on the preview iPhone."
+  status: active
+  oracle:
+    signal: "Each Apple baseline app row has sanitized physical evidence for keyboard availability, insert action, exact-once text mutation or honest blocker, and App Group cleanup."
+    cadence: "after each app row and at matrix audit"
+    final_proof: "Matrix table, WDA/screenshot/app-group receipts per row, private-content scan, and final audit."
+  intake:
+    original_request: "Physical iPhone beta rehearsal, Apple app matrix."
+    interpreted_outcome: "Test the closed-beta insertion experience across the default Apple apps a tester is likely to try first."
+    input_shape: existing_plan
+    audience: "Foil owner/developer and trusted beta testers"
+    authority: approved
+    proof_type: demo
+    completion_proof: "Notes, Messages/iMessage, Mail, and Safari rows are passed, honestly blocked, or routed to beta UX fix board with receipts."
+    likely_misfire: "Counting host-app support from one app, or leaking private app content while trying to prove support."
+    blind_spots_considered:
+      - "Messages/iMessage requires a sterile thread and should not send private content."
+      - "Mail compose may require account state and should avoid sending unless approved."
+      - "Safari secure fields should reject custom keyboards by design."
+      - "Keyboard reset/refresh friction may occur between host apps."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/ios-v0-23-apple-app-matrix/"
+    command: "npx goalbuddy board docs/goals/ios-v0.23-apple-app-matrix"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    reasoning_hint: medium
+    objective: "Design the sanitized Apple app row protocol and identify which rows require operator setup before touching private apps."
+    inputs:
+      - "docs/goals/ios-v0.23-testflight-rehearsal/state.yaml"
+      - "Existing host-app matrix receipts"
+    constraints:
+      - "Read-only except this board's notes."
+      - "Do not open private Messages/Mail content until sterile target constraints are defined."
+      - "Preserve prior evidence but require fresh v0.23 proof for this matrix."
+    expected_output:
+      - "notes/T001-matrix-protocol.md"
+      - "Row protocol for Notes, Messages/iMessage, Mail, Safari normal text, and Safari secure/private field limitation."
+      - "Operator setup checklist for sterile Messages and Mail if needed."
+    acceptance_criteria:
+      - "Each row has a named sterile target, before receipt, insert action receipt, after receipt, cleanup receipt, and stop_if condition."
+      - "Private-content boundaries are explicit for Messages, Mail, and Safari."
+      - "Matrix can proceed row by row without ambiguity."
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run the Notes row as the control row and prove exact-once insertion."
+    allowed_files:
+      - "docs/goals/ios-v0.23-apple-app-matrix/**"
+    verify:
+      - "App Group staged transcript receipt before row"
+      - "Notes sterile field before receipt"
+      - "Foil Keyboard Insert latest action receipt"
+      - "Notes sterile field after receipt"
+      - "App Group after-insert cleanup receipt"
+      - "Private-content scan over receipts"
+    stop_if:
+      - "Notes opens private content that cannot be sanitized."
+      - "Foil Keyboard is unavailable and keyboard refresh requires operator."
+    expected_output:
+      - "notes/T002-notes-row.md"
+      - "notes/receipts/notes-*.json"
+    acceptance_criteria:
+      - "The inserted sterile text appears exactly once in the target field."
+      - "Insert latest is disabled or App Group has no staged transcript after insertion."
+      - "Receipts do not include private Notes content."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run the Messages/iMessage row in a sterile thread without sending private content."
+    allowed_files:
+      - "docs/goals/ios-v0.23-apple-app-matrix/**"
+    verify:
+      - "Sterile thread target receipt or operator-created thread receipt"
+      - "Message input before receipt"
+      - "Foil Keyboard Insert latest action receipt"
+      - "Message input after receipt"
+      - "No-send cleanup or explicit approved-send receipt"
+      - "Private-content scan over receipts"
+    stop_if:
+      - "No sterile thread exists and operator setup is required."
+      - "Messages displays private content that cannot be sanitized."
+      - "The only way to prove insertion would send a real message without approval."
+    expected_output:
+      - "notes/T003-messages-row.md"
+      - "notes/receipts/messages-*.json"
+    acceptance_criteria:
+      - "The sterile transcript appears in the compose field exactly once, or blocker records the missing sterile thread/operator action."
+      - "No private conversation content is committed."
+      - "No real message is sent without explicit approval receipt."
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run the Mail compose row using a sterile draft target."
+    allowed_files:
+      - "docs/goals/ios-v0.23-apple-app-matrix/**"
+    verify:
+      - "Mail sterile compose target receipt"
+      - "Body field before receipt"
+      - "Foil Keyboard Insert latest action receipt"
+      - "Body field after receipt"
+      - "Draft cleanup receipt or exact blocker"
+      - "Private-content scan over receipts"
+    stop_if:
+      - "Mail account state or private inbox content blocks safe testing."
+      - "A draft cannot be created without exposing private data."
+      - "Sending would be required without approval."
+    expected_output:
+      - "notes/T004-mail-row.md"
+      - "notes/receipts/mail-*.json"
+    acceptance_criteria:
+      - "Sterile transcript appears exactly once in the Mail compose body or row records exact blocker."
+      - "No email is sent unless explicitly approved."
+      - "Draft cleanup state is recorded."
+
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run Safari normal text-field and secure-field limitation rows."
+    allowed_files:
+      - "docs/goals/ios-v0.23-apple-app-matrix/**"
+    verify:
+      - "Sterile local fixture or safe web text field receipt"
+      - "Normal text field before/action/after receipts"
+      - "Secure field keyboard exclusion receipt"
+      - "App Group cleanup receipt"
+      - "Private-content scan over receipts"
+    stop_if:
+      - "Local fixture cannot be served or Safari cannot access it."
+      - "Secure field exposes unexpected custom keyboard behavior requiring security review."
+    expected_output:
+      - "notes/T005-safari-row.md"
+      - "notes/receipts/safari-*.json"
+    acceptance_criteria:
+      - "Normal Safari text field receives the sterile transcript exactly once."
+      - "Secure field proves custom keyboard absence or no insertion as expected."
+      - "Receipts distinguish expected secure-field limitation from app failure."
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Audit the Apple app matrix and route any beta-blocking friction to the recovery/UX board."
+    inputs:
+      - "T001-T005 receipts"
+    constraints:
+      - "Do not hide blocked rows under partial pass language."
+      - "Do not call the matrix complete if any required app row lacks before/action/after/cleanup evidence or an exact blocker."
+    expected_output:
+      - "notes/T999-matrix-audit.md"
+      - "decision: pass | small_ux_fix_required | external_blocker"
+    acceptance_criteria:
+      - "Every Apple baseline app row is represented in the final matrix."
+      - "Any failure has a concrete recovery/UX task or external-blocker owner."
+      - "GoalBuddy state checker passes."

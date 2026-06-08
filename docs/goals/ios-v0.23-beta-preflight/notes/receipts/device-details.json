@@ -1,0 +1,30 @@
+{
+  "capabilities": {
+    "applicationControl": true,
+    "processControl": true,
+    "viewDeviceScreen": true
+  },
+  "connection": {
+    "pairingState": "paired",
+    "transportType": "localNetwork",
+    "tunnelState": "connected",
+    "tunnelTransportProtocol": "tcp"
+  },
+  "device": {
+    "bootState": "booted",
+    "developerModeStatus": "enabled",
+    "name": "iPhone-preview",
+    "osBuildUpdate": "23F77",
+    "osVersionNumber": "26.5"
+  },
+  "hardware": {
+    "deviceType": "iPhone",
+    "marketingName": "iPhone 11",
+    "platform": "iOS",
+    "productType": "iPhone12,1",
+    "reality": "physical",
+    "udidHash": "c170f1c5784f5a1b"
+  },
+  "identifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+  "schema": "foil.iosV023Preflight.deviceDetails.v1"
+}
