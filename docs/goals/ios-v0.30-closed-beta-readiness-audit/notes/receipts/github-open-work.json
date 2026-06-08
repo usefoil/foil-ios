@@ -1,0 +1,12 @@
+{
+  "openIssueCount": 1,
+  "openIssues": [
+    {
+      "number": 12,
+      "title": "Defer Mail blank compose keyboard insertion row",
+      "url": "https://github.com/mean-weasel/foil-ios/issues/12"
+    }
+  ],
+  "openPrCount": 0,
+  "schema": "foil.iosV030.githubOpenWork.v1"
+}

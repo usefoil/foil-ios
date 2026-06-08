@@ -1,0 +1,119 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.30 Closed Beta Readiness Audit"
+  slug: "ios-v0.30-closed-beta-readiness-audit"
+  kind: audit
+  tranche: "Consolidate current iOS proof into a closed-beta go/no-go decision."
+  status: done
+  oracle:
+    signal: "A receipt-backed readiness decision with explicit claim boundaries."
+    cadence: "after receipt index and go/no-go note"
+    final_proof: "Final audit names strongest overclaim failure mode and rules it out."
+  intake:
+    original_request: "ok do this"
+    interpreted_outcome: "Create and execute a closed-beta readiness audit after current host-app proof."
+    input_shape: specific
+    audience: "Foil owner/developer preparing internal TestFlight beta"
+    authority: approved
+    proof_type: review
+    completion_proof: "Committed GoalBuddy board with go/no-go decision and updated claim docs."
+    likely_misfire: "Calling beta ready while hiding Mail deferral or overclaiming Messages/arbitrary app support."
+    blind_spots_considered:
+      - "Installed build might be stale relative to source metadata."
+      - "Old v0.23 no-go could conflict with newer WDA recovery evidence."
+      - "Tester copy could overclaim Mail, delivery, or existing private-thread behavior."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-30-closed-beta-readiness-audit/"
+    command: "npx goalbuddy board docs/goals/ios-v0.30-closed-beta-readiness-audit"
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Build a receipt index for current closed-beta criteria."
+    expected_output:
+      - "notes/T001-receipt-index.md"
+      - "notes/receipts/installed-app-build.json"
+      - "notes/receipts/github-open-work.json"
+    acceptance_criteria:
+      - "Installed build, open work, host-app rows, and deferred Mail are mapped to evidence."
+      - "Old v0.23 no-go is explicitly superseded only where newer proof exists."
+    receipt:
+      result: receipt_index_complete
+      task_id: T001
+      note: "notes/T001-receipt-index.md"
+      summary: "Current build and matrix evidence indexed; Mail is deferred in issue #12."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Make a closed-beta go/no-go decision."
+    inputs:
+      - "T001 receipt index"
+      - "docs/acceptance-evidence.md"
+    expected_output:
+      - "notes/T002-go-no-go.md"
+    acceptance_criteria:
+      - "Decision is explicit and caveated."
+      - "Mail/Messages/arbitrary-app boundaries are not hidden."
+    receipt:
+      result: go_narrow_internal_beta_with_caveats
+      task_id: T002
+      decision: go_narrow_internal_beta_with_caveats
+      note: "notes/T002-go-no-go.md"
+      summary: "Audit recommends a small internal beta for the narrow app-to-keyboard loop."
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Final audit against overclaiming beta readiness."
+    inputs:
+      - "T001"
+      - "T002"
+      - "README.md"
+      - "docs/ios-keyboard-host-app-matrix.md"
+    constraints:
+      - "Do not approve broad app compatibility."
+      - "Do not treat Mail as complete."
+    expected_output:
+      - "notes/T999-final-audit.md"
+    acceptance_criteria:
+      - "Strongest realistic failure mode is named and ruled out."
+      - "Final decision and next board are explicit."
+    receipt:
+      result: final_audit_pass
+      task_id: T999
+      decision: go_narrow_internal_beta_with_caveats
+      note: "notes/T999-final-audit.md"
+      full_outcome_complete: true
+      summary: "Closed-beta readiness audit passes for a narrow internal beta with explicit caveats."

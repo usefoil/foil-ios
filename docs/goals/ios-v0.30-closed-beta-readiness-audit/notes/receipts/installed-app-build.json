@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier": "com.neonwatty.FoilIOS",
+  "deviceId": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+  "devicectlJsonSha256": "8cfead51ce6f9cac1ed6d710b9e024e8d48409b495122f750f59375b7acf7732",
+  "printedRawDeviceOutput": false,
+  "schema": "foil.iosV030.installedAppBuild.v1",
+  "version": "0.1.0",
+  "build": "11"
+}

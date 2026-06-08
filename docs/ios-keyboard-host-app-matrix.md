@@ -24,10 +24,22 @@ bodies from non-sterile contexts must not be committed.
 | Calendar blank new-event title | Blocked | `docs/goals/ios-v0.20-host-app-matrix/notes/receipts/calendar-new-event-blocker.json` | Opening Calendar normally could expose private event titles before a blank event sheet is focused. The run stopped before fetching Calendar source or screenshots. |
 | Foil iOS secure-field rejection fallback | Blocked | `docs/goals/ios-v0.20-host-app-matrix/notes/receipts/foil-secure-stage.json`, `foil-secure-blocker.json`, `foil-secure-cleanup.json` | A secure-field rejection row could falsely pass without focusing the secure field. The run records this as blocked because Diagnostics could not be expanded through WDA, and cleanup reset App Group to idle. |
 
+## v0.26-v0.30 Closed-Beta Readiness Coverage
+
+| Row | Status | Receipts | Strongest Failure Mode Checked |
+| --- | --- | --- | --- |
+| Safari normal field | Pass | `docs/goals/ios-v0.26-apple-host-app-matrix-rerun/notes/receipts/safari-retry-before-insert.json`, `safari-retry-after-insert.json`, `safari-retry-app-group-after-insert.json` | The row preserved failed tap evidence, then proved the corrected tap produced exactly one sterile value and consumed App Group state. |
+| Safari secure/password field | Expected rejection pass | `docs/goals/ios-v0.26-apple-host-app-matrix-rerun/notes/receipts/safari-secure-focused.json`, `safari-secure-app-group-after-focus.json`, `safari-secure-cleanup.json` | Custom keyboard absence and secure length `0` prove Foil did not insert into the secure field; cleanup removed the staged transcript afterward. |
+| Notes sterile editor | Pass | `docs/goals/ios-v0.27-notes-row-proof/notes/receipts/notes-after-insert-retry.json`, `notes-app-group-after-insert-retry.json` | The first missed tap is recorded as a failure; the retry proves exactly one sterile value in Notes and App Group idle/no transcript. |
+| Messages existing visible thread | Privacy blocked | `docs/goals/ios-v0.28-messages-row-proof/notes/receipts/messages-privacy-blocker.json`, `messages-privacy-cleanup.json` | The row stopped before insertion when the visible thread was not sterile, then reset App Group. |
+| Messages fake-recipient compose draft | Pass, draft-only | `docs/goals/ios-v0.29-messages-fake-recipient/notes/receipts/messages-fake-before-insert.json`, `messages-fake-after-insert.json`, `messages-fake-draft-cleanup.json`, `messages-fake-app-group-cleanup.json` | The row proves exactly-once draft insertion, `sendTapped=false`, draft cleanup, and App Group idle/no transcript. It does not claim delivery or existing private-thread behavior. |
+| Closed-beta readiness | Go, narrow internal beta | `docs/goals/ios-v0.30-closed-beta-readiness-audit/notes/T999-final-audit.md` | The audit explicitly limits readiness to the narrow app-to-keyboard loop and keeps Mail/arbitrary-app claims out of scope. |
+
 ## Next Useful Rows
 
 - Mail compose after confirming Mail is installed or installing/configuring a
-  sterile mail account.
+  sterile mail account. Deferred in
+  `https://github.com/mean-weasel/foil-ios/issues/12`.
 - Calendar new-event title after operator setup opens a blank unsaved event
   sheet with the title field focused.
 - Foil secure-field rejection after adding a first-party deep link or

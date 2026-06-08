@@ -15,7 +15,7 @@ privacy, and physical-device automation workflows.
 - Custom keyboard extension: `com.neonwatty.FoilIOS.Keyboard`
 - App Group: `group.com.neonwatty.FoilIOS`
 - Project generator: XcodeGen via `FoiliOS/project.yml`
-- Current source version: `0.1.0 (10)`
+- Current source version: `0.1.0 (11)`
 
 The prototype supports:
 
@@ -56,5 +56,7 @@ targets, with known keyboard-extension friction around Full Access, keyboard
 cycling, and host-app refresh behavior.
 
 Do not claim arbitrary app support. Secure fields are expected to reject custom
-keyboards. Messages support is only proven for an operator-prepared sterile
-thread.
+keyboards. Messages support is proven for a privacy-safe fake-recipient compose
+draft insertion without sending; delivery and existing private-thread behavior
+are not claimed. Mail compose proof is intentionally deferred in
+`https://github.com/mean-weasel/foil-ios/issues/12`.
