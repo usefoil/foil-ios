@@ -1,0 +1,110 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.28 Messages Row Attempt"
+  slug: "ios-v0.28-messages-row-proof"
+  kind: recovery
+  tranche: "Attempt Messages insertion only if the operator-opened field is sterile."
+  status: done
+  oracle:
+    signal: "Messages row passes only in a sterile thread or blocks before insertion with cleanup proof."
+    cadence: "before insertion and after cleanup"
+    final_proof: "Privacy blocker with insertAttempted=false and App Group idle/no transcript."
+  intake:
+    original_request: "ready"
+    interpreted_outcome: "Run the Messages row against the operator-opened thread if sterile."
+    input_shape: recovery
+    audience: "Foil owner/developer preparing closed beta"
+    authority: approved
+    proof_type: demo
+    completion_proof: "Messages row pass or precise privacy blocker."
+    likely_misfire: "Inserting into a private Messages thread because the draft field is focused."
+    blind_spots_considered:
+      - "Focused Messages surfaces can still contain private prior messages."
+      - "Pre-insert keyboard proof is insufficient if the host thread is not sterile."
+      - "Cleanup is required after staging even when insertion is blocked."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-28-messages-row-proof/"
+    command: "npx goalbuddy board docs/goals/ios-v0.28-messages-row-proof"
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Attempt Messages row only if sterile."
+    allowed_files:
+      - "docs/goals/ios-v0.28-messages-row-proof/**"
+    verify:
+      - "Precheck WDA source without printing private content."
+      - "Stage sterile transcript."
+      - "Verify Foil Keyboard Insert latest enabled."
+      - "Stop before insertion if thread is not sterile."
+      - "Reset App Group after stop."
+    stop_if:
+      - "Any private Messages content is visible."
+    expected_output:
+      - "notes/T001-messages-attempt.md"
+      - "Sanitized receipts under notes/receipts/"
+    acceptance_criteria:
+      - "No insertion occurs in a non-sterile thread."
+      - "App Group cleanup returns idle/no transcript."
+    receipt:
+      result: blocked_privacy
+      task_id: T001
+      note: "notes/T001-messages-attempt.md"
+      summary: "Messages row stopped before insertion because the visible thread was not sterile."
+      evidence:
+        precheck: "notes/receipts/messages-sterile-precheck.json"
+        staged: "notes/receipts/messages-stage-transcript.json"
+        before_insert: "notes/receipts/messages-before-insert.json"
+        blocker: "notes/receipts/messages-privacy-blocker.json"
+        cleanup: "notes/receipts/messages-privacy-cleanup.json"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit Messages privacy blocker."
+    inputs:
+      - "T001 receipts"
+      - "docs/acceptance-evidence.md"
+    constraints:
+      - "Do not claim Messages pass."
+    expected_output:
+      - "notes/T999-final-audit.md"
+    acceptance_criteria:
+      - "Strongest realistic privacy failure is named and ruled out."
+      - "Receipt parsing, board rendering, git diff check, and privacy scan pass."
+    receipt:
+      result: messages_privacy_blocker
+      task_id: T999
+      decision: messages_privacy_blocker
+      note: "notes/T999-final-audit.md"
+      full_outcome_complete: false
+      summary: "Messages remains untested until a dedicated sterile thread is available."
