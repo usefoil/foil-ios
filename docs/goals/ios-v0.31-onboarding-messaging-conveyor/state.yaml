@@ -49,13 +49,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-31-onboarding-messaging-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.31-onboarding-messaging-conveyor"
 
-active_task: T001
+active_task: T002
 
 tasks:
   - id: T001
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Run the tester handoff child board."
     allowed_files:
@@ -75,13 +75,14 @@ tasks:
       - "Copy mentions Full Access, keyboard cycling, secure-field rejection, Messages draft-only, and Mail deferred."
       - "Verification receipt records stale-copy and overclaim scans."
     receipt:
-      result: pending
+      result: done
       child_board: "docs/goals/ios-v0.31-closed-beta-tester-handoff/goal.md"
+      note: "Fresh build-11 tester handoff created, stale v0.7 doc superseded, and copy-scan receipt passed."
 
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Run the iOS app onboarding polish child board."
     allowed_files:

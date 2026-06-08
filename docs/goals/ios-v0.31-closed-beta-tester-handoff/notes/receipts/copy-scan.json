@@ -1,0 +1,97 @@
+{
+  "schema": "foil.iosV031.closedBetaTesterHandoff.copyScan.v1",
+  "generatedBy": "node copy-boundary scan",
+  "checkedFiles": [
+    "docs/ios-closed-beta-tester-handoff.md",
+    "docs/ios-testflight-feedback-v0.7.md",
+    "docs/goals/ios-v0.31-closed-beta-tester-handoff/notes/T001-copy-inventory.md",
+    "docs/goals/ios-v0.31-closed-beta-tester-handoff/notes/T002-handoff-worker.md",
+    "docs/goals/ios-v0.31-closed-beta-tester-handoff/notes/T999-final-audit.md"
+  ],
+  "currentHandoff": {
+    "file": "docs/ios-closed-beta-tester-handoff.md",
+    "staleBuild7Hits": 0,
+    "messagesNotTestedHits": 0,
+    "requiredBoundaryHits": {
+      "fullAccess": 4,
+      "secureField": 2,
+      "mail": 3,
+      "delivery": 2,
+      "privateBoundary": 7,
+      "broadSupportBoundary": 2,
+      "screenshots": 1
+    },
+    "passed": true
+  },
+  "supersededHistoricalHandoff": {
+    "file": "docs/ios-testflight-feedback-v0.7.md",
+    "hasSupersededNotice": true,
+    "staleBuild7Hits": 4,
+    "messagesNotTestedHits": 1,
+    "classification": "historical receipt context, not current tester instructions"
+  },
+  "boundaryClassification": {
+    "mail": "current handoff says Mail compose is deferred via issue #12 and unsafe to claim as supported",
+    "messages": "current handoff says fake-recipient draft insertion only; no send, no delivery, no existing private-thread claim",
+    "arbitraryApps": "current handoff says this is not arbitrary iPhone app support",
+    "privacy": "current handoff asks for no private transcript text, screenshots, contacts, accounts, or private app content"
+  },
+  "allPatternCounts": {
+    "docs/ios-closed-beta-tester-handoff.md": {
+      "staleBuild7": 0,
+      "messagesNotTested": 0,
+      "fullAccess": 4,
+      "secureField": 2,
+      "mail": 3,
+      "delivery": 2,
+      "privateBoundary": 7,
+      "broadSupportBoundary": 2,
+      "screenshots": 1
+    },
+    "docs/ios-testflight-feedback-v0.7.md": {
+      "staleBuild7": 4,
+      "messagesNotTested": 1,
+      "fullAccess": 6,
+      "secureField": 2,
+      "mail": 0,
+      "delivery": 0,
+      "privateBoundary": 4,
+      "broadSupportBoundary": 1,
+      "screenshots": 2
+    },
+    "docs/goals/ios-v0.31-closed-beta-tester-handoff/notes/T001-copy-inventory.md": {
+      "staleBuild7": 1,
+      "messagesNotTested": 1,
+      "fullAccess": 0,
+      "secureField": 1,
+      "mail": 3,
+      "delivery": 1,
+      "privateBoundary": 1,
+      "broadSupportBoundary": 1,
+      "screenshots": 0
+    },
+    "docs/goals/ios-v0.31-closed-beta-tester-handoff/notes/T002-handoff-worker.md": {
+      "staleBuild7": 0,
+      "messagesNotTested": 0,
+      "fullAccess": 2,
+      "secureField": 1,
+      "mail": 2,
+      "delivery": 1,
+      "privateBoundary": 1,
+      "broadSupportBoundary": 1,
+      "screenshots": 0
+    },
+    "docs/goals/ios-v0.31-closed-beta-tester-handoff/notes/T999-final-audit.md": {
+      "staleBuild7": 0,
+      "messagesNotTested": 0,
+      "fullAccess": 0,
+      "secureField": 0,
+      "mail": 1,
+      "delivery": 1,
+      "privateBoundary": 3,
+      "broadSupportBoundary": 1,
+      "screenshots": 1
+    }
+  },
+  "passed": true
+}
