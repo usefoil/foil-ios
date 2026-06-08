@@ -1,0 +1,101 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.32 App Onboarding Polish"
+  slug: "ios-v0.32-ios-app-onboarding-polish"
+  kind: specific
+  tranche: "Polish in-app setup and onboarding for closed beta testers."
+  status: live
+  oracle:
+    signal: "Swift tests and UI proof show a coherent first-run/setup checklist and recovery path."
+    cadence: "after implementation and visual/test verification"
+    final_proof: "Focused tests plus screenshot/receipt evidence for ready, blocked, stale, and transcript-ready states."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  goal_pressure_requires_oracle: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-32-ios-app-onboarding-polish/"
+    command: "npx goalbuddy board docs/goals/ios-v0.32-ios-app-onboarding-polish"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Inventory current iOS onboarding/setup surfaces and test coverage."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/FoilKeyboard/KeyboardViewController.swift"
+      - "FoiliOS/FoilIOSTests/**"
+    verify:
+      - "Map each setup message/control to the beta tester journey."
+      - "Identify gaps: deep links/actions, checklist progress, safe target suggestions, caveats, visual hierarchy, tests."
+    acceptance_criteria:
+      - "Scout note names the smallest safe implementation slice and exact files."
+    expected_output:
+      - "notes/T001-onboarding-inventory.md"
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Approve a bounded onboarding implementation slice."
+    verify:
+      - "Choose whether this board touches only presenter/copy or also SwiftUI layout/actions."
+      - "Define tests and screenshot/physical proof needed before completion."
+    acceptance_criteria:
+      - "Worker has allowed files, stop conditions, and test commands."
+    expected_output:
+      - "notes/T002-slice-approval.md"
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Implement the approved onboarding polish slice."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/**"
+      - "FoiliOS/Shared/**"
+      - "FoiliOS/FoilKeyboard/**"
+      - "FoiliOS/FoilIOSTests/**"
+      - "docs/goals/ios-v0.32-ios-app-onboarding-polish/**"
+    verify:
+      - "Run focused iOS unit tests for presenter/copy states."
+      - "Run simulator build/test if UI/layout files changed."
+      - "Capture simulator or physical screenshot/receipt for the main setup state when practical."
+    stop_if:
+      - "Implementation needs new entitlements, TestFlight upload, private app inspection, or unsupported deep links."
+    acceptance_criteria:
+      - "Setup checklist is clear on provider, microphone, keyboard install, Full Access, record, return, insert, and reset."
+      - "Copy includes safe targets and caveats without overclaiming."
+      - "Tests cover new states and no text overlaps are evident in captured proof."
+    expected_output:
+      - "notes/T003-worker.md"
+      - "notes/receipts/test-output.json"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Audit onboarding polish against beta-user confusion."
+    acceptance_criteria:
+      - "Final audit names and rules out the strongest setup-confusion failure mode."
+      - "Residual risks and next build/TestFlight needs are explicit."
+    expected_output:
+      - "notes/T999-final-audit.md"

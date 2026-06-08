@@ -1,0 +1,93 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.33 Landing Page iOS Preview Messaging"
+  slug: "ios-v0.33-foil-landing-ios-preview-messaging"
+  kind: specific
+  tranche: "Add honest iOS preview messaging to the main Foil landing page."
+  status: live
+  oracle:
+    signal: "Landing page/browser proof and copy scans show accurate iOS preview messaging."
+    cadence: "after implementation and browser verification"
+    final_proof: "Desktop/mobile screenshots plus copy scan receipts."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  goal_pressure_requires_oracle: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-33-foil-landing-ios-preview-messaging/"
+    command: "npx goalbuddy board docs/goals/ios-v0.33-foil-landing-ios-preview-messaging"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Inventory iOS references on the main Foil public site."
+    allowed_files:
+      - "/Users/neonwatty/Desktop/foil/site/**"
+      - "/Users/neonwatty/Desktop/foil/README.md"
+      - "/Users/neonwatty/Desktop/foil/docs/superpowers/**"
+    verify:
+      - "List all iOS/iPhone/TestFlight references and whether they are stale, missing, or accurate."
+      - "Identify the landing-page insertion point and any comparison blog updates."
+    stop_if:
+      - "Main Foil repo has unrelated dirty changes touching the same public-site files."
+    acceptance_criteria:
+      - "Scout note names exact files, current copy gaps, and proposed section outline."
+    expected_output:
+      - "notes/T001-public-copy-inventory.md"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Implement accurate landing-page iOS preview messaging."
+    allowed_files:
+      - "/Users/neonwatty/Desktop/foil/site/index.html"
+      - "/Users/neonwatty/Desktop/foil/site/blog/**/index.html"
+      - "/Users/neonwatty/Desktop/foil/site/assets/**"
+      - "/Users/neonwatty/Desktop/foil/docs/goals/**"
+      - "docs/goals/ios-v0.33-foil-landing-ios-preview-messaging/**"
+    verify:
+      - "Use existing site style and avoid adding a marketing hero."
+      - "Run the local static/site verification available in the main Foil repo."
+      - "Capture desktop and mobile screenshots with Browser/Playwright."
+    acceptance_criteria:
+      - "Landing page includes an iPhone preview/beta section."
+      - "Copy says custom keyboard and Full Access are required."
+      - "Copy says Notes/Safari/Messages draft are proven and Mail is deferred."
+      - "CTA is request/join preview or docs, not public availability."
+      - "No layout text overflow on mobile/desktop screenshots."
+    expected_output:
+      - "notes/T002-landing-worker.md"
+      - "notes/receipts/browser-proof.json"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Audit public iOS messaging for overclaiming and visual regressions."
+    verify:
+      - "Scan public site for broad iOS support, public app availability, Mail pass, and delivery claims."
+      - "Review desktop/mobile screenshots."
+      - "Check main Foil repo git diff and PR state."
+    acceptance_criteria:
+      - "Public copy is accurate and visually readable."
+      - "PR/commit path is explicit for the main Foil repo."
+    expected_output:
+      - "notes/T999-final-audit.md"

@@ -1,0 +1,90 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.31 Closed Beta Tester Handoff"
+  slug: "ios-v0.31-closed-beta-tester-handoff"
+  kind: specific
+  tranche: "Fresh tester-facing handoff for build 11 narrow internal beta."
+  status: live
+  oracle:
+    signal: "Tester handoff doc is current, actionable, privacy-safe, and caveated."
+    cadence: "after copy draft and final scan"
+    final_proof: "Copy scans plus reviewer note show no stale build 7 or overbroad support claims."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  goal_pressure_requires_oracle: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-31-closed-beta-tester-handoff/"
+    command: "npx goalbuddy board docs/goals/ios-v0.31-closed-beta-tester-handoff"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Inventory stale tester handoff copy and current proof boundaries."
+    allowed_files:
+      - "docs/ios-testflight-feedback-v0.7.md"
+      - "docs/goals/ios-v0.30-closed-beta-readiness-audit/**"
+      - "docs/ios-keyboard-host-app-matrix.md"
+      - "README.md"
+    verify:
+      - "Identify every stale build-7 or Messages-not-tested claim that conflicts with v0.30."
+      - "Map required tester caveats to receipts or issue #12."
+    acceptance_criteria:
+      - "Note lists stale copy, current replacement facts, and recommended doc action."
+    expected_output:
+      - "notes/T001-copy-inventory.md"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Write the fresh closed-beta tester handoff."
+    allowed_files:
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "docs/ios-testflight-feedback-v0.7.md"
+      - "docs/goals/ios-v0.31-closed-beta-tester-handoff/**"
+    verify:
+      - "Doc includes install/update, provider key, microphone, keyboard install, Full Access, record/transcribe, return-to-keyboard, Insert latest, and recovery steps."
+      - "Doc includes safe tasks for Notes, Safari, and Messages fake-recipient draft."
+      - "Doc includes feedback template that asks for device/build/caveat state without private content."
+    acceptance_criteria:
+      - "Build 11 and v0.30 caveats are present."
+      - "Mail is deferred via issue #12."
+      - "Messages is draft-only/no-send."
+      - "Secure fields are expected rejection."
+      - "No private screenshots/text requested."
+    expected_output:
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "notes/T002-handoff-worker.md"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Audit tester handoff for stale or unsafe claims."
+    verify:
+      - "Run rg scans for build 7, Messages not tested, arbitrary app support, Mail pass, delivery proof, and private screenshot requests."
+      - "Run markdown/link sanity checks available in repo."
+    acceptance_criteria:
+      - "Strongest realistic tester-confusion failure mode is named and ruled out."
+      - "All scan outputs are recorded in a receipt."
+    expected_output:
+      - "notes/T999-final-audit.md"
+      - "notes/receipts/copy-scan.json"

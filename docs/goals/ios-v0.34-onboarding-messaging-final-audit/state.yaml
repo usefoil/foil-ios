@@ -1,0 +1,80 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.34 Onboarding Messaging Final Audit"
+  slug: "ios-v0.34-onboarding-messaging-final-audit"
+  kind: audit
+  tranche: "Final cross-repo audit for iOS onboarding and messaging readiness."
+  status: live
+  oracle:
+    signal: "Cross-repo copy, docs, app onboarding, and PR state are internally consistent."
+    cadence: "after all previous child boards"
+    final_proof: "Final audit note with scan receipts and go/hold recommendation."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  goal_pressure_requires_oracle: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-34-onboarding-messaging-final-audit/"
+    command: "npx goalbuddy board docs/goals/ios-v0.34-onboarding-messaging-final-audit"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: judge
+    assignee: Judge
+    status: active
+    objective: "Audit child board completion and repo/PR state."
+    verify:
+      - "Check v0.31, v0.32, and v0.33 board statuses."
+      - "Check open PRs/issues in both foil-ios and foil."
+      - "Record any blockers with exact owner/action."
+    acceptance_criteria:
+      - "No child board is silently incomplete."
+      - "Open PRs are merged, queued, or explicitly blocking."
+    expected_output:
+      - "notes/T001-board-and-pr-audit.md"
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Run cross-repo stale-copy and overclaim scans."
+    allowed_files:
+      - "/Users/neonwatty/Desktop/foil-ios/**"
+      - "/Users/neonwatty/Desktop/foil/**"
+    verify:
+      - "Scan for stale build 7 handoff claims, Messages-not-tested conflicts, Mail pass claims, arbitrary iOS support, delivery proof, and public iOS availability."
+      - "Scan for private screenshots/raw WDA/media artifacts in new board/docs diffs."
+    acceptance_criteria:
+      - "All scan hits are expected caveats or are fixed before completion."
+    expected_output:
+      - "notes/receipts/cross-repo-copy-scan.json"
+      - "notes/T002-copy-scan.md"
+
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Make the next closed-beta action recommendation."
+    verify:
+      - "Compare final state against v0.30 readiness caveats."
+      - "Recommend either invite testers, upload a new build, or fix remaining blockers."
+    acceptance_criteria:
+      - "Recommendation has a concrete next action and owner."
+      - "Strongest realistic failure mode is named and ruled out or accepted as caveat."
+    expected_output:
+      - "notes/T999-final-audit.md"

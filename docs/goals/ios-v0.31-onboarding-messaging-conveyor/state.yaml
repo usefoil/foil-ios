@@ -1,0 +1,155 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.31 Onboarding Messaging Conveyor"
+  slug: "ios-v0.31-onboarding-messaging-conveyor"
+  kind: existing_plan
+  tranche: "Prepare a conveyor for iOS beta tester handoff, onboarding polish, landing-page messaging, and final copy audit."
+  status: live
+  oracle:
+    signal: "All child boards complete or precisely blocked; final audit proves no overclaiming."
+    cadence: "after each child board and at final audit"
+    final_proof: "v0.34 final audit maps tester docs, iOS app onboarding, and landing page copy to v0.30 claim boundaries."
+  intake:
+    original_request: "plan it out as a goalbuddy board conveyor"
+    interpreted_outcome: "Create execution-ready GoalBuddy boards for onboarding and messaging work."
+    input_shape: existing_plan
+    audience: "Foil owner/developer preparing a narrow iOS internal beta"
+    authority: approved
+    proof_type: artifact
+    completion_proof: "Committed conveyor board plus child boards with measurable acceptance criteria."
+    likely_misfire: "Making nice copy while leaving tester setup, iOS app onboarding, and landing page claims inconsistent."
+    blind_spots_considered:
+      - "Landing-page work lives in /Users/neonwatty/Desktop/foil, not this repo."
+      - "Existing tester handoff docs are stale at build 7."
+      - "In-app setup exists but is not a polished first-run checklist."
+      - "Copy must preserve the v0.30 narrow beta boundary."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-31-onboarding-messaging-conveyor/"
+    command: "npx goalbuddy board docs/goals/ios-v0.31-onboarding-messaging-conveyor"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: worker
+    assignee: Worker
+    status: active
+    reasoning_hint: medium
+    objective: "Run the tester handoff child board."
+    allowed_files:
+      - "docs/goals/ios-v0.31-closed-beta-tester-handoff/**"
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "docs/ios-testflight-feedback-v0.7.md"
+      - "README.md"
+    verify:
+      - "Follow docs/goals/ios-v0.31-closed-beta-tester-handoff/goal.md."
+      - "Produce a tester-facing handoff artifact with build 11, setup steps, caveats, and feedback template."
+      - "Run copy scans for stale build 7 and overbroad iOS claims."
+    stop_if:
+      - "Tester instructions would require private screenshots or message/email content."
+      - "The doc implies Mail, delivery, or arbitrary app support."
+    acceptance_criteria:
+      - "Fresh tester handoff doc exists and does not depend on stale v0.7 copy."
+      - "Copy mentions Full Access, keyboard cycling, secure-field rejection, Messages draft-only, and Mail deferred."
+      - "Verification receipt records stale-copy and overclaim scans."
+    receipt:
+      result: pending
+      child_board: "docs/goals/ios-v0.31-closed-beta-tester-handoff/goal.md"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run the iOS app onboarding polish child board."
+    allowed_files:
+      - "FoiliOS/**"
+      - "docs/goals/ios-v0.32-ios-app-onboarding-polish/**"
+    verify:
+      - "Follow docs/goals/ios-v0.32-ios-app-onboarding-polish/goal.md."
+      - "Run focused Swift tests for touched presenter/onboarding code."
+      - "Use simulator or physical-device screenshots/receipts where the UI surface changes materially."
+    stop_if:
+      - "Changes require new TestFlight upload before local proof."
+      - "Onboarding copy claims unsupported host-app behavior."
+    acceptance_criteria:
+      - "First-run/setup UI presents a clear checklist from provider, microphone, keyboard install, Full Access, record, return, and insert."
+      - "Recovery copy covers stale keyboard and Full Access-off states."
+      - "Tests cover each new presenter/copy state."
+    receipt:
+      result: pending
+      child_board: "docs/goals/ios-v0.32-ios-app-onboarding-polish/goal.md"
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: medium
+    objective: "Run the landing-page iOS preview messaging child board."
+    allowed_files:
+      - "/Users/neonwatty/Desktop/foil/site/**"
+      - "/Users/neonwatty/Desktop/foil/README.md"
+      - "/Users/neonwatty/Desktop/foil/docs/goals/**"
+      - "docs/goals/ios-v0.33-foil-landing-ios-preview-messaging/**"
+    verify:
+      - "Follow docs/goals/ios-v0.33-foil-landing-ios-preview-messaging/goal.md."
+      - "Run static/local site checks available in /Users/neonwatty/Desktop/foil."
+      - "Use browser screenshots for desktop and mobile landing-page changes."
+    stop_if:
+      - "Main Foil repo has unrelated dirty changes that conflict with landing-page edits."
+      - "Copy implies public iOS availability beyond the closed-beta preview."
+    acceptance_criteria:
+      - "Landing page has an iPhone preview/beta section with accurate setup expectations."
+      - "CTA routes to request/join beta or docs without claiming public availability."
+      - "Blog/comparison copy remains consistent with the v0.30 claim boundary."
+    receipt:
+      result: pending
+      child_board: "docs/goals/ios-v0.33-foil-landing-ios-preview-messaging/goal.md"
+
+  - id: T004
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Run the final onboarding/messaging copy audit child board."
+    allowed_files:
+      - "docs/goals/ios-v0.34-onboarding-messaging-final-audit/**"
+      - "README.md"
+      - "docs/**"
+      - "/Users/neonwatty/Desktop/foil/site/**"
+      - "/Users/neonwatty/Desktop/foil/README.md"
+    verify:
+      - "Follow docs/goals/ios-v0.34-onboarding-messaging-final-audit/goal.md."
+      - "Scan both repos for stale build numbers, outdated Messages copy, Mail overclaims, and arbitrary app support claims."
+      - "Confirm all child PRs are merged or exactly blocked."
+    stop_if:
+      - "A child board is incomplete without an accepted blocker."
+    acceptance_criteria:
+      - "Final audit explicitly rules out the strongest overclaim and setup-confusion failure modes."
+      - "Both repos are clean/synced or list exact PRs/blockers."
+      - "Next action after the conveyor is clear."
+    receipt:
+      result: pending
+      child_board: "docs/goals/ios-v0.34-onboarding-messaging-final-audit/goal.md"
