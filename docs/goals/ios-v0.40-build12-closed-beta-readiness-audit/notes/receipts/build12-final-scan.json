@@ -1,0 +1,36 @@
+{
+  "schema": "foil.iosV040.build12FinalScan.v1",
+  "capturedAt": "2026-06-09T01:31:10Z",
+  "foilIos": {
+    "staleCurrentCopyScan": {
+      "command": "rg -n '0\\.1\\.0 \\((7|8|9|10|11)\\)|build (7|8|9|10|11)|Build (7|8|9|10|11)' README.md docs/ios-closed-beta-tester-handoff.md docs/ios-keyboard-host-app-matrix.md docs/ios-testflight-upload-runbook.md || true",
+      "matches": 0,
+      "passed": true
+    },
+    "overclaimScan": {
+      "command": "rg -n 'Mail (works|supported|passes|is proven)|Messages delivery is|existing private-thread behavior is proven|arbitrary app support is|public App Store|App Store availability|build 12 Notes pass|build 12 Messages pass' README.md docs/ios-closed-beta-tester-handoff.md docs/ios-keyboard-host-app-matrix.md || true",
+      "matches": 0,
+      "passed": true
+    },
+    "privateArtifactScan": {
+      "command": "find docs/goals/ios-v0.36-build12-testflight-release-proof docs/goals/ios-v0.37-build12-physical-onboarding-smoke docs/goals/ios-v0.38-build12-host-app-matrix-rerun docs/goals/ios-v0.39-build12-tester-handoff-update docs/goals/ios-v0.40-build12-closed-beta-readiness-audit -type f \\( -name '*.jpg' -o -name '*.jpeg' -o -name '*.mov' -o -name '*source*.json' -o -name '*.xml' \\) -print",
+      "matches": 0,
+      "passed": true
+    }
+  },
+  "foil": {
+    "siteCopyPr": {
+      "url": "https://github.com/mean-weasel/foil/pull/287",
+      "merged": true,
+      "mergeCommit": "195a2aa2cad28fbd9cd26e07baeb1b0cf9fadd0c"
+    },
+    "scan": {
+      "command": "rg -n 'Messages fake-recipient draft insertion|Notes, Safari normal text fields|Current Foil iOS setup surface from simulator proof|verified host-app rows: Notes|Foil iOS solves all keyboard insertion issues|iOS keyboard works everywhere|public App Store availability' site docs/seo docs/product docs/research || true",
+      "unexpectedMatches": 0,
+      "expectedNegativeOrCaveatMatches": 3,
+      "passed": true
+    }
+  },
+  "recommendation": "invite_narrow_internal_beta",
+  "verdict": "passed"
+}

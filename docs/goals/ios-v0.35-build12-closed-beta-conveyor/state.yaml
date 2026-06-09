@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.35-build12-closed-beta-conveyor"
   kind: existing_plan
   tranche: "Automate the next 1+5 boards: build 12 release, physical smoke, matrix rerun, handoff, and readiness audit."
-  status: active
+  status: done
   oracle:
     signal: "Build 12 is uploaded/installed/smoked or exactly blocked, and beta copy points only at proven behavior."
     cadence: "after each child board and at final audit"
@@ -49,7 +49,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-35-build12-closed-beta-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.35-build12-closed-beta-conveyor"
 
-active_task: T005
+active_task: null
 
 tasks:
   - id: T001
@@ -157,7 +157,7 @@ tasks:
   - id: T005
     type: judge
     assignee: Judge
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Run the build 12 closed-beta readiness audit child board."
     allowed_files:
@@ -175,5 +175,7 @@ tasks:
     acceptance_criteria:
       - "Final audit gives a clear invite / hold / fix recommendation with evidence."
     receipt:
-      result: pending
+      result: done
       child_board: "docs/goals/ios-v0.40-build12-closed-beta-readiness-audit/goal.md"
+      decision: "invite_narrow_internal_beta"
+      note: "Final audit recommends a narrow internal build 12 invite, with Safari normal and secure-field proof green, build 12 onboarding green, and Notes/Messages/Mail held as explicit scoped blockers."
