@@ -1,0 +1,34 @@
+{
+  "result": "blocked",
+  "blocker": "iPhone-preview is locked; Xcode cannot launch WebDriverAgentRunner until the device is unlocked.",
+  "owner": "operator/user",
+  "nextAction": "Unlock iPhone-preview, leave it awake, approve any TestFlight/build update prompts if shown, then tell Codex done.",
+  "device": {
+    "name": "iPhone-preview",
+    "identifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+    "hardwareUdid": "00008030-001A0C980A33C02E",
+    "bootState": "booted",
+    "developerModeStatus": "enabled",
+    "pairingState": "paired",
+    "transportType": "localNetwork",
+    "tunnelState": "connected",
+    "osVersion": "26.5"
+  },
+  "installedFoil": {
+    "bundleId": "com.neonwatty.FoilIOS",
+    "version": "0.1.0",
+    "bundleVersion": "11"
+  },
+  "build12Release": {
+    "deliveryUuid": "75f05a85-cfe5-443f-bc9a-32ff8c27b710",
+    "buildStatus": "VALID",
+    "internalBuildState": "IN_BETA_TESTING",
+    "groupContainsBuild12": true
+  },
+  "wda": {
+    "ready": false,
+    "statusUrl": "http://192.168.1.40:8100/status",
+    "xcodePreflightError": "Unlock iPhone-preview to Continue",
+    "xcodePreflightSuggestion": "Xcode cannot launch WebDriverAgentRunner on iPhone-preview because the device is locked."
+  }
+}

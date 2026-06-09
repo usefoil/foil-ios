@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.37-build12-physical-onboarding-smoke"
   kind: specific
   tranche: "Install/update build 12 and prove onboarding polish on iPhone-preview."
-  status: live
+  status: blocked
   oracle:
     signal: "iPhone-preview reports build 12 and sanitized physical UI proof shows the onboarding/setup surface."
     cadence: "after build 12 release proof"
@@ -30,13 +30,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-37-build12-physical-onboarding-smoke/"
     command: "npx goalbuddy board docs/goals/ios-v0.37-build12-physical-onboarding-smoke"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: blocked
     objective: "Check device, WDA/Appium, TestFlight install/update, and safe UI automation readiness."
     allowed_files:
       - "docs/ios-physical-automation-runbook.md"
@@ -51,6 +51,12 @@ tasks:
       - "Scout note says whether physical smoke can proceed and exact tool path."
     expected_output:
       - "notes/T001-physical-preflight.md"
+    receipt:
+      result: blocked
+      blocker: "iPhone-preview is locked; Xcode cannot launch WebDriverAgentRunner until the device is unlocked."
+      owner: "operator/user"
+      next_action: "Unlock iPhone-preview, leave it awake, approve any TestFlight/build update prompts if shown, then tell Codex done."
+      note: "CoreDevice sees the phone as booted/paired/developer-mode/tunnel-connected and installed Foil is still build 11, but WDA launch repeatedly stops at Xcode preflight: Unlock iPhone-preview to Continue."
 
   - id: T002
     type: worker

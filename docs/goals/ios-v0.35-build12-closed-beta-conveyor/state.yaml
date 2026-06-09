@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.35-build12-closed-beta-conveyor"
   kind: existing_plan
   tranche: "Automate the next 1+5 boards: build 12 release, physical smoke, matrix rerun, handoff, and readiness audit."
-  status: live
+  status: blocked
   oracle:
     signal: "Build 12 is uploaded/installed/smoked or exactly blocked, and beta copy points only at proven behavior."
     cadence: "after each child board and at final audit"
@@ -49,7 +49,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-35-build12-closed-beta-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.35-build12-closed-beta-conveyor"
 
-active_task: T002
+active_task: null
 
 tasks:
   - id: T001
@@ -81,7 +81,7 @@ tasks:
   - id: T002
     type: worker
     assignee: Worker
-    status: active
+    status: blocked
     reasoning_hint: high
     objective: "Run the build 12 physical onboarding smoke child board."
     allowed_files:
@@ -96,8 +96,12 @@ tasks:
     acceptance_criteria:
       - "Physical iPhone-preview proves build 12 has the polished onboarding/setup surface and expected keyboard guidance."
     receipt:
-      result: pending
+      result: blocked
       child_board: "docs/goals/ios-v0.37-build12-physical-onboarding-smoke/goal.md"
+      blocker: "iPhone-preview is locked; WDA cannot launch, and installed Foil remains build 11."
+      owner: "operator/user"
+      next_action: "Unlock iPhone-preview and leave it awake so Codex can restart WDA, install/update build 12, and run physical onboarding smoke."
+      note: "Physical onboarding smoke is blocked before WDA/TestFlight update because Xcode cannot launch WebDriverAgentRunner while iPhone-preview is locked; CoreDevice still sees the phone as booted/paired/tunnel-connected."
 
   - id: T003
     type: worker
