@@ -49,7 +49,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-35-build12-closed-beta-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.35-build12-closed-beta-conveyor"
 
-active_task: T004
+active_task: T005
 
 tasks:
   - id: T001
@@ -133,7 +133,7 @@ tasks:
   - id: T004
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Run the build 12 tester handoff update child board."
     allowed_files:
@@ -150,13 +150,14 @@ tasks:
     acceptance_criteria:
       - "Tester handoff accurately targets build 12 and preserves all caveats."
     receipt:
-      result: pending
+      result: done
       child_board: "docs/goals/ios-v0.39-build12-tester-handoff-update/goal.md"
+      note: "Tester handoff and README now target build 12 while preserving Safari-only build 12 pass, Notes/Messages blockers, Mail deferral, Full Access requirement, secure-field caveat, and no broad app support."
 
   - id: T005
     type: judge
     assignee: Judge
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Run the build 12 closed-beta readiness audit child board."
     allowed_files:
