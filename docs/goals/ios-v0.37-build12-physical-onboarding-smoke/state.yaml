@@ -1,0 +1,86 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.37 Build 12 Physical Onboarding Smoke"
+  slug: "ios-v0.37-build12-physical-onboarding-smoke"
+  kind: specific
+  tranche: "Install/update build 12 and prove onboarding polish on iPhone-preview."
+  status: live
+  oracle:
+    signal: "iPhone-preview reports build 12 and sanitized physical UI proof shows the onboarding/setup surface."
+    cadence: "after build 12 release proof"
+    final_proof: "Physical smoke receipt with device build metadata, UI assertions, sanitized screenshot/source policy, and App Group state."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  goal_pressure_requires_oracle: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-37-build12-physical-onboarding-smoke/"
+    command: "npx goalbuddy board docs/goals/ios-v0.37-build12-physical-onboarding-smoke"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Check device, WDA/Appium, TestFlight install/update, and safe UI automation readiness."
+    allowed_files:
+      - "docs/ios-physical-automation-runbook.md"
+      - "docs/goals/ios-v0.37-build12-physical-onboarding-smoke/**"
+    verify:
+      - "Check device visibility and WDA status without capturing private app content."
+      - "Confirm build 12 release proof exists before install/update."
+    stop_if:
+      - "Device is locked or TestFlight install/update needs human action."
+      - "WDA is unavailable and cannot be recovered without account/signing action."
+    acceptance_criteria:
+      - "Scout note says whether physical smoke can proceed and exact tool path."
+    expected_output:
+      - "notes/T001-physical-preflight.md"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Install/update build 12 on iPhone-preview and verify onboarding/setup UI."
+    allowed_files:
+      - "docs/goals/ios-v0.37-build12-physical-onboarding-smoke/**"
+    verify:
+      - "Confirm installed build metadata is 12."
+      - "Verify setup checklist/guidance text from v0.32 is visible/readable on physical device."
+      - "Verify no private screenshots/raw WDA sources are committed."
+    stop_if:
+      - "Physical phone content is private or unsafe to capture."
+      - "Build 12 is not available through TestFlight."
+    acceptance_criteria:
+      - "Sanitized receipts prove build 12 onboarding polish on iPhone-preview."
+    expected_output:
+      - "notes/T002-physical-onboarding-smoke.md"
+      - "notes/receipts/build12-physical-onboarding.json"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Audit physical onboarding smoke proof."
+    verify:
+      - "Reject simulator screenshots as physical proof."
+      - "Check device build metadata, UI assertions, and private-content hygiene."
+    acceptance_criteria:
+      - "Build 12 physical onboarding proof is go for host-app matrix rerun, or blocker is exact."
+    expected_output:
+      - "notes/T999-final-audit.md"

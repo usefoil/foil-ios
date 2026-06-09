@@ -1,0 +1,105 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.38 Build 12 Host-App Matrix Rerun"
+  slug: "ios-v0.38-build12-host-app-matrix-rerun"
+  kind: specific
+  tranche: "Rerun verified host-app rows on build 12."
+  status: live
+  oracle:
+    signal: "Build 12 physical host-app receipts prove the narrow matrix and no private content leaks."
+    cadence: "after physical onboarding smoke"
+    final_proof: "Host-app matrix receipt and updated matrix doc or exact blocker."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  goal_pressure_requires_oracle: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-38-build12-host-app-matrix-rerun/"
+    command: "npx goalbuddy board docs/goals/ios-v0.38-build12-host-app-matrix-rerun"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Map prior matrix fixtures, safe targets, and required receipts for build 12."
+    allowed_files:
+      - "docs/ios-keyboard-host-app-matrix.md"
+      - "docs/goals/ios-v0.27-notes-row-proof/**"
+      - "docs/goals/ios-v0.29-messages-fake-recipient/**"
+      - "docs/goals/ios-v0.38-build12-host-app-matrix-rerun/**"
+    verify:
+      - "Identify reusable sterile fixtures and private-content constraints."
+      - "Confirm Mail remains out of scope."
+    acceptance_criteria:
+      - "Scout note names exact rows, fixtures, receipt format, and stop conditions."
+    expected_output:
+      - "notes/T001-matrix-preflight.md"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Run Notes, Safari normal-field, Safari secure-field, and App Group reset rows."
+    allowed_files:
+      - "docs/goals/ios-v0.38-build12-host-app-matrix-rerun/**"
+      - "docs/ios-keyboard-host-app-matrix.md"
+    verify:
+      - "Prove exactly-once insertion for Notes and Safari normal field."
+      - "Prove secure-field rejection/preservation behavior."
+      - "Prove App Group idle/no transcript after insert/reset."
+    stop_if:
+      - "Any target displays private content that cannot be sanitized."
+    acceptance_criteria:
+      - "Rows have sanitized JSON/text receipts and matrix doc is updated if appropriate."
+    expected_output:
+      - "notes/T002-notes-safari-secure.md"
+      - "notes/receipts/build12-notes-safari-secure.json"
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Run Messages fake-recipient draft insertion without sending."
+    allowed_files:
+      - "docs/goals/ios-v0.38-build12-host-app-matrix-rerun/**"
+      - "docs/ios-keyboard-host-app-matrix.md"
+    verify:
+      - "Use fake recipient or sterile test thread only."
+      - "Prove draft body changed once, send was not tapped, draft cleanup happened, and App Group reset to idle/no transcript."
+    stop_if:
+      - "Only private/existing message threads are available."
+      - "Automation cannot prove no-send safely."
+    acceptance_criteria:
+      - "Messages row remains draft-only and no delivery/private-thread claim is made."
+    expected_output:
+      - "notes/T003-messages-fake-draft.md"
+      - "notes/receipts/build12-messages-fake-draft.json"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Audit build 12 host-app matrix."
+    verify:
+      - "Check matrix rows are proven or exactly blocked."
+      - "Check no Mail pass, arbitrary app support, Messages delivery, or private content claim slipped in."
+    acceptance_criteria:
+      - "Host-app matrix is safe input to tester handoff update."
+    expected_output:
+      - "notes/T999-final-audit.md"

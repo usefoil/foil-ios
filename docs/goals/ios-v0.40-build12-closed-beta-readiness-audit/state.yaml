@@ -1,0 +1,77 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.40 Build 12 Closed Beta Readiness Audit"
+  slug: "ios-v0.40-build12-closed-beta-readiness-audit"
+  kind: audit
+  tranche: "Final go/hold/fix audit for build 12 closed beta."
+  status: live
+  oracle:
+    signal: "All build 12 child boards are merged or precisely blocked, and copy/docs/app evidence support a decision."
+    cadence: "after build 12 handoff update"
+    final_proof: "Final audit note with recommendation, evidence table, blocker list, and next action."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  goal_pressure_requires_oracle: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-40-build12-closed-beta-readiness-audit/"
+    command: "npx goalbuddy board docs/goals/ios-v0.40-build12-closed-beta-readiness-audit"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: judge
+    assignee: Judge
+    status: active
+    objective: "Audit build 12 child board and PR state."
+    verify:
+      - "Check v0.36, v0.37, v0.38, and v0.39 board statuses."
+      - "Check open PRs in foil-ios and foil."
+      - "Record exact blockers with owner/action."
+    acceptance_criteria:
+      - "No prerequisite board is silently incomplete."
+    expected_output:
+      - "notes/T001-board-pr-audit.md"
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Run final build 12 stale-copy, overclaim, and private-artifact scans."
+    allowed_files:
+      - "/Users/neonwatty/Desktop/foil-ios/**"
+      - "/Users/neonwatty/Desktop/foil/**"
+    verify:
+      - "Scan for stale build 11/12 mismatches, build 7 leftovers in current docs, Mail pass claims, Messages delivery claims, arbitrary app support, public App Store claims, and private media/raw WDA artifacts."
+    acceptance_criteria:
+      - "All scan hits are expected caveats/historical context or are fixed before completion."
+    expected_output:
+      - "notes/T002-final-copy-artifact-scan.md"
+      - "notes/receipts/build12-final-scan.json"
+
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Make invite/hold/fix recommendation."
+    verify:
+      - "Compare build 12 evidence against narrow closed-beta criteria."
+      - "Name strongest realistic failure mode and evidence that rules it out or accepts it."
+    acceptance_criteria:
+      - "Recommendation is concrete and has owner/action/date-sensitive caveats if needed."
+    expected_output:
+      - "notes/T999-final-audit.md"
