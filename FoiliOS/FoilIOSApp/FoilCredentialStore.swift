@@ -1,7 +1,13 @@
 import Foundation
 import Security
 
-struct FoilCredentialStore {
+protocol FoilCredentialProviding {
+    func loadGroqAPIKey() -> String?
+    func saveGroqAPIKey(_ value: String) throws
+    func clearGroqAPIKey() throws
+}
+
+struct FoilCredentialStore: FoilCredentialProviding {
     static let shared = FoilCredentialStore()
 
     private let service = "com.neonwatty.FoilIOS.groq"

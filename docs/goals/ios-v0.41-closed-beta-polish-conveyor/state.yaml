@@ -53,13 +53,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-41-closed-beta-polish-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.41-closed-beta-polish-conveyor"
 
-active_task: T001
+active_task: T003
 
 tasks:
   - id: T001
     type: worker
     assignee: Worker
-    status: active
+    status: blocked
     reasoning_hint: high
     objective: "Run the first-run onboarding polish child board."
     child_board: "docs/goals/ios-v0.42-first-run-onboarding-polish/goal.md"
@@ -78,11 +78,19 @@ tasks:
     acceptance_criteria:
       - "A tester can understand what to do first, what is done, what remains, and which targets are safe without reading external docs."
       - "No copy implies broad iPhone app support, Mail support, Messages delivery, or secure-field support."
+    receipt:
+      result: external_blocker
+      summary: "v0.42 implementation PR #27 is open as a draft with local/simulator proof, but the child board is exactly blocked before merge because iPhone-preview is unavailable, WDA is not reachable, and installing the branch requires operator approval."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/27"
+        - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T001-v0.42-blocker.md"
+      next_owner: "operator"
+      next_action: "Make iPhone-preview available/unlocked, approve installing PR #27's development build, and restore WDA/equivalent physical UI automation."
 
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Run the provider configuration health child board."
     child_board: "docs/goals/ios-v0.43-provider-configuration-health/goal.md"
@@ -99,11 +107,23 @@ tasks:
       - "Live API failure cannot be distinguished from configuration failure."
     acceptance_criteria:
       - "Provider configured, missing, invalid, network-failed, and recovery states are visible, actionable, and tested without leaking secrets."
+    receipt:
+      result: done
+      summary: "v0.43 adds provider-specific recovery presentation and deterministic tests for configured, missing-key, invalid-key, network, provider-response, transcription-quality, and recovered-success states without live keys or secret-bearing receipts."
+      evidence:
+        - "docs/goals/ios-v0.43-provider-configuration-health/notes/T002-worker-receipt.md"
+        - "docs/goals/ios-v0.43-provider-configuration-health/notes/T003-judge-audit.md"
+        - "FoiliOS/FoilIOSTests/FoilProviderFailurePresentationTests.swift"
+      verification:
+        - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+        - "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO"
+        - "git diff --check"
+        - "Secret/copy scans for provider keys, Authorization, Bearer, and provider-body sentinels."
 
   - id: T003
     type: worker
     assignee: Worker
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Run the keyboard setup, Full Access, and recovery child board."
     child_board: "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/goal.md"

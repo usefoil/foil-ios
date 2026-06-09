@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.43-provider-configuration-health"
   kind: specific
   tranche: "Provider setup, validation, and safe failure recovery."
-  status: active
+  status: done
   oracle:
     signal: "Provider state is legible and recoverable without leaking secrets."
     cadence: "after each provider-state test"
@@ -20,26 +20,78 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map provider storage, validation, and error surfaces without printing secrets."
     acceptance_criteria:
       - "Receipt names provider states and safe test strategy."
+    receipt:
+      result: done
+      summary: "Provider key storage is Keychain-backed and save/clear UI exists, but transcription failure copy collapses invalid key, network, provider response, and other transcription failures into one generic message. The safe slice is to add provider-specific recovery presentation and deterministic tests using stubs, not live keys."
+      evidence:
+        - "FoiliOS/FoilIOSApp/FoilCredentialStore.swift"
+        - "FoiliOS/FoilIOSApp/TranscriptionController.swift"
+        - "FoiliOS/FoilIOSApp/FoilTranscriptionClient.swift"
+        - "FoiliOS/FoilIOSTests/FoilTranscriptionClientTests.swift"
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+      provider_states:
+        - "configured: Keychain or environment key exists."
+        - "missing: no recording/key path reports Groq key needed."
+        - "invalid: HTTP 401/403 should tell tester to replace the key."
+        - "network-failed: URL/network failure should tell tester to check connection."
+        - "transcription-failed: malformed provider response or non-auth HTTP should be retryable without leaking provider body."
+        - "recovered: saving a key or later success clears recovery copy."
+      safe_test_strategy:
+        - "Use mocked transcription client/transport and dummy key strings only."
+        - "Assert errors do not include raw provider bodies, authorization headers, or key values."
+        - "Use unit tests and simulator UI snapshots; physical phone is not needed for provider copy unless live microphone/API proof is attempted."
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Polish provider configuration and recovery states."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/FoilCredentialStore.swift"
+      - "FoiliOS/FoilIOSApp/TranscriptionController.swift"
+      - "FoiliOS/FoilIOSApp/FoilTranscriptionClient.swift"
+      - "FoiliOS/FoilIOSTests/**"
+      - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+      - "docs/goals/ios-v0.43-provider-configuration-health/**"
+      - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/state.yaml"
+    verify:
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+      - "git diff --check"
+      - "Secret/copy scan for provider keys and unsafe provider-body leakage."
+    stop_if:
+      - "A live provider key is required to prove the local slice."
+      - "A test or receipt would print a real key, Authorization header, provider response body, transcript body, or private recording."
     acceptance_criteria:
       - "Missing, invalid, network, transcription, retry, and configured states are actionable."
+    receipt:
+      result: done
+      summary: "Added provider-specific failure presentation and injectable provider/credential protocols. Controller-level tests prove configured, missing-key, invalid-key, network, provider-response, transcription-quality, and recovered-success states with sanitized stubs."
+      evidence:
+        - "docs/goals/ios-v0.43-provider-configuration-health/notes/T002-worker-receipt.md"
+        - "FoiliOS/FoilIOSApp/TranscriptionController.swift"
+        - "FoiliOS/FoilIOSTests/FoilProviderFailurePresentationTests.swift"
+      verification:
+        - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+        - "git diff --check"
+        - "Secret/copy scan for provider keys and unsafe provider-body leakage."
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Verify provider health proof and secret hygiene."
     acceptance_criteria:
       - "Live or mocked receipts prove behavior; secret scan is clean."
+    receipt:
+      result: done
+      summary: "Mocked controller receipts prove the required provider states, and secret/copy scans rule out live key or unsafe provider-body leakage in app/docs copy."
+      evidence:
+        - "docs/goals/ios-v0.43-provider-configuration-health/notes/T003-judge-audit.md"
+        - "FoiliOS/FoilIOSTests/FoilProviderFailurePresentationTests.swift"

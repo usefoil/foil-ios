@@ -10,6 +10,7 @@
 		0487CA500F0109EBC53F8710 /* FoilTranscriptionClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CF921C0034784102049E070 /* FoilTranscriptionClient.swift */; };
 		05B62FBA1BC372A85B1B3E8A /* FoilKeyboardBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC574AC144BA7F61AAA6B60E /* FoilKeyboardBridge.swift */; };
 		0BBFCD60BD149E3F6CB6DA66 /* TranscriptionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621DDB56882D26AAEC465CB0 /* TranscriptionController.swift */; };
+		1D2B410EDA42F09012974E5C /* FoilProviderFailurePresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517B99BD6F16C11BEB5B6507 /* FoilProviderFailurePresentationTests.swift */; };
 		2CDF09B597678B083CCCF602 /* FoilKeyboardBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC574AC144BA7F61AAA6B60E /* FoilKeyboardBridge.swift */; };
 		407D54E2E86FD06A6015AFE4 /* FoilDictationLoopPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C101F2BCE2DE49E0CF59FE9 /* FoilDictationLoopPresenter.swift */; };
 		4AAE3B322F4DAB161951B0DC /* FoilDictationLoopPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243E8B108679282C050F860F /* FoilDictationLoopPresentationTests.swift */; };
@@ -66,6 +67,7 @@
 		243E8B108679282C050F860F /* FoilDictationLoopPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilDictationLoopPresentationTests.swift; sourceTree = "<group>"; };
 		268ED96A1069398E9D573385 /* FoilTranscriptQualityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilTranscriptQualityTests.swift; sourceTree = "<group>"; };
 		3583EEDEF91366197D5835CE /* FoilTranscriptionClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilTranscriptionClientTests.swift; sourceTree = "<group>"; };
+		517B99BD6F16C11BEB5B6507 /* FoilProviderFailurePresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilProviderFailurePresentationTests.swift; sourceTree = "<group>"; };
 		58C4258EB9EC3B85F4B3132E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		59E66C051F406E089F849D00 /* FoilCredentialStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilCredentialStore.swift; sourceTree = "<group>"; };
 		5EE790723AA98A22C747B75F /* FoilKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = FoilKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,6 +113,7 @@
 			children = (
 				243E8B108679282C050F860F /* FoilDictationLoopPresentationTests.swift */,
 				E80A5EC71E0768BC7DCDB9C6 /* FoilKeyboardBridgeTests.swift */,
+				517B99BD6F16C11BEB5B6507 /* FoilProviderFailurePresentationTests.swift */,
 				3583EEDEF91366197D5835CE /* FoilTranscriptionClientTests.swift */,
 				268ED96A1069398E9D573385 /* FoilTranscriptQualityTests.swift */,
 			);
@@ -309,6 +312,7 @@
 			files = (
 				4AAE3B322F4DAB161951B0DC /* FoilDictationLoopPresentationTests.swift in Sources */,
 				CEF221C874A713CB0AF6B31F /* FoilKeyboardBridgeTests.swift in Sources */,
+				1D2B410EDA42F09012974E5C /* FoilProviderFailurePresentationTests.swift in Sources */,
 				A45D5112259C81FF8B809D7A /* FoilTranscriptQualityTests.swift in Sources */,
 				4AC314D95DEBA3047166C0F8 /* FoilTranscriptionClientTests.swift in Sources */,
 			);
