@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.41-closed-beta-polish-conveyor"
   kind: existing_plan
   tranche: "Large end-to-end closed-beta polish conveyor after build 12 readiness."
-  status: active
+  status: done
   oracle:
     signal: "Every closed-beta polish child board is merged or exactly blocked, and the final audit gives an evidence-backed invite/hold decision."
     cadence: "after each child board and before every beta-readiness claim"
@@ -53,7 +53,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-41-closed-beta-polish-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.41-closed-beta-polish-conveyor"
 
-active_task: T012
+active_task: null
 
 tasks:
   - id: T001
@@ -376,7 +376,7 @@ tasks:
   - id: T012
     type: judge
     assignee: Judge
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Run the final closed-beta readiness audit child board."
     child_board: "docs/goals/ios-v0.53-closed-beta-final-readiness-audit/goal.md"
@@ -396,3 +396,9 @@ tasks:
       - "Any public or tester-facing copy overclaims unsupported behavior."
     acceptance_criteria:
       - "Final audit gives invite/hold recommendation and a tester scope that matches only proven behavior."
+    receipt:
+      result: invite_narrow_internal_only
+      summary: "Final audit completed the conveyor by mapping v0.42-v0.52 to merged receipts or accepted blockers and aligning tester/public copy with proven build-scoped behavior."
+      evidence:
+        - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T012-v0.53-done.md"
+        - "docs/goals/ios-v0.53-closed-beta-final-readiness-audit/notes/T003-final-recommendation.md"
