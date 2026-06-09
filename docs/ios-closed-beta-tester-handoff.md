@@ -53,7 +53,8 @@ in safe text fields.
 5. Open **Settings > General > Keyboard > Keyboards**.
 6. Add **Foil Keyboard**.
 7. Open **Foil Keyboard** and enable **Allow Full Access**.
-8. Return to Foil and confirm Keyboard health is not blocked.
+8. Return to the target field, tap it again, cycle back to Foil Keyboard, then
+   return to Foil and confirm Keyboard health is not blocked.
 
 ## Test Tasks
 
@@ -101,11 +102,11 @@ private history visible.
 
 ## Recovery
 
-- If Foil Keyboard does not appear, cycle keyboards and tap the target field
-  again.
+- If Foil Keyboard does not appear, tap the target field again and use
+  globe/Next Keyboard to cycle back to Foil Keyboard.
 - If Insert latest is disabled, open Foil and check Keyboard health.
-- If Full Access is off, enable it in Keyboard settings, then reopen the target
-  field.
+- If Full Access is off, enable it in Keyboard settings, then refocus the target
+  field and cycle back to Foil Keyboard.
 - If the transcript is stale or wrong, use **Reset shared state** in Foil and
   record again.
 - If recording or transcription fails, retry with a shorter phrase.

@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.44-keyboard-setup-full-access-recovery"
   kind: specific
   tranche: "Keyboard setup and recovery polish."
-  status: active
+  status: blocked
   oracle:
     signal: "Physical iPhone setup and recovery paths work or name exact external blockers."
     cadence: "after each Settings/keyboard state"
@@ -20,26 +20,62 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map keyboard setup states and physical automation prerequisites."
     acceptance_criteria:
       - "Receipt identifies setup states, physical blockers, and safe receipts."
+    receipt:
+      result: done
+      summary: "App and keyboard already expose setup checklist, Full Access health, disabled Insert Latest, reset, stale check-in, and keyboard-side recovery. iPhone-preview is visible, but WDA is not reachable, so final physical proof is blocked until automation is restored; local copy/test polish can proceed safely."
+      evidence:
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/T001-scout-receipt.md"
+        - "scripts/ios-physical-harness.py status"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilKeyboard/KeyboardViewController.swift"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Polish keyboard setup and recovery UX."
+    allowed_files:
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/**"
+    verify:
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+      - "git diff --check"
+      - "scripts/ios-physical-harness.py status"
+    stop_if:
+      - "Physical Settings, Full Access, install, or WDA trust action is required."
+      - "A receipt would include private app content or transcript text."
     acceptance_criteria:
       - "Blocked states explain next action and recovery without overpromising iOS behavior."
+    receipt:
+      result: done
+      summary: "Polished setup/recovery copy to explicitly name choosing Foil Keyboard, refocusing the target field, and using globe/Next Keyboard to cycle back after Full Access or stale keyboard states."
+      evidence:
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/T002-worker-receipt.md"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "docs/ios-closed-beta-tester-handoff.md"
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: blocked
     objective: "Verify physical setup/recovery proof."
     acceptance_criteria:
       - "Physical receipts prove or exactly block the critical keyboard setup paths."
+    receipt:
+      result: external_blocker
+      summary: "Physical iPhone proof is blocked because iPhone-preview is visible but WDA is not reachable at localhost:8100, and restoring WDA may require a device install/trust/operator action."
+      evidence:
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/T003-physical-blocker.md"
+        - "scripts/ios-physical-harness.py status"
+      next_owner: "operator"
+      next_action: "Approve or perform WDA/TestFlight/device actions required to make physical UI automation reachable, then rerun setup and recovery proof."
