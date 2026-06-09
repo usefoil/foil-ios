@@ -15,7 +15,7 @@ privacy, and physical-device automation workflows.
 - Custom keyboard extension: `com.neonwatty.FoilIOS.Keyboard`
 - App Group: `group.com.neonwatty.FoilIOS`
 - Project generator: XcodeGen via `FoiliOS/project.yml`
-- Current source version: `0.1.0 (12)`
+- Current source version: `0.1.0 (13)`
 
 The prototype supports:
 
@@ -55,7 +55,7 @@ Closed-beta feedback triage is documented in
 
 ## Claim Boundary
 
-The safe current claim is narrow: build `0.1.0 (12)` can complete the
+The safe current released TestFlight claim is narrow: build `0.1.0 (12)` can complete the
 app-to-keyboard dictation loop on a physical iPhone for the sterile Safari
 normal-field fixture, and secure fields are expected to reject the custom
 keyboard. The preview also has physical build 12 onboarding/setup proof.

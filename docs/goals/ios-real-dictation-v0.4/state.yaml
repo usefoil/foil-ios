@@ -87,7 +87,7 @@ tasks:
         - "rg showed FoiliOS/project.yml CURRENT_PROJECT_VERSION 5 and MARKETING_VERSION 0.1.0."
         - "rg showed generated FoilIOS.xcodeproj CURRENT_PROJECT_VERSION 5."
         - "docs/ios-testflight-upload-runbook.md records App Store Connect app Foil Dictation, bundle id com.neonwatty.FoilIOS, Apple ID 6777069277, and beta group Foil Internal Testers."
-        - "Local key presence check found AuthKey_Q46379TC9A.p8 without printing private key contents."
+        - "Local key presence check found one App Store Connect private-key file without printing the key filename or contents."
         - "xcrun devicectl list devices showed iPhone-preview available with CoreDevice identifier 5320F5AD-2A71-50AC-94FE-207B544B6247."
         - "v0.3 receipt proves one real Groq transcript inserted into Notes and App Group reset, but records a redacted residual phrase mismatch from Mac speaker-to-phone microphone capture."
       strongest_failure_modes:
