@@ -1,0 +1,87 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.39 Build 12 Tester Handoff Update"
+  slug: "ios-v0.39-build12-tester-handoff-update"
+  kind: specific
+  tranche: "Update closed-beta tester handoff after build 12 proof."
+  status: live
+  oracle:
+    signal: "Tester handoff says build 12 only after release/smoke receipts prove it, and no overclaims remain."
+    cadence: "after host-app matrix rerun"
+    final_proof: "Copy scan and handoff audit receipts."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  goal_pressure_requires_oracle: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-39-build12-tester-handoff-update/"
+    command: "npx goalbuddy board docs/goals/ios-v0.39-build12-tester-handoff-update"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Map current tester copy against build 12 release and matrix receipts."
+    allowed_files:
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "README.md"
+      - "docs/goals/ios-v0.36-build12-testflight-release-proof/**"
+      - "docs/goals/ios-v0.37-build12-physical-onboarding-smoke/**"
+      - "docs/goals/ios-v0.38-build12-host-app-matrix-rerun/**"
+    verify:
+      - "Do not approve build-number update unless build 12 release and physical proof exist."
+      - "List stale build, Mail, Messages delivery, arbitrary app, and public availability risks."
+    acceptance_criteria:
+      - "Scout note says exactly what copy should change or why it is blocked."
+    expected_output:
+      - "notes/T001-handoff-preflight.md"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Update tester handoff and README caveats for proven build 12."
+    allowed_files:
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "README.md"
+      - "docs/goals/ios-v0.39-build12-tester-handoff-update/**"
+    verify:
+      - "Run stale build and overclaim copy scans."
+      - "Keep Mail deferred, Messages draft-only, Full Access required, secure-field caveat, and no arbitrary app support."
+    stop_if:
+      - "Build 12 is not physically smoked."
+      - "Copy would require private screenshots or private tester content."
+    acceptance_criteria:
+      - "Build 12 handoff is accurate and scan receipts pass."
+    expected_output:
+      - "notes/T002-handoff-worker.md"
+      - "notes/receipts/build12-copy-scan.json"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Audit build 12 tester handoff."
+    verify:
+      - "Reject handoff if it advances build number without proof."
+      - "Reject handoff if it overclaims host-app behavior."
+    acceptance_criteria:
+      - "Handoff is safe input to closed-beta invite/readiness audit."
+    expected_output:
+      - "notes/T999-final-audit.md"

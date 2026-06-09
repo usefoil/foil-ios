@@ -1,0 +1,93 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.36 Build 12 TestFlight Release Proof"
+  slug: "ios-v0.36-build12-testflight-release-proof"
+  kind: specific
+  tranche: "Upload and prove build 12 for internal TestFlight."
+  status: live
+  oracle:
+    signal: "Build 12 exists in App Store Connect/TestFlight with sanitized release receipts."
+    cadence: "after archive/export/upload and before physical smoke"
+    final_proof: "Release audit note with build metadata, upload status, beta group attachment, PR link, and secret scan."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  goal_pressure_requires_oracle: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-36-build12-testflight-release-proof/"
+    command: "npx goalbuddy board docs/goals/ios-v0.36-build12-testflight-release-proof"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Map current source metadata, signing, archive/export, App Store Connect auth, and prior build-11 proof."
+    allowed_files:
+      - "FoiliOS/**"
+      - "docs/ios-testflight-upload-runbook.md"
+      - "docs/goals/ios-v0.22-testflight-release-proof/**"
+      - "docs/goals/ios-v0.32-ios-app-onboarding-polish/**"
+    verify:
+      - "Inspect build metadata without modifying it."
+      - "Confirm whether App Store Connect credential material is present by presence only, without printing secrets."
+      - "Identify exact commands from existing runbook to reuse."
+    stop_if:
+      - "Credential inspection would print private key, JWT, password, or token."
+    acceptance_criteria:
+      - "Scout note names current build number, next build number, signing/auth state, and exact safe worker path."
+    expected_output:
+      - "notes/T001-release-preflight.md"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Bump to build 12, regenerate/build/test/archive/export/upload, and verify TestFlight internal readiness."
+    allowed_files:
+      - "FoiliOS/project.yml"
+      - "FoiliOS/FoilIOS.xcodeproj/**"
+      - "docs/goals/ios-v0.36-build12-testflight-release-proof/**"
+    verify:
+      - "Run focused/full iOS tests appropriate to touched build metadata."
+      - "Archive/export Release IPA with app and keyboard extension build 12 metadata."
+      - "Validate/upload to App Store Connect, clear export compliance, attach to Foil Internal Testers, and record sanitized IDs/status."
+      - "Run secret scan over staged diff and receipts."
+    stop_if:
+      - "App Store Connect credentials or provider selection require human/private input."
+      - "Upload would expose credentials or private content in logs."
+      - "Archive/export fails for signing reasons that require account action."
+    acceptance_criteria:
+      - "Build 12 is uploaded and internally available, or blocker is exact."
+    expected_output:
+      - "notes/T002-release-worker.md"
+      - "notes/receipts/build12-release.json"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Audit build 12 release proof before physical smoke."
+    verify:
+      - "Reject simulator-only or source-only proof as TestFlight release proof."
+      - "Check PR/merge state and sanitized receipts."
+      - "Check no secrets or private artifacts were committed."
+    acceptance_criteria:
+      - "Judge says build 12 is ready for iPhone-preview install/smoke, or records exact blocker."
+    expected_output:
+      - "notes/T999-final-audit.md"

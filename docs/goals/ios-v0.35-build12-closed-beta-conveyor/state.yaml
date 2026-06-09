@@ -1,0 +1,165 @@
+version: 2
+
+goal:
+  title: "Foil iOS v0.35 Build 12 Closed Beta Conveyor"
+  slug: "ios-v0.35-build12-closed-beta-conveyor"
+  kind: existing_plan
+  tranche: "Automate the next 1+5 boards: build 12 release, physical smoke, matrix rerun, handoff, and readiness audit."
+  status: live
+  oracle:
+    signal: "Build 12 is uploaded/installed/smoked or exactly blocked, and beta copy points only at proven behavior."
+    cadence: "after each child board and at final audit"
+    final_proof: "v0.40 readiness audit maps build 12 release, physical smoke, matrix, and tester docs to narrow beta criteria."
+  intake:
+    original_request: "automate the next 1 + 5"
+    interpreted_outcome: "Create and run a GoalBuddy conveyor for the next build-12 closed-beta release path."
+    input_shape: existing_plan
+    audience: "Foil owner preparing a narrow internal iOS closed beta"
+    authority: approved
+    proof_type: artifact
+    completion_proof: "Merged conveyor and child PRs with release/smoke/copy receipts, or exact external blocker."
+    likely_misfire: "Inviting testers or updating copy before the installed TestFlight build contains the v0.32 onboarding polish."
+    blind_spots_considered:
+      - "App Store Connect upload may require private credentials or external Apple state."
+      - "Physical iPhone smoke may require device unlock, TestFlight install/update, or WDA health."
+      - "Messages proof must remain fake-recipient draft only and must not expose private threads."
+      - "Tester handoff build number should not move to 12 until build 12 is actually uploaded and smoked."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: pending
+    url: "http://goalbuddy.localhost:41737/ios-v0-35-build12-closed-beta-conveyor/"
+    command: "npx goalbuddy board docs/goals/ios-v0.35-build12-closed-beta-conveyor"
+
+active_task: T001
+
+tasks:
+  - id: T001
+    type: worker
+    assignee: Worker
+    status: active
+    reasoning_hint: high
+    objective: "Run the build 12 TestFlight release proof child board."
+    allowed_files:
+      - "FoiliOS/**"
+      - "docs/goals/ios-v0.36-build12-testflight-release-proof/**"
+      - "docs/ios-testflight-upload-runbook.md"
+    verify:
+      - "Follow docs/goals/ios-v0.36-build12-testflight-release-proof/goal.md."
+      - "Bump/regenerate/build/archive/upload only after release preflight proves credentials and app state."
+      - "Record sanitized App Store Connect/TestFlight receipts without printing credentials."
+    stop_if:
+      - "App Store Connect credentials, provider, or account state require private human action."
+      - "Upload would use guessed or missing build metadata."
+    acceptance_criteria:
+      - "Build 12 is uploaded, export compliance is cleared, internal beta group attachment is verified, and PR is merged; or exact blocker is recorded."
+    receipt:
+      result: pending
+      child_board: "docs/goals/ios-v0.36-build12-testflight-release-proof/goal.md"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run the build 12 physical onboarding smoke child board."
+    allowed_files:
+      - "docs/goals/ios-v0.37-build12-physical-onboarding-smoke/**"
+      - "docs/ios-physical-automation-runbook.md"
+    verify:
+      - "Follow docs/goals/ios-v0.37-build12-physical-onboarding-smoke/goal.md."
+      - "Use simulator only as fallback context; physical iPhone-preview proof is the oracle."
+    stop_if:
+      - "Device unlock, TestFlight install/update, or WDA requires user action."
+      - "Any raw private phone content would be captured or committed."
+    acceptance_criteria:
+      - "Physical iPhone-preview proves build 12 has the polished onboarding/setup surface and expected keyboard guidance."
+    receipt:
+      result: pending
+      child_board: "docs/goals/ios-v0.37-build12-physical-onboarding-smoke/goal.md"
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run the build 12 host-app matrix rerun child board."
+    allowed_files:
+      - "docs/goals/ios-v0.38-build12-host-app-matrix-rerun/**"
+      - "docs/ios-keyboard-host-app-matrix.md"
+    verify:
+      - "Follow docs/goals/ios-v0.38-build12-host-app-matrix-rerun/goal.md."
+      - "Rerun Notes, Safari normal field, Safari secure field, Messages fake-recipient draft, and App Group reset proof."
+    stop_if:
+      - "Messages cannot be tested without exposing private content."
+      - "Mail is accidentally pulled into the pass matrix before issue #12 is solved."
+    acceptance_criteria:
+      - "Build 12 matrix rows are proven or precisely blocked, with no private raw WDA/screenshots committed."
+    receipt:
+      result: pending
+      child_board: "docs/goals/ios-v0.38-build12-host-app-matrix-rerun/goal.md"
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: medium
+    objective: "Run the build 12 tester handoff update child board."
+    allowed_files:
+      - "docs/goals/ios-v0.39-build12-tester-handoff-update/**"
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "README.md"
+    verify:
+      - "Follow docs/goals/ios-v0.39-build12-tester-handoff-update/goal.md."
+      - "Update tester docs only after release and physical smoke receipts prove build 12."
+      - "Run stale-copy and overclaim scans."
+    stop_if:
+      - "Build 12 is not uploaded/installed/smoked."
+      - "Copy would imply Mail, Messages delivery, public App Store availability, or arbitrary app support."
+    acceptance_criteria:
+      - "Tester handoff accurately targets build 12 and preserves all caveats."
+    receipt:
+      result: pending
+      child_board: "docs/goals/ios-v0.39-build12-tester-handoff-update/goal.md"
+
+  - id: T005
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Run the build 12 closed-beta readiness audit child board."
+    allowed_files:
+      - "docs/goals/ios-v0.40-build12-closed-beta-readiness-audit/**"
+      - "docs/**"
+      - "README.md"
+      - "/Users/neonwatty/Desktop/foil/site/**"
+      - "/Users/neonwatty/Desktop/foil/docs/**"
+    verify:
+      - "Follow docs/goals/ios-v0.40-build12-closed-beta-readiness-audit/goal.md."
+      - "Confirm all child PRs are merged or precisely blocked."
+      - "Scan both repos for stale build numbers and overbroad iOS claims."
+    stop_if:
+      - "Any child board is incomplete without accepted blocker."
+    acceptance_criteria:
+      - "Final audit gives a clear invite / hold / fix recommendation with evidence."
+    receipt:
+      result: pending
+      child_board: "docs/goals/ios-v0.40-build12-closed-beta-readiness-audit/goal.md"
