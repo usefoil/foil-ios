@@ -89,7 +89,7 @@ tasks:
         - "docs/ios-testflight-upload-runbook.md records App Store Connect app Foil Dictation, bundle id com.neonwatty.FoilIOS, Apple ID 6777069277, and beta group Foil Internal Testers."
         - "Local key presence check found AuthKey_Q46379TC9A.p8 without printing private key contents."
         - "xcrun devicectl list devices showed iPhone-preview available with CoreDevice identifier 5320F5AD-2A71-50AC-94FE-207B544B6247."
-        - "v0.3 receipt proves one real Groq transcript inserted into Notes and App Group reset, but records the residual phrase mismatch `Foiled lift` vs intended `Foil live` from Mac speaker-to-phone microphone capture."
+        - "v0.3 receipt proves one real Groq transcript inserted into Notes and App Group reset, but records a redacted residual phrase mismatch from Mac speaker-to-phone microphone capture."
       strongest_failure_modes:
         - "Build upload proof could accidentally test an older build if device metadata is not checked after TestFlight update."
         - "Repeated smoke could pass by reusing stale App Group transcript unless each cycle records a fresh transcript and verifies reset."
@@ -261,14 +261,19 @@ tasks:
       rejected_attempts:
         - attempt: "cycle1-initial"
           phrase: "violet cactus one"
-          transcript: "."
-          reason: "Rejected as weak proof because transcript was only punctuation and did not contain the sterile phrase."
+          transcript_redacted: true
+          transcript_length: 1
+          transcript_sha256: "cdb4ee2aea69cc6a"
+          reason: "Rejected as weak proof because the transcript was only punctuation and did not contain the sterile phrase."
           artifacts:
             - "docs/goals/ios-real-dictation-v0.4/notes/cycle1-complete-snapshot.json"
       counted_cycles:
         - cycle: 1
           phrase: "violet cactus number one, repeated three times"
-          transcript: "Violet cactus number one violet cactus number one violet cactus number one"
+          transcript_redacted: true
+          transcript_length: 74
+          transcript_sha256: "20e7a555c7b9a9a4"
+          transcript_summary: "Sterile phrase recognized with expected repeated markers."
           insertion_evidence: "Notes source after insert contained the transcript; canonical App Group snapshot reset to phase idle/message Ready/no transcript."
           artifacts:
             - "docs/goals/ios-real-dictation-v0.4/notes/cycle1-retry-complete-snapshot.json"
@@ -277,8 +282,11 @@ tasks:
             - "docs/goals/ios-real-dictation-v0.4/notes/visual/cycle1-after-insert.png"
         - cycle: 2
           phrase: "silver compass number two, repeated three times"
-          transcript: "What are you working out there? Silver compass number 2, silver compass number 2, silver compass number 2."
-          insertion_evidence: "Notes source after insert contained the new Silver compass transcript after the prior Violet cactus text; canonical App Group snapshot reset to phase idle/message Ready/no transcript."
+          transcript_redacted: true
+          transcript_length: 106
+          transcript_sha256: "0dbde428c8247bef"
+          transcript_summary: "Recognized the intended sterile phrase markers but also captured a small environmental phrase, so the raw body is redacted."
+          insertion_evidence: "Notes source after insert contained the new cycle-2 transcript after the prior cycle text; canonical App Group snapshot reset to phase idle/message Ready/no transcript."
           artifacts:
             - "docs/goals/ios-real-dictation-v0.4/notes/cycle2-complete-snapshot.json"
             - "docs/goals/ios-real-dictation-v0.4/notes/cycle2-after-insert-snapshot.json"
@@ -286,8 +294,11 @@ tasks:
             - "docs/goals/ios-real-dictation-v0.4/notes/visual/cycle2-after-insert.png"
         - cycle: 3
           phrase: "green lantern number three, repeated three times"
-          transcript: "Green Lantern Number 3"
-          insertion_evidence: "Notes source after insert contained Green Lantern Number 3 after the prior two transcripts; canonical App Group snapshot reset to phase idle/message Ready/no transcript."
+          transcript_redacted: true
+          transcript_length: 22
+          transcript_sha256: "233837096c0a54a9"
+          transcript_summary: "Sterile phrase recognized once instead of all repetitions."
+          insertion_evidence: "Notes source after insert contained the cycle-3 transcript after the prior two transcripts; canonical App Group snapshot reset to phase idle/message Ready/no transcript."
           artifacts:
             - "docs/goals/ios-real-dictation-v0.4/notes/cycle3-complete-snapshot.json"
             - "docs/goals/ios-real-dictation-v0.4/notes/cycle3-after-insert-snapshot.json"
@@ -325,9 +336,9 @@ tasks:
         - failure: "The phone could still be running build 5 while build 6 exists only in App Store Connect."
           ruled_out_by: "Before update devicectl reported bundle version 5; after tapping TestFlight's build 6 replacement confirmation at point coordinates, devicectl poll 2 reported Foil iOS 0.1.0 bundle version 6 and TestFlight showed 0.1.0 (6) Open."
         - failure: "The repeated proof could reuse stale transcript state instead of recording fresh audio."
-          ruled_out_by: "Three counted cycles have distinct complete snapshots before insert: Violet cactus number one, Silver compass number 2, and Green Lantern Number 3. Each cycle's after-insert snapshot copied from the canonical App Group file showed phase idle/message Ready/no transcript."
+          ruled_out_by: "Three counted cycles have distinct complete snapshots before insert with different transcript lengths/hashes and expected sterile phrase markers. Each cycle's after-insert snapshot copied from the canonical App Group file showed phase idle/message Ready/no transcript."
         - failure: "The keyboard could show ready text but fail to mutate the host app or clear canonical state."
-          ruled_out_by: "Notes accessibility source after cycle 1 contained the Violet cactus transcript; after cycle 2 contained the new Silver compass transcript after the prior text; after cycle 3 contained Green Lantern Number 3 after the prior two transcripts. Each post-insert snapshot reset to idle/Ready."
+          ruled_out_by: "Notes accessibility source after each cycle contained the corresponding new redacted transcript after the prior text. Each post-insert snapshot reset to idle/Ready."
         - failure: "Build/upload proof could pass locally but fail App Store Connect/TestFlight readiness."
           ruled_out_by: "altool validation/upload/build-status succeeded; ASC API reported buildBetaDetail internal IN_BETA_TESTING / external READY_FOR_BETA_SUBMISSION; beta group relationship verification returned contains_build_6 true."
         - failure: "Credentials or private key material could leak into committed proof."

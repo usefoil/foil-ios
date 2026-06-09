@@ -273,7 +273,7 @@ tasks:
       evidence:
         - "xcrun devicectl device process launch launched com.neonwatty.FoilIOS after TestFlight install, and devicectl app metadata still reported version 0.1.0 bundle version 2."
         - "Writing command action=startRecording to App Group Library/foil-ios-command.json changed the snapshot to phase listening with message Recording in Foil. Stop when finished."
-        - "First recording/transcribe attempt completed but returned transcript `. Thank you.`, so it was treated as weak proof rather than success."
+        - "First recording/transcribe attempt completed but returned a weak transcript, redacted as length 12 / sha256 3ee480e502940011, so it was treated as weak proof rather than success."
         - "macOS output and system routes were verified as MacBook Pro Speakers, output volume was set to 100, and AirPods were not connected."
         - "Second recording used the phrase: Foil TestFlight build two second audio proof. Orange lantern river."
         - "Second command action=stopRecording changed the snapshot to phase processing with message Recording saved. Tap Transcribe in Foil."
@@ -388,7 +388,7 @@ tasks:
       additional_failure_modes:
         - claim: "The audio/transcription proof could be a false positive caused by silence or AirPods routing."
           evidence_that_rules_it_out:
-            - "T004 recorded the first weak transcript `. Thank you.` as failed/weak proof."
+            - "T004 recorded the first weak transcript as failed/weak proof; raw body redacted as length 12 / sha256 3ee480e502940011."
             - "T004 reverified MacBook Pro Speakers as output/system route, set volume to 100, and reran with a longer sterile phrase."
             - "The second transcript captured the intended phrase as `Foil test flight build 2 second audio prove Orange Lantern River`."
         - claim: "The transcript could exist in shared state but not insert through the custom keyboard."

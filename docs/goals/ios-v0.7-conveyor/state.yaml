@@ -144,7 +144,7 @@ tasks:
       evidence:
         - "Physical WDA flow: Record in Foil -> macOS say played known phrase -> Finish recording -> Transcribe."
         - "WDA source found Ready for keyboard, Insert latest, Groq transcript ready, and Transcription complete."
-        - "App Group snapshot transcript: Violet cactus number one violet cactus number one ."
+        - "App Group snapshot transcript metadata: length 51, body redacted; normalized markers contained violet, cactus, and number one."
       residual_risk:
         - "No target-app insertion claim yet; transcript remains staged for docs/goals/ios-target-app-insertion-matrix-v0.7."
 

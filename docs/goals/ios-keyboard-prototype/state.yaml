@@ -307,7 +307,7 @@ tasks:
       merged_at: "2026-06-04T12:24:40Z"
       evidence:
         - "/tmp/foil-ios-keyboard-prototype/pr2-fake-transcript-ready.jpg"
-        - "XcodeBuildMCP snapshot text contained Transcript Ready, Fake transcript ready, and Foil keyboard shell."
+        - "XcodeBuildMCP snapshot text contained Transcript Ready, Fake transcript ready, and deterministic fake transcript metadata length 19 / sha256 f698b7a670a73cf9."
       residual_risk:
         - "True host-app custom-keyboard insertion is not proven; Settings automation landed in an Apps list and did not reach Keyboard settings."
         - "XcodeBuildMCP UI automation attached to simulator 8C27 even after a profile was set for 8A7; UI proof used 8C27 while build proof used iOS 26.5 destination."
@@ -441,7 +441,7 @@ tasks:
         - "/tmp/foil-ios-keyboard-prototype/pr4-groq-transcription.jpg"
         - "SIMCTL_CHILD_FOIL_IOS_GROQ_API_KEY env-only launch did not survive the URL-driven flow; the app showed Missing FOIL_IOS_GROQ_API_KEY, which led to a DEBUG-only UserDefaults simulator fallback."
         - "XcodeBuildMCP build_sim after final xcodegen: SUCCEEDED with warnings: []."
-        - "XcodeBuildMCP wait_for_ui matched Transcription complete; final snapshot contained Transcript Ready, Groq transcript ready, transcript text Thank you., and recording foil-ios-2026-06-04T12-40-33.889Z.m4a."
+        - "XcodeBuildMCP wait_for_ui matched Transcription complete; final snapshot contained Transcript Ready, Groq transcript ready, redacted transcript metadata length 10 / sha256 8569efc4ed5a6273, and recording foil-ios-2026-06-04T12-40-33.889Z.m4a."
         - "Simulator recording file exists at 151225 bytes."
         - "Temporary simulator UserDefaults key deletion verified with key preference absent."
         - "Secret/token scan over FoiliOS and docs/goals/ios-keyboard-prototype returned no matches."
@@ -507,7 +507,7 @@ tasks:
         - "/tmp/foil-ios-keyboard-prototype/pr5-reminders-inserted.jpg"
         - "Settings showed Foil Keyboard — Foil iOS added to the installed keyboard list."
         - "Reminders host app showed the Foil keyboard UI with Transcript Ready, Fake transcript ready, Start, Insert latest, and Next Keyboard."
-        - "After tapping Insert latest, XcodeBuildMCP snapshot value changed from Hwould we to Hwould weFoil keyboard shell."
+        - "After tapping Insert latest, XcodeBuildMCP snapshot value changed from redacted metadata length 9 / sha256 bc6b50c462fad30f to length 28 / sha256 e0b82971eb6ddc3c."
         - "Simulator logs showed com.neonwatty.FoilIOS.Keyboard viewservice launched, Foil_Keyboard.KeyboardViewController created, App Group container lookup succeeded, and viewControllerAppearance appeared."
       residual_risk:
         - "This proves insertion in Apple Reminders only; Messages, Safari, secure fields, and third-party apps still need a broader matrix."
@@ -577,8 +577,8 @@ tasks:
         - "/tmp/foil-ios-keyboard-prototype/pr5-reminders-foil-active-blank.jpg"
         - "/tmp/foil-ios-keyboard-prototype/pr5-reminders-inserted.jpg"
         - "Issue evidence update: https://github.com/mean-weasel/foil/issues/216#issuecomment-4622391759"
-        - "Reminders insertion proof: title changed from Hwould we to Hwould weFoil keyboard shell after tapping Insert latest."
-        - "Groq proof: final simulator snapshot contained Transcription complete, Groq transcript ready, transcript text Thank you., and recording foil-ios-2026-06-04T12-40-33.889Z.m4a."
+        - "Reminders insertion proof: title changed from redacted metadata length 9 / sha256 bc6b50c462fad30f to length 28 / sha256 e0b82971eb6ddc3c after tapping Insert latest."
+        - "Groq proof: final simulator snapshot contained Transcription complete, Groq transcript ready, redacted transcript metadata length 10 / sha256 8569efc4ed5a6273, and recording foil-ios-2026-06-04T12-40-33.889Z.m4a."
       strongest_remaining_failure_mode:
         - "The simulator path works, but physical iPhone microphone/background/custom-keyboard behavior may still fail. This is the highest-risk part of the product because keyboard extensions and containing-app microphone handoff have device-only lifecycle constraints."
       blocker_evidence:
@@ -687,7 +687,7 @@ checks:
       - "cd FoiliOS && xcodegen generate --spec project.yml"
       - "XcodeBuildMCP build_sim for FoilIOS on iPhone 17 simulator"
       - "Simulator Settings enabled Foil Keyboard — Foil iOS"
-      - "Apple Reminders insertion changed title to Hwould weFoil keyboard shell"
+      - "Apple Reminders insertion changed the title to redacted metadata length 28 / sha256 e0b82971eb6ddc3c."
       - "gh issue comment 216 --repo mean-weasel/foil"
       - "xcrun xctrace list devices"
       - "xcodebuild -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'id=00008140-001055D83E87001C' build"

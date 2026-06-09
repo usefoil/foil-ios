@@ -74,7 +74,7 @@ Evidence:
   - `foil-keyboard-message = Fake transcript ready`
   - enabled `foil-keyboard-insert-latest`
 - After tapping `foil-keyboard-insert-latest`, WDA source showed the Notes
-  `TextView` value exactly `Foil keyboard shell`.
+  `TextView` value matched deterministic fake transcript metadata length 19 / sha256 f698b7a670a73cf9.
 
 Residual risk / follow-up:
 
