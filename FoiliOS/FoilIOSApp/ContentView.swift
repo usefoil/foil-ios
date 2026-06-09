@@ -343,6 +343,8 @@ struct ContentView: View {
                     .foregroundStyle(.secondary)
             }
 
+            setupReadinessPanel
+
             VStack(alignment: .leading, spacing: 10) {
                 ForEach(FoilDictationLoopPresenter.setupChecklistPresentation()) { item in
                     setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
@@ -396,6 +398,41 @@ struct ContentView: View {
         )
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("closed-beta-setup-checklist")
+    }
+
+    private var setupReadinessPanel: some View {
+        let presentation = setupReadiness
+        return VStack(alignment: .leading, spacing: 8) {
+            Label {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(presentation.title)
+                        .font(.callout.weight(.semibold))
+                    Text(presentation.detail)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.8)
+                }
+            } icon: {
+                Image(systemName: presentation.systemImage)
+            }
+
+            Text(presentation.nextAction)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(presentation.tone.color)
+                .lineLimit(3)
+                .minimumScaleFactor(0.8)
+                .accessibilityIdentifier("setup-readiness-next-action")
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(presentation.tone.color.opacity(0.10), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(presentation.tone.color.opacity(0.28))
+        )
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("setup-readiness-summary")
     }
 
     private var betaGuidancePanel: some View {
@@ -587,12 +624,34 @@ struct ContentView: View {
         }
     }
 
+    private var microphoneSetupState: FoilMicrophoneSetupState {
+        switch AVAudioApplication.shared.recordPermission {
+        case .granted:
+            .allowed
+        case .denied:
+            .blocked
+        case .undetermined:
+            .needsPrompt
+        @unknown default:
+            .unavailable
+        }
+    }
+
     private var keyboardHealthSummary: String {
         keyboardHealthPresentation.detail
     }
 
     private var keyboardHealthPresentation: FoilKeyboardHealthPresentation {
         FoilDictationLoopPresenter.keyboardHealthPresentation(report: keyboardHealth)
+    }
+
+    private var setupReadiness: FoilSetupReadinessPresentation {
+        FoilDictationLoopPresenter.setupReadinessPresentation(
+            hasProviderKey: transcription.hasConfiguredAPIKey,
+            microphoneState: microphoneSetupState,
+            keyboardHealth: keyboardHealth,
+            snapshot: snapshot
+        )
     }
 
     private var storageHealthSummary: String {

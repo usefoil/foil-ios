@@ -20,26 +20,70 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: T003
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map current onboarding/setup surfaces and identify the smallest polish slice."
     acceptance_criteria:
       - "Receipt lists current states, missing tester decisions, and exact files to edit."
+    receipt:
+      result: done
+      summary: "Current onboarding already includes closed-beta setup, target guidance, provider editor, keyboard health recovery, and overclaim tests. The smallest useful polish slice is a state-specific readiness summary so first-run, partial, blocked, and complete states answer what to do next without reading every row."
+      evidence:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "docs/ios-closed-beta-tester-handoff.md"
+      missing_tester_decisions:
+        - "The UI does not yet present one synthesized setup readiness state."
+        - "Partial setup and blocked-keyboard states rely on separate rows instead of a single next action."
+      exact_files_to_edit:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Implement onboarding/setup polish and update tester copy if needed."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      - "docs/goals/ios-v0.42-first-run-onboarding-polish/state.yaml"
+      - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T002-worker-receipt.md"
+    verify:
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+      - "git diff --check"
+      - "Copy scan for broad iPhone, Mail, Messages delivery, secure-field, and public App Store overclaims."
+    stop_if:
+      - "The polish requires new credentials or private provider-key content."
+      - "The UI copy would claim unproven host-app support."
+      - "Physical iPhone install is needed; leave that for the Judge proof gate."
     acceptance_criteria:
       - "UI distinguishes provider, microphone, keyboard installed, Full Access, target guidance, and recovery."
+    receipt:
+      result: done
+      note: "notes/T002-worker-receipt.md"
+      changed_files:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+          status: pass
+        - cmd: "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Added and verified a state-specific setup readiness summary for first-run, partial, blocked-keyboard, stale-keyboard, ready-to-insert, and setup-complete onboarding states."
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: active
     objective: "Verify onboarding proof and overclaim boundaries."
     acceptance_criteria:
       - "Simulator and physical receipts rule out confusing first-run or unsafe beta claims."
