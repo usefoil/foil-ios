@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.46-insert-latest-usage-ux"
   kind: specific
   tranche: "Keyboard insertion predictability and state polish."
-  status: active
+  status: blocked
   oracle:
     signal: "Insert Latest inserts once when valid and clearly refuses unsafe/empty/stale states."
     cadence: "after each insertion-state scenario"
@@ -20,26 +20,45 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map Insert Latest states, App Group state, and safe host-field fixtures."
     acceptance_criteria:
       - "Receipt identifies strongest double-insert/stale-insert risks and proof strategy."
+    receipt:
+      result: done
+      summary: "Mapped double-insert, stale-insert, non-complete leftover transcript, and physical host-field proof risks."
+      evidence:
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/T001-scout-receipt.md"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Polish Insert Latest UX and state handling."
     acceptance_criteria:
       - "Keyboard state is explicit for fresh, missing, stale, already inserted, and reset states."
+    receipt:
+      result: done
+      summary: "Added freshness-aware Insert Latest checks and stale transcript keyboard presentation, with focused bridge/presenter tests."
+      evidence:
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/T002-worker-receipt.md"
+      verification:
+        - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: blocked
     objective: "Verify insert-state proof."
     acceptance_criteria:
       - "Receipts rule out double insert, stale insert, and misleading enabled states."
+    receipt:
+      result: external_blocker
+      summary: "Local shared-state and presentation proof passed, but physical host-field proof is blocked because WDA is not reachable."
+      evidence:
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/T003-physical-blocker.md"
+      next_owner: "operator"
+      next_action: "Restore WDA or equivalent physical UI automation, then rerun exactly-once/stale/reset proof in a sterile field."

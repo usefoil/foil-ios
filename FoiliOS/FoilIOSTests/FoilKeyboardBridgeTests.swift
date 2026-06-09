@@ -37,6 +37,27 @@ final class FoilKeyboardBridgeTests: XCTestCase {
         XCTAssertEqual(bridge.storageReport().operation, "insert")
     }
 
+    func testConsumeTranscriptForInsertionIgnoresStaleCompleteTranscript() {
+        bridge.save(
+            FoilKeyboardSnapshot(
+                phase: .complete,
+                transcript: "stale transcript",
+                message: "Old transcript",
+                updatedAt: Date(timeIntervalSince1970: 100)
+            )
+        )
+
+        XCTAssertNil(
+            bridge.consumeTranscriptForInsertion(
+                now: Date(timeIntervalSince1970: 500),
+                staleAfter: 120
+            )
+        )
+        XCTAssertEqual(bridge.load().phase, .idle)
+        XCTAssertNil(bridge.load().transcript)
+        XCTAssertEqual(bridge.storageReport().operation, "insert")
+    }
+
     func testConsumeTranscriptForInsertionIgnoresNonCompleteLeftoverTranscripts() {
         let phases: [FoilKeyboardPhase] = [.idle, .handoffRequested, .listening, .processing, .failed]
 
@@ -64,7 +85,7 @@ final class FoilKeyboardBridgeTests: XCTestCase {
                 transcript: "  ready to insert  ",
                 message: "Ready",
                 updatedAt: Date()
-            ).insertableTranscript,
+            ).insertableTranscript(),
             "ready to insert"
         )
 
@@ -74,7 +95,7 @@ final class FoilKeyboardBridgeTests: XCTestCase {
                 transcript: "   ",
                 message: "Ready",
                 updatedAt: Date()
-            ).insertableTranscript
+            ).insertableTranscript()
         )
 
         XCTAssertNil(
@@ -83,7 +104,30 @@ final class FoilKeyboardBridgeTests: XCTestCase {
                 transcript: "leftover transcript",
                 message: "Failed",
                 updatedAt: Date()
-            ).insertableTranscript
+            ).insertableTranscript()
+        )
+    }
+
+    func testInsertableTranscriptRejectsStaleCompleteTranscript() {
+        let snapshot = FoilKeyboardSnapshot(
+            phase: .complete,
+            transcript: "ready earlier",
+            message: "Ready",
+            updatedAt: Date(timeIntervalSince1970: 100)
+        )
+
+        XCTAssertEqual(
+            snapshot.insertableTranscript(
+                now: Date(timeIntervalSince1970: 200),
+                staleAfter: 120
+            ),
+            "ready earlier"
+        )
+        XCTAssertNil(
+            snapshot.insertableTranscript(
+                now: Date(timeIntervalSince1970: 500),
+                staleAfter: 120
+            )
         )
     }
 }

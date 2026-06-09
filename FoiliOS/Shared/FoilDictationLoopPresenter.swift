@@ -315,7 +315,9 @@ enum FoilDictationLoopPresenter {
 
     static func keyboardPresentation(
         snapshot: FoilKeyboardSnapshot,
-        fullAccessEnabled: Bool
+        fullAccessEnabled: Bool,
+        now: Date = Date(),
+        staleAfter: TimeInterval = FoilKeyboardSnapshot.defaultTranscriptStaleAfter
     ) -> FoilKeyboardLoopPresentation {
         guard fullAccessEnabled else {
             return FoilKeyboardLoopPresentation(
@@ -328,12 +330,21 @@ enum FoilDictationLoopPresenter {
         }
 
         let hasTranscript = snapshot.transcript?.isEmpty == false
+        let hasInsertableTranscript = snapshot.insertableTranscript(now: now, staleAfter: staleAfter) != nil
         switch snapshot.phase {
-        case .complete where hasTranscript:
+        case .complete where hasInsertableTranscript:
             return FoilKeyboardLoopPresentation(
                 status: "Transcript ready",
                 message: "Tap Insert latest once, then keep typing.",
                 insertTitle: "Insert latest",
+                clearTitle: "Clear latest",
+                startTitle: "Dictate again in Foil"
+            )
+        case .complete where hasTranscript:
+            return FoilKeyboardLoopPresentation(
+                status: "Transcript may be stale",
+                message: "Clear latest, then dictate again in Foil if this is not the text you expect.",
+                insertTitle: "Stale transcript",
                 clearTitle: "Clear latest",
                 startTitle: "Dictate again in Foil"
             )

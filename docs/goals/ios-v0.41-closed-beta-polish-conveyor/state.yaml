@@ -53,7 +53,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-41-closed-beta-polish-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.41-closed-beta-polish-conveyor"
 
-active_task: T003
+active_task: T006
 
 tasks:
   - id: T001
@@ -123,7 +123,7 @@ tasks:
   - id: T003
     type: worker
     assignee: Worker
-    status: active
+    status: blocked
     reasoning_hint: high
     objective: "Run the keyboard setup, Full Access, and recovery child board."
     child_board: "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/goal.md"
@@ -141,11 +141,19 @@ tasks:
       - "Full Access cannot be toggled without user action."
     acceptance_criteria:
       - "A tester can recover from the common keyboard-extension failure modes using in-app guidance and verified handoff steps."
+    receipt:
+      result: external_blocker
+      summary: "v0.44 draft PR #29 has local copy/test polish, but physical setup and Full Access proof is blocked because WDA is not reachable and restoring it may require operator device actions."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/29"
+        - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T003-v0.44-blocker.md"
+      next_owner: "operator"
+      next_action: "Approve or perform WDA/TestFlight/device actions required to make physical UI automation reachable, then rerun v0.44 proof."
 
   - id: T004
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Run the recording and transcription quality-loop child board."
     child_board: "docs/goals/ios-v0.45-recording-transcription-quality-loop/goal.md"
@@ -163,11 +171,19 @@ tasks:
       - "Physical microphone permission requires user intervention."
     acceptance_criteria:
       - "The app makes transcription status legible and recoverable, with evidence for three repeated safe real-audio cycles plus realistic failure paths."
+    receipt:
+      result: external_blocker
+      summary: "v0.45 draft PR #30 has local recording cancel/recovery polish, but live audio and physical record/transcribe/insert cycles are blocked because WDA is not reachable."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/30"
+        - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T004-v0.45-blocker.md"
+      next_owner: "operator"
+      next_action: "Approve or perform WDA/TestFlight/device actions required to make physical UI automation reachable, then rerun safe real-audio insert cycles."
 
   - id: T005
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Run the Insert Latest usage UX child board."
     child_board: "docs/goals/ios-v0.46-insert-latest-usage-ux/goal.md"
@@ -184,11 +200,22 @@ tasks:
       - "App Group state cannot be inspected without leaking transcript text."
     acceptance_criteria:
       - "Insert Latest feels predictable and cannot silently double-insert or expose stale text in the tested safe paths."
+    receipt:
+      result: external_blocker
+      summary: "v0.46 branch adds local freshness-aware Insert Latest proof, but physical host-field insertion proof is blocked because WDA is not reachable."
+      evidence:
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/T001-scout-receipt.md"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/T002-worker-receipt.md"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/T003-physical-blocker.md"
+      verification:
+        - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+      next_owner: "operator"
+      next_action: "Restore WDA or equivalent physical UI automation, then rerun exactly-once/stale/reset proof in a sterile field."
 
   - id: T006
     type: worker
     assignee: Worker
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Run the host-app sterile matrix expansion child board."
     child_board: "docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/goal.md"

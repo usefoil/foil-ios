@@ -27,13 +27,19 @@ enum FoilKeyboardPhase: String, Codable, Equatable {
 }
 
 struct FoilKeyboardSnapshot: Codable, Equatable {
+    static let defaultTranscriptStaleAfter: TimeInterval = 300
+
     var phase: FoilKeyboardPhase
     var transcript: String?
     var message: String
     var updatedAt: Date
 
-    var insertableTranscript: String? {
+    func insertableTranscript(
+        now: Date = Date(),
+        staleAfter: TimeInterval = FoilKeyboardSnapshot.defaultTranscriptStaleAfter
+    ) -> String? {
         guard phase == .complete else { return nil }
+        guard now.timeIntervalSince(updatedAt) <= staleAfter else { return nil }
         let trimmedTranscript = transcript?.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let trimmedTranscript, !trimmedTranscript.isEmpty else { return nil }
         return trimmedTranscript
@@ -301,9 +307,12 @@ struct FoilKeyboardBridge {
         )
     }
 
-    func consumeTranscriptForInsertion() -> String? {
+    func consumeTranscriptForInsertion(
+        now: Date = Date(),
+        staleAfter: TimeInterval = FoilKeyboardSnapshot.defaultTranscriptStaleAfter
+    ) -> String? {
         let snapshot = load()
-        let transcript = snapshot.insertableTranscript
+        let transcript = snapshot.insertableTranscript(now: now, staleAfter: staleAfter)
         persist(.initial, operation: "insert")
         let currentHealth = keyboardHealthReport()
         saveKeyboardHealthReport(
