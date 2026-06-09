@@ -1,0 +1,52 @@
+version: 2
+goal:
+  title: "Foil iOS v0.52 TestFlight Beta Launch Rehearsal"
+  slug: "ios-v0.52-testflight-beta-launch-rehearsal"
+  kind: specific
+  tranche: "Closed-beta candidate TestFlight release proof."
+  status: active
+  oracle:
+    signal: "Candidate build is available, installed, and minimally smoked or exactly blocked."
+    cadence: "before upload, after upload, after install, after smoke"
+    final_proof: "Sanitized App Store Connect/TestFlight/CoreDevice/WDA receipts plus scoped release notes."
+  intake:
+    completion_proof: "Merged PR with sanitized upload, TestFlight availability, preview-iPhone install/update, post-update smoke, and scoped release-note receipts, or exact Apple-state blocker."
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+active_task: T001
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Preflight signing, build metadata, release notes, and TestFlight state."
+    acceptance_criteria:
+      - "Receipt proves upload is safe to attempt or names exact Apple/signing blocker."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Archive/upload candidate build and attach internal beta state."
+    acceptance_criteria:
+      - "Upload, processing, export compliance, and internal group state are verified or exactly blocked."
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Install/update candidate build and run minimal physical smoke."
+    acceptance_criteria:
+      - "Preview iPhone runs candidate build and proves onboarding plus one safe insertion path."
+  - id: T004
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Verify release proof and scoped claims."
+    acceptance_criteria:
+      - "Release notes and docs claim only the behaviors proven by the candidate build."

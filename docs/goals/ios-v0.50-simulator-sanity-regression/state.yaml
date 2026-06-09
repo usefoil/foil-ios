@@ -1,0 +1,45 @@
+version: 2
+goal:
+  title: "Foil iOS v0.50 Simulator Sanity Regression"
+  slug: "ios-v0.50-simulator-sanity-regression"
+  kind: specific
+  tranche: "Fast simulator regression coverage for closed-beta polish."
+  status: active
+  oracle:
+    signal: "Simulator sanity catches regressions without overclaiming physical keyboard behavior."
+    cadence: "before physical boards and before release rehearsal"
+    final_proof: "Build/test logs and UI/state receipts labeled simulator-only."
+  intake:
+    completion_proof: "Merged PR with simulator build/test and UI/state receipts labeled simulator-only and explicitly excluded from physical host-app proof."
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+active_task: T001
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Map current simulator build/test coverage and keyboard-state fixtures."
+    acceptance_criteria:
+      - "Receipt names commands, missing fixture states, and physical-proof boundaries."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Add or run simulator sanity coverage."
+    acceptance_criteria:
+      - "Coverage includes onboarding/provider/keyboard-state fixture paths and compile health."
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Verify simulator evidence is useful and scoped."
+    acceptance_criteria:
+      - "Receipts are labeled non-physical and do not replace physical host-app proof."

@@ -1,0 +1,45 @@
+version: 2
+goal:
+  title: "Foil iOS v0.48 Physical Automation Hardening"
+  slug: "ios-v0.48-physical-automation-hardening"
+  kind: specific
+  tranche: "WDA/CoreDevice/TestFlight automation reliability."
+  status: active
+  oracle:
+    signal: "Automation preflight can prove healthy/unhealthy state without private capture."
+    cadence: "before and after each physical automation run"
+    final_proof: "Runbook or helper receipts for device, tunnel, WDA, app launch, host fixture, redaction, and teardown."
+  intake:
+    completion_proof: "Merged PR with runbook or helper receipts proving physical automation health checks, a realistic unhealthy path, artifact redaction, and teardown."
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+active_task: T001
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Map current physical automation runbook and failure modes."
+    acceptance_criteria:
+      - "Receipt identifies preflight, recovery, redaction, and teardown gaps."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Implement or document hardened automation checks."
+    acceptance_criteria:
+      - "Runbook/helper can classify locked device, missing tunnel, dead WDA, wrong app build, private surface, and teardown state."
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Verify automation hardening proof."
+    acceptance_criteria:
+      - "Receipts prove healthy path and at least the strongest realistic unhealthy path."

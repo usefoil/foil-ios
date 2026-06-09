@@ -1,0 +1,45 @@
+version: 2
+goal:
+  title: "Foil iOS v0.49 Beta Feedback Intake Loop"
+  slug: "ios-v0.49-beta-feedback-intake-loop"
+  kind: specific
+  tranche: "Closed-beta feedback intake and privacy guardrails."
+  status: active
+  oracle:
+    signal: "Feedback path is actionable and privacy-safe."
+    cadence: "after template/handoff changes"
+    final_proof: "Docs/template scan proves feedback asks for target state, result, recovery, and device context without private data."
+  intake:
+    completion_proof: "Merged PR with privacy-safe tester feedback artifacts and scan evidence ruling out private-content or credential requests."
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+active_task: T001
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Map current feedback paths and privacy risks."
+    acceptance_criteria:
+      - "Receipt identifies missing templates, labels, and unsafe asks."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Create or polish beta feedback intake artifacts."
+    acceptance_criteria:
+      - "Feedback form captures setup state, build, target app, field type, result, recovery, and logs status safely."
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Verify feedback intake safety."
+    acceptance_criteria:
+      - "Scan rules out private-content requests and ambiguous tester instructions."
