@@ -1,0 +1,36 @@
+{
+  "schema": "foil.iosV039.build12CopyScan.v1",
+  "files": [
+    "README.md",
+    "docs/ios-closed-beta-tester-handoff.md"
+  ],
+  "scans": {
+    "staleBuild11": {
+      "command": "rg -n '0\\.1\\.0 \\(11\\)|build 11|Build 11|Current source version:.*11|Current beta target:.*11' README.md docs/ios-closed-beta-tester-handoff.md || true",
+      "matches": 0,
+      "passed": true
+    },
+    "overclaims": {
+      "command": "rg -n 'Mail (works|supported|passes|is proven)|Messages delivery is|existing private-thread behavior is proven|arbitrary app support is|public App Store|App Store availability|build 12 Notes pass|build 12 Messages pass' README.md docs/ios-closed-beta-tester-handoff.md || true",
+      "matches": 0,
+      "passed": true
+    },
+    "positiveAndCaveatCoverage": {
+      "command": "rg -n '0\\.1\\.0 \\(12\\)|build 12|Safari normal|secure|Notes|Messages|Full Access|Mail|arbitrary|delivery|private-thread' README.md docs/ios-closed-beta-tester-handoff.md",
+      "passed": true,
+      "requiredConceptsPresent": {
+        "build12": true,
+        "safariNormal": true,
+        "secureFieldRejection": true,
+        "notesCaveat": true,
+        "messagesCaveat": true,
+        "fullAccess": true,
+        "mailDeferred": true,
+        "noArbitrarySupport": true,
+        "noMessagesDelivery": true,
+        "noPrivateThreadClaim": true
+      }
+    }
+  },
+  "verdict": "passed"
+}

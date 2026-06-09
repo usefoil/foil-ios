@@ -6,7 +6,7 @@ Audience: internal TestFlight testers for the Foil iOS preview.
 
 - App: Foil Dictation / Foil iOS
 - Bundle ID: `com.neonwatty.FoilIOS`
-- Current beta target: `0.1.0 (11)`
+- Current beta target: `0.1.0 (12)`
 - Keyboard: Foil Keyboard
 - Status: narrow internal beta for the app-to-keyboard dictation loop
 
@@ -20,18 +20,23 @@ in safe text fields.
 
 ## What Is Proven
 
-- Foil can record/transcribe on the installed build and stage text for the
-  keyboard.
-- Foil Keyboard can insert once into a sterile Notes editor.
-- Foil Keyboard can insert once into a Safari normal text field.
-- Safari secure/password fields reject the custom keyboard as expected.
-- Messages draft insertion is proven only in a fake-recipient compose draft, and
-  no message was sent.
+- Build `0.1.0 (12)` is available to internal TestFlight testers.
+- Build `0.1.0 (12)` installed on the preview iPhone and showed the closed-beta
+  setup, target guidance, and recovery guidance.
+- Build `0.1.0 (12)` inserted once into a Safari normal text field on a sterile
+  local test page.
+- Build `0.1.0 (12)` kept Foil Keyboard out of a Safari secure/password field,
+  as expected.
+- Earlier builds proved sterile Notes insertion and fake-recipient Messages
+  draft insertion, but the build 12 rerun stopped before insertion when those
+  apps did not open to sterile surfaces.
 
 ## Known Caveats
 
 - This is not arbitrary iPhone app support.
 - Mail compose is deferred: `https://github.com/mean-weasel/foil-ios/issues/12`.
+- Notes and Messages are safe feedback targets only when you create a blank,
+  non-private editor/draft first.
 - Messages delivery and existing private-thread behavior are not claimed.
 - Full Access is required so the keyboard can read and clear shared dictation
   state.
@@ -59,6 +64,9 @@ Use only non-private phrases, such as:
 - `green lantern number three`
 
 ### Notes
+
+Use only a new blank note. Skip this task if Notes opens to existing content
+that is not safe to edit.
 
 1. Open a new blank note.
 2. Tap the note body.
@@ -125,8 +133,11 @@ Please do not send:
 
 ## Safe Claim
 
-Foil iOS build `0.1.0 (11)` is ready for narrow internal feedback on the
-record-in-Foil, return-to-keyboard, Insert-latest loop in safe text fields.
+Foil iOS build `0.1.0 (12)` is ready for narrow internal feedback on the
+record-in-Foil, return-to-keyboard, Insert-latest loop in safe text fields. The
+build 12 physical matrix currently proves Safari normal insertion and Safari
+secure-field rejection; Notes and Messages remain tester feedback targets only
+when the tester can create a blank, non-private note or draft.
 
 ## Unsafe Claims
 

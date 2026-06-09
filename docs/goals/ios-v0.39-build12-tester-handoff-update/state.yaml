@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.39-build12-tester-handoff-update"
   kind: specific
   tranche: "Update closed-beta tester handoff after build 12 proof."
-  status: live
+  status: done
   oracle:
     signal: "Tester handoff says build 12 only after release/smoke receipts prove it, and no overclaims remain."
     cadence: "after host-app matrix rerun"
@@ -30,13 +30,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-39-build12-tester-handoff-update/"
     command: "npx goalbuddy board docs/goals/ios-v0.39-build12-tester-handoff-update"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map current tester copy against build 12 release and matrix receipts."
     allowed_files:
       - "docs/ios-closed-beta-tester-handoff.md"
@@ -51,11 +51,14 @@ tasks:
       - "Scout note says exactly what copy should change or why it is blocked."
     expected_output:
       - "notes/T001-handoff-preflight.md"
+    receipt:
+      result: done
+      note: "Build 12 release, physical onboarding, and host-app matrix receipts exist; copy must update build 11 references while preserving Safari-only build 12 pass and Notes/Messages blockers."
 
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Update tester handoff and README caveats for proven build 12."
     allowed_files:
       - "docs/ios-closed-beta-tester-handoff.md"
@@ -72,11 +75,14 @@ tasks:
     expected_output:
       - "notes/T002-handoff-worker.md"
       - "notes/receipts/build12-copy-scan.json"
+    receipt:
+      result: done
+      note: "Tester handoff and README now target build 12 while limiting build 12 host-app proof to Safari normal insertion and Safari secure-field rejection; scan receipt passes."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Audit build 12 tester handoff."
     verify:
       - "Reject handoff if it advances build number without proof."
@@ -85,3 +91,7 @@ tasks:
       - "Handoff is safe input to closed-beta invite/readiness audit."
     expected_output:
       - "notes/T999-final-audit.md"
+    receipt:
+      result: done
+      decision: "handoff_safe_for_readiness_audit"
+      note: "Handoff no longer has stale build 11 copy and does not claim Mail, Messages delivery, existing-thread support, arbitrary app support, or build 12 Notes/Messages passes."

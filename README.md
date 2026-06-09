@@ -15,7 +15,7 @@ privacy, and physical-device automation workflows.
 - Custom keyboard extension: `com.neonwatty.FoilIOS.Keyboard`
 - App Group: `group.com.neonwatty.FoilIOS`
 - Project generator: XcodeGen via `FoiliOS/project.yml`
-- Current source version: `0.1.0 (11)`
+- Current source version: `0.1.0 (12)`
 
 The prototype supports:
 
@@ -50,13 +50,15 @@ Physical-device testing requires the local WDA setup described in
 
 ## Claim Boundary
 
-The safe current claim is narrow: the iOS prototype can complete an
-app-to-keyboard dictation loop on a physical iPhone for sterile/safe text
-targets, with known keyboard-extension friction around Full Access, keyboard
-cycling, and host-app refresh behavior.
+The safe current claim is narrow: build `0.1.0 (12)` can complete the
+app-to-keyboard dictation loop on a physical iPhone for the sterile Safari
+normal-field fixture, and secure fields are expected to reject the custom
+keyboard. The preview also has physical build 12 onboarding/setup proof.
 
-Do not claim arbitrary app support. Secure fields are expected to reject custom
-keyboards. Messages support is proven for a privacy-safe fake-recipient compose
-draft insertion without sending; delivery and existing private-thread behavior
-are not claimed. Mail compose proof is intentionally deferred in
-`https://github.com/mean-weasel/foil-ios/issues/12`.
+Do not claim arbitrary app support. Earlier builds proved sterile Notes
+insertion and fake-recipient Messages draft insertion without sending, but the
+build 12 rerun stopped before insertion when Notes and Messages did not open to
+sterile surfaces. Messages delivery and existing private-thread behavior are
+not claimed. Mail compose proof is intentionally deferred in
+`https://github.com/mean-weasel/foil-ios/issues/12`. Full Access, keyboard
+cycling, and host-app refresh friction remain expected beta caveats.
