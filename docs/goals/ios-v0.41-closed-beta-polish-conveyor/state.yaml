@@ -53,7 +53,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-41-closed-beta-polish-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.41-closed-beta-polish-conveyor"
 
-active_task: T003
+active_task: T004
 
 tasks:
   - id: T001
@@ -123,7 +123,7 @@ tasks:
   - id: T003
     type: worker
     assignee: Worker
-    status: active
+    status: blocked
     reasoning_hint: high
     objective: "Run the keyboard setup, Full Access, and recovery child board."
     child_board: "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/goal.md"
@@ -141,11 +141,19 @@ tasks:
       - "Full Access cannot be toggled without user action."
     acceptance_criteria:
       - "A tester can recover from the common keyboard-extension failure modes using in-app guidance and verified handoff steps."
+    receipt:
+      result: external_blocker
+      summary: "v0.44 draft PR #29 has local copy/test polish, but physical setup and Full Access proof is blocked because WDA is not reachable and restoring it may require operator device actions."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/29"
+        - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T003-v0.44-blocker.md"
+      next_owner: "operator"
+      next_action: "Approve or perform WDA/TestFlight/device actions required to make physical UI automation reachable, then rerun v0.44 proof."
 
   - id: T004
     type: worker
     assignee: Worker
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Run the recording and transcription quality-loop child board."
     child_board: "docs/goals/ios-v0.45-recording-transcription-quality-loop/goal.md"

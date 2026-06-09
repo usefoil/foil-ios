@@ -61,6 +61,31 @@ enum FoilAppPrimaryAction: Equatable {
     }
 }
 
+enum FoilAppSecondaryAction: Equatable {
+    case cancelRecording
+
+    var title: String {
+        switch self {
+        case .cancelRecording:
+            "Cancel recording"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .cancelRecording:
+            "xmark.circle"
+        }
+    }
+
+    var accessibilityIdentifier: String {
+        switch self {
+        case .cancelRecording:
+            "secondary-cancel-recording-button"
+        }
+    }
+}
+
 struct FoilAppLoopPresentation: Equatable {
     var title: String
     var badge: String
@@ -68,6 +93,7 @@ struct FoilAppLoopPresentation: Equatable {
     var systemImage: String
     var tone: FoilLoopTone
     var primaryAction: FoilAppPrimaryAction?
+    var secondaryAction: FoilAppSecondaryAction?
 }
 
 struct FoilKeyboardLoopPresentation: Equatable {
@@ -255,7 +281,8 @@ enum FoilDictationLoopPresenter {
                 detail: "Speak naturally. Finish recording here, then create a transcript for Foil Keyboard.",
                 systemImage: "waveform.circle.fill",
                 tone: .live,
-                primaryAction: .stopRecording
+                primaryAction: .stopRecording,
+                secondaryAction: .cancelRecording
             )
         }
 

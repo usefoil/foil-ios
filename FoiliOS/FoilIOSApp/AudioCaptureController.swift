@@ -66,6 +66,20 @@ final class AudioCaptureController: NSObject, ObservableObject {
         try? AVAudioSession.sharedInstance().setActive(false)
     }
 
+    func cancelRecording() {
+        let recordingURL = recorder?.url ?? lastRecordingURL
+        recorder?.stop()
+        recorder = nil
+        if let recordingURL {
+            try? FileManager.default.removeItem(at: recordingURL)
+        }
+        lastRecordingURL = nil
+        status = "Recording canceled"
+        recoveryMessage = nil
+        bridge.reset()
+        try? AVAudioSession.sharedInstance().setActive(false)
+    }
+
     private func requestRecordPermission() async -> Bool {
         switch AVAudioApplication.shared.recordPermission {
         case .granted:

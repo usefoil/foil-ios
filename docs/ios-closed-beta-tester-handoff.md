@@ -73,9 +73,11 @@ that is not safe to edit.
 3. Switch to Foil Keyboard.
 4. Tap **Dictate in Foil** or open Foil manually.
 5. Record a short safe phrase.
-6. Create the transcript.
-7. Return to Notes and tap **Insert latest** once.
-8. Confirm the text appears once.
+6. If you started with the wrong phrase or noisy audio, tap **Cancel** and
+   record again.
+7. Create the transcript.
+8. Return to Notes and tap **Insert latest** once.
+9. Confirm the text appears once.
 
 ### Safari
 
@@ -106,6 +108,8 @@ private history visible.
 - If Insert latest is disabled, open Foil and check Keyboard health.
 - If Full Access is off, enable it in Keyboard settings, then reopen the target
   field.
+- If you start recording the wrong phrase or background noise, tap **Cancel**
+  before creating a transcript and record again.
 - If the transcript is stale or wrong, use **Reset shared state** in Foil and
   record again.
 - If recording or transcription fails, retry with a shorter phrase.

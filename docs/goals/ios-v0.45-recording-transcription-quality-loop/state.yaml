@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.45-recording-transcription-quality-loop"
   kind: specific
   tranche: "Recording, transcription, retry, and reset polish."
-  status: active
+  status: blocked
   oracle:
     signal: "Safe audio loop succeeds and realistic failure states are recoverable."
     cadence: "after each recording/transcription scenario"
@@ -20,26 +20,69 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map recording/transcription states and test hooks."
     acceptance_criteria:
       - "Receipt identifies success/failure scenarios and safe audio fixture strategy."
+    receipt:
+      result: done
+      summary: "Recording/transcription states are mostly present, but v0.45 names cancel and the app lacks a first-class cancel-recording path. Real-audio and insert-cycle proof remains physical/device/provider gated."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T001-scout-receipt.md"
+        - "FoiliOS/FoilIOSApp/AudioCaptureController.swift"
+        - "FoiliOS/FoilIOSApp/TranscriptionController.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Polish recording/transcription status and recovery."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/AudioCaptureController.swift"
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilTranscriptQualityTests.swift"
+      - "docs/goals/ios-v0.45-recording-transcription-quality-loop/**"
+      - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/state.yaml"
+      - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T003-v0.44-blocker.md"
+    verify:
+      - "Watch new recording cancel presentation test fail before implementation."
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+      - "git diff --check"
+      - "scripts/ios-physical-harness.py status"
+    stop_if:
+      - "Live microphone, provider key, TestFlight install/update, WDA, or physical Insert Latest proof is required."
+      - "A receipt would include private audio, transcript text outside sterile fixtures, provider secrets, or host-app private content."
     acceptance_criteria:
       - "Core audio loop states are clear, recoverable, reflected in keyboard-ready state, and proven over three consecutive safe real-audio cycles."
+    receipt:
+      result: done
+      summary: "Added first-class cancel-recording presentation/UI/controller behavior with a red-green focused test. The local app now lets testers cancel an active recording without using broader reset."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T002-worker-receipt.md"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSApp/AudioCaptureController.swift"
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: blocked
     objective: "Verify audio loop proof and privacy."
     acceptance_criteria:
       - "Receipts rule out private audio/transcript leakage and weak happy-path-only proof."
+    receipt:
+      result: external_blocker
+      summary: "Physical/live audio proof is blocked on WDA/physical automation readiness and explicit safe-phrase microphone/provider/host-app insertion approval."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T003-physical-blocker.md"
+        - "scripts/ios-physical-harness.py status"
+      next_owner: "operator"
+      next_action: "Restore WDA or equivalent physical automation and approve safe-phrase physical audio proof."

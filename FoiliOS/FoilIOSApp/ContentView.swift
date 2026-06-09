@@ -181,6 +181,19 @@ struct ContentView: View {
                 .accessibilityIdentifier(primaryAction.accessibilityIdentifier)
             }
 
+            if let secondaryAction = dictationStage.secondaryAction {
+                Button {
+                    perform(secondaryAction)
+                } label: {
+                    Label(secondaryAction.title, systemImage: secondaryAction.systemImage)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .buttonBorderShape(.roundedRectangle(radius: 8))
+                .accessibilityIdentifier(secondaryAction.accessibilityIdentifier)
+            }
+
             VStack(alignment: .leading, spacing: 10) {
                 statusRow(snapshot.message, systemImage: "keyboard")
                 statusRow(audioCapture.status, systemImage: "mic")
@@ -283,6 +296,16 @@ struct ContentView: View {
         .buttonStyle(.bordered)
         .disabled(!audioCapture.isRecording)
         .accessibilityIdentifier("stop-recording-button")
+
+        Button {
+            audioCapture.cancelRecording()
+            refresh()
+        } label: {
+            Label("Cancel", systemImage: "xmark.circle")
+        }
+        .buttonStyle(.bordered)
+        .disabled(!audioCapture.isRecording)
+        .accessibilityIdentifier("cancel-recording-button")
 
         Button {
             Task { await transcription.transcribeLatestRecording(audioCapture.lastRecordingURL) }
@@ -633,6 +656,14 @@ struct ContentView: View {
             Task { await transcription.transcribeLatestRecording(audioCapture.lastRecordingURL) }
         case .reset:
             bridge.reset()
+            refresh()
+        }
+    }
+
+    private func perform(_ action: FoilAppSecondaryAction) {
+        switch action {
+        case .cancelRecording:
+            audioCapture.cancelRecording()
             refresh()
         }
     }
