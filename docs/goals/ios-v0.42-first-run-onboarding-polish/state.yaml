@@ -1,0 +1,45 @@
+version: 2
+goal:
+  title: "Foil iOS v0.42 First-Run Onboarding Polish"
+  slug: "ios-v0.42-first-run-onboarding-polish"
+  kind: specific
+  tranche: "Closed-beta onboarding and setup surface polish."
+  status: active
+  oracle:
+    signal: "A tester can complete or recover setup from the app UI, with physical iPhone proof."
+    cadence: "after implementation and before PR merge"
+    final_proof: "Receipts for first-run, partial, blocked, and complete states plus overclaim scan."
+  intake:
+    completion_proof: "Merged PR with simulator and physical iPhone receipts for first-run, partial, blocked, and setup-complete onboarding states."
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+active_task: T001
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Map current onboarding/setup surfaces and identify the smallest polish slice."
+    acceptance_criteria:
+      - "Receipt lists current states, missing tester decisions, and exact files to edit."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Implement onboarding/setup polish and update tester copy if needed."
+    acceptance_criteria:
+      - "UI distinguishes provider, microphone, keyboard installed, Full Access, target guidance, and recovery."
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Verify onboarding proof and overclaim boundaries."
+    acceptance_criteria:
+      - "Simulator and physical receipts rule out confusing first-run or unsafe beta claims."

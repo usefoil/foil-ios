@@ -1,0 +1,45 @@
+version: 2
+goal:
+  title: "Foil iOS v0.43 Provider Configuration Health"
+  slug: "ios-v0.43-provider-configuration-health"
+  kind: specific
+  tranche: "Provider setup, validation, and safe failure recovery."
+  status: active
+  oracle:
+    signal: "Provider state is legible and recoverable without leaking secrets."
+    cadence: "after each provider-state test"
+    final_proof: "Sanitized receipts for success and failure paths plus secret scan."
+  intake:
+    completion_proof: "Merged PR with sanitized receipts for configured, missing, invalid, network-failed, transcription-failed, and recovered provider states."
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+active_task: T001
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Map provider storage, validation, and error surfaces without printing secrets."
+    acceptance_criteria:
+      - "Receipt names provider states and safe test strategy."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Polish provider configuration and recovery states."
+    acceptance_criteria:
+      - "Missing, invalid, network, transcription, retry, and configured states are actionable."
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Verify provider health proof and secret hygiene."
+    acceptance_criteria:
+      - "Live or mocked receipts prove behavior; secret scan is clean."

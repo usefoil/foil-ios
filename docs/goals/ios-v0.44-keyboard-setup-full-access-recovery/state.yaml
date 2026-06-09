@@ -1,0 +1,45 @@
+version: 2
+goal:
+  title: "Foil iOS v0.44 Keyboard Setup, Full Access, And Recovery"
+  slug: "ios-v0.44-keyboard-setup-full-access-recovery"
+  kind: specific
+  tranche: "Keyboard setup and recovery polish."
+  status: active
+  oracle:
+    signal: "Physical iPhone setup and recovery paths work or name exact external blockers."
+    cadence: "after each Settings/keyboard state"
+    final_proof: "WDA/CoreDevice receipts for setup, Full Access, cycling/refocus, stale state, and reset."
+  intake:
+    completion_proof: "Merged PR with physical iPhone receipts for keyboard install, Full Access, cycling/refocus, stale state, reset, and recovery guidance."
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+active_task: T001
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Map keyboard setup states and physical automation prerequisites."
+    acceptance_criteria:
+      - "Receipt identifies setup states, physical blockers, and safe receipts."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Polish keyboard setup and recovery UX."
+    acceptance_criteria:
+      - "Blocked states explain next action and recovery without overpromising iOS behavior."
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Verify physical setup/recovery proof."
+    acceptance_criteria:
+      - "Physical receipts prove or exactly block the critical keyboard setup paths."

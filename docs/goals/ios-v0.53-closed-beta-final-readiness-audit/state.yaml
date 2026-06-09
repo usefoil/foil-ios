@@ -1,0 +1,45 @@
+version: 2
+goal:
+  title: "Foil iOS v0.53 Closed Beta Final Readiness Audit"
+  slug: "ios-v0.53-closed-beta-final-readiness-audit"
+  kind: audit
+  tranche: "Final closed-beta go/hold decision."
+  status: active
+  oracle:
+    signal: "Final recommendation is backed by child-board receipts and overclaim scans."
+    cadence: "after all child boards and before any invite recommendation"
+    final_proof: "Audit note with evidence table, strongest failure mode, scan results, PR/CI status, and invite boundary."
+  intake:
+    completion_proof: "Merged final audit with evidence table, strongest realistic failure mode, copy/artifact scans, PR/CI status, and invite/hold boundary."
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+active_task: T001
+tasks:
+  - id: T001
+    type: judge
+    assignee: Judge
+    status: active
+    objective: "Audit child-board completion and evidence strength."
+    acceptance_criteria:
+      - "Receipt maps v0.42-v0.52 to merged PRs, receipts, and exact blockers."
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Scan tester-facing and public-facing copy for stale or unsafe claims."
+    acceptance_criteria:
+      - "Scans cover iOS repo docs/README plus Foil landing/SEO copy."
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Issue final invite/hold recommendation."
+    acceptance_criteria:
+      - "Recommendation names tester scope, remaining blockers, and strongest realistic failure mode ruled out by evidence."

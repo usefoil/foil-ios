@@ -1,0 +1,45 @@
+version: 2
+goal:
+  title: "Foil iOS v0.47 Host-App Sterile Matrix Expansion"
+  slug: "ios-v0.47-host-app-sterile-matrix-expansion"
+  kind: specific
+  tranche: "Safe host-app matrix expansion."
+  status: active
+  oracle:
+    signal: "Host-app claims match build-specific sterile receipts."
+    cadence: "after each host-app row"
+    final_proof: "Matrix doc and receipts distinguish pass, expected rejection, deferred, and privacy-blocked rows."
+  intake:
+    completion_proof: "Merged PR with build-specific sterile host-app matrix rows and sanitized receipts for every pass, expected rejection, deferred, or privacy-blocked classification."
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+active_task: T001
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Identify sterile row setup for each target host app."
+    acceptance_criteria:
+      - "Receipt names rows, fixtures, private-content risks, and skip conditions."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Run and document sterile host-app rows."
+    acceptance_criteria:
+      - "Matrix is updated with build-specific row evidence and no unsafe claims."
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Verify row classification and privacy."
+    acceptance_criteria:
+      - "No row overclaims delivery, private-thread safety, Mail, secure fields, or arbitrary support."

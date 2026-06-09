@@ -1,0 +1,45 @@
+version: 2
+goal:
+  title: "Foil iOS v0.45 Recording And Transcription Quality Loop"
+  slug: "ios-v0.45-recording-transcription-quality-loop"
+  kind: specific
+  tranche: "Recording, transcription, retry, and reset polish."
+  status: active
+  oracle:
+    signal: "Safe audio loop succeeds and realistic failure states are recoverable."
+    cadence: "after each recording/transcription scenario"
+    final_proof: "Simulator plus physical receipts for success, cancel, retry, failure, reset, App Group readiness, and three repeated safe real-audio insert cycles."
+  intake:
+    completion_proof: "Merged PR with safe-phrase receipts for recording/transcription success, failure/retry/reset, and three consecutive real-audio insert cycles."
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+active_task: T001
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    objective: "Map recording/transcription states and test hooks."
+    acceptance_criteria:
+      - "Receipt identifies success/failure scenarios and safe audio fixture strategy."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: queued
+    objective: "Polish recording/transcription status and recovery."
+    acceptance_criteria:
+      - "Core audio loop states are clear, recoverable, reflected in keyboard-ready state, and proven over three consecutive safe real-audio cycles."
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    objective: "Verify audio loop proof and privacy."
+    acceptance_criteria:
+      - "Receipts rule out private audio/transcript leakage and weak happy-path-only proof."
