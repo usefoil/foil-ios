@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.36-build12-testflight-release-proof"
   kind: specific
   tranche: "Upload and prove build 12 for internal TestFlight."
-  status: live
+  status: done
   oracle:
     signal: "Build 12 exists in App Store Connect/TestFlight with sanitized release receipts."
     cadence: "after archive/export/upload and before physical smoke"
@@ -30,13 +30,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-36-build12-testflight-release-proof/"
     command: "npx goalbuddy board docs/goals/ios-v0.36-build12-testflight-release-proof"
 
-active_task: T001
+active_task: null
 
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map current source metadata, signing, archive/export, App Store Connect auth, and prior build-11 proof."
     allowed_files:
       - "FoiliOS/**"
@@ -53,11 +53,15 @@ tasks:
       - "Scout note names current build number, next build number, signing/auth state, and exact safe worker path."
     expected_output:
       - "notes/T001-release-preflight.md"
+    receipt:
+      result: done
+      decision: "approve_build12_release_worker"
+      note: "Source/build settings are 0.1.0 build 11, App Store Connect read-only auth found the Foil Dictation app, private key presence was confirmed without printing secrets, and v0.32 onboarding polish is present in source."
 
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Bump to build 12, regenerate/build/test/archive/export/upload, and verify TestFlight internal readiness."
     allowed_files:
       - "FoiliOS/project.yml"
@@ -77,11 +81,16 @@ tasks:
     expected_output:
       - "notes/T002-release-worker.md"
       - "notes/receipts/build12-release.json"
+    receipt:
+      result: done
+      delivery_uuid: "75f05a85-cfe5-443f-bc9a-32ff8c27b710"
+      build_id: "75f05a85-cfe5-443f-bc9a-32ff8c27b710"
+      note: "Build 12 source metadata, simulator tests, archive/export, IPA metadata, validation, upload, beta detail, and internal group attachment are proven with sanitized receipts."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Audit build 12 release proof before physical smoke."
     verify:
       - "Reject simulator-only or source-only proof as TestFlight release proof."
@@ -91,3 +100,7 @@ tasks:
       - "Judge says build 12 is ready for iPhone-preview install/smoke, or records exact blocker."
     expected_output:
       - "notes/T999-final-audit.md"
+    receipt:
+      result: done
+      decision: "build12_ready_for_physical_install_smoke"
+      note: "Audit ruled out stale/mismatched IPA and App Store Connect beta-readiness failures; physical install/smoke remains for v0.37."

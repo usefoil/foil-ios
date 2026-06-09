@@ -49,13 +49,13 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-35-build12-closed-beta-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.35-build12-closed-beta-conveyor"
 
-active_task: T001
+active_task: T002
 
 tasks:
   - id: T001
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Run the build 12 TestFlight release proof child board."
     allowed_files:
@@ -72,13 +72,16 @@ tasks:
     acceptance_criteria:
       - "Build 12 is uploaded, export compliance is cleared, internal beta group attachment is verified, and PR is merged; or exact blocker is recorded."
     receipt:
-      result: pending
+      result: done
       child_board: "docs/goals/ios-v0.36-build12-testflight-release-proof/goal.md"
+      delivery_uuid: "75f05a85-cfe5-443f-bc9a-32ff8c27b710"
+      build_id: "75f05a85-cfe5-443f-bc9a-32ff8c27b710"
+      note: "Build 12 is uploaded, valid, export-compliance safe, beta-ready internally, and attached to Foil Internal Testers."
 
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Run the build 12 physical onboarding smoke child board."
     allowed_files:

@@ -1,0 +1,67 @@
+{
+  "passed": true,
+  "marketingVersion": "0.1.0",
+  "build": "12",
+  "changedMetadata": {
+    "projectYml": "CURRENT_PROJECT_VERSION changed from 11 to 12",
+    "xcodeProject": "Regenerated with XcodeGen; generated build settings show CURRENT_PROJECT_VERSION 12"
+  },
+  "tests": {
+    "tool": "Xcode Build MCP test_sim",
+    "scheme": "FoilIOS",
+    "simulator": "iPhone 17",
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0,
+    "xcresultPath": "/Users/neonwatty/Library/Developer/XcodeBuildMCP/workspaces/foil-fc4876127f01/result-bundles/test_sim_2026-06-09T00-26-15-321Z_pid56619_2726128f.xcresult"
+  },
+  "artifacts": {
+    "archive": "/tmp/FoilIOS-v036-build12.xcarchive",
+    "export": "/tmp/FoilIOS-v036-build12-export",
+    "ipa": "/tmp/FoilIOS-v036-build12-export/Foil iOS.ipa",
+    "ipaSha256": "2058385fe65bc51e2dd0bca603b099eb7de0c6834e19dca794745eae5f15d7a6"
+  },
+  "ipaMetadata": {
+    "app": {
+      "bundleId": "com.neonwatty.FoilIOS",
+      "version": "0.1.0",
+      "build": "12",
+      "iconName": "AppIcon"
+    },
+    "keyboard": {
+      "bundleId": "com.neonwatty.FoilIOS.Keyboard",
+      "version": "0.1.0",
+      "build": "12"
+    },
+    "requiredAssetsPresent": [
+      "AppIcon60x60@2x.png",
+      "AppIcon76x76@2x~ipad.png",
+      "Assets.car"
+    ]
+  },
+  "appStoreConnect": {
+    "deliveryUuid": "75f05a85-cfe5-443f-bc9a-32ff8c27b710",
+    "buildId": "75f05a85-cfe5-443f-bc9a-32ff8c27b710",
+    "appId": "6777069277",
+    "appName": "Foil Dictation",
+    "sku": "foil-ios-001",
+    "altoolValidate": "VERIFY SUCCEEDED with no errors",
+    "altoolUpload": "UPLOAD SUCCEEDED with no errors",
+    "buildStatus": "VALID",
+    "importStatus": "VALID",
+    "isOnAppStoreConnect": true,
+    "usesNonExemptEncryption": false,
+    "processingState": "VALID",
+    "internalBuildState": "IN_BETA_TESTING",
+    "externalBuildState": "READY_FOR_BETA_SUBMISSION",
+    "betaGroupId": "bcca568d-167d-44cb-b952-a410e9c9e10f",
+    "betaGroupName": "Foil Internal Testers",
+    "groupContainsBuild12": true
+  },
+  "secrets": {
+    "privateKeyPrinted": false,
+    "jwtPrinted": false,
+    "passwordPrinted": false,
+    "bearerTokenPrinted": false
+  }
+}
