@@ -44,6 +44,17 @@ bodies from non-sterile contexts must not be committed.
 | Notes sterile editor | Privacy blocked | `docs/goals/ios-v0.38-build12-host-app-matrix-rerun/notes/receipts/build12-notes-safari-secure.json`, `build12-notes-blocker-app-group.json` | Notes opened to an editor with unknown existing content, and the blank-note URL attempt did not create a sterile editor. The row stopped before staging transcript, clearing content, or inserting. |
 | Messages fake-recipient compose draft | Privacy blocked | `docs/goals/ios-v0.38-build12-host-app-matrix-rerun/notes/receipts/build12-messages-fake-draft.json`, `build12-messages-blocker-app-group.json` | Fake-recipient payloads landed on the thread-list surface instead of New Message compose. The row stopped before staging transcript, tapping compose, inserting, or sending. |
 
+## v0.47 Closed-Beta Polish Attempt
+
+| Row | Status | Evidence | Strongest Failure Mode Checked |
+| --- | --- | --- | --- |
+| Safari normal field | Blocked, not rerun | `docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md` | A current-build row could be claimed from stale build 12 evidence. The v0.47 attempt records WDA unreachable before staging or inserting text. |
+| Safari secure/password field | Blocked, not rerun | `docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md` | A secure-field rejection could be claimed without proving the current keyboard is absent and App Group remains staged. The row remains unproven for v0.47. |
+| Notes blank editor | Privacy blocked, not rerun | `docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md` | Notes can reopen private or unknown existing content. The v0.47 attempt does not navigate Notes without physical automation and a sterile editor precheck. |
+| Messages fake or dedicated draft | Privacy blocked, not rerun | `docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md` | Messages can expose private thread lists or send controls. The v0.47 attempt does not navigate Messages without a sterile compose/draft surface. |
+| Reminders or another safe Apple text surface | Blocked, not rerun | `docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md` | An additional row would need physical proof of intended-field mutation and cleanup. WDA is unavailable. |
+| Mail blank compose | Deferred | `https://github.com/mean-weasel/foil-ios/issues/12` | Mail requires a sterile blank compose surface and must not expose inbox/account/private email content or send mail. |
+
 ## Next Useful Rows
 
 - Mail compose after confirming Mail is installed or installing/configuring a
