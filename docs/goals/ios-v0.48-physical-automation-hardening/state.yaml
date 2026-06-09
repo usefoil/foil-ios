@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.48-physical-automation-hardening"
   kind: specific
   tranche: "WDA/CoreDevice/TestFlight automation reliability."
-  status: active
+  status: blocked
   oracle:
     signal: "Automation preflight can prove healthy/unhealthy state without private capture."
     cadence: "before and after each physical automation run"
@@ -20,26 +20,49 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map current physical automation runbook and failure modes."
     acceptance_criteria:
       - "Receipt identifies preflight, recovery, redaction, and teardown gaps."
+    receipt:
+      result: done
+      summary: "Mapped missing pre-host-app gate, redaction self-test requirement, WDA failure classification, and teardown/process-state receipt gaps."
+      evidence:
+        - "docs/goals/ios-v0.48-physical-automation-hardening/notes/T001-scout-receipt.md"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Implement or document hardened automation checks."
     acceptance_criteria:
       - "Runbook/helper can classify locked device, missing tunnel, dead WDA, wrong app build, private surface, and teardown state."
+    receipt:
+      result: done
+      summary: "Added privacy-safe preflight command and runbook guidance; proven against fixture-only redaction self-test and current WDA-unreachable state."
+      evidence:
+        - "docs/goals/ios-v0.48-physical-automation-hardening/notes/T002-worker-receipt.md"
+      verification:
+        - "scripts/ios-physical-harness.py self-test"
+        - "scripts/ios-physical-harness.py preflight"
+        - "scripts/ios-physical-harness.py preflight --strict"
+        - "scripts/ios-physical-harness.py --help"
+        - "scripts/ios-physical-harness.py preflight --help"
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: blocked
     objective: "Verify automation hardening proof."
     acceptance_criteria:
       - "Receipts prove healthy path and at least the strongest realistic unhealthy path."
+    receipt:
+      result: external_blocker
+      summary: "The strongest unhealthy path is proven and fails closed, but the healthy WDA/app/host path is blocked because WDA is not reachable."
+      evidence:
+        - "docs/goals/ios-v0.48-physical-automation-hardening/notes/T003-healthy-path-blocker.md"
+      next_owner: "operator"
+      next_action: "Start or repair WDA, then rerun preflight --strict and continue healthy-path proof."
