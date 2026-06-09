@@ -112,7 +112,10 @@ private history visible.
 
 ## Feedback Template
 
-Please send:
+Please use the GitHub **iOS beta feedback** issue form when available. It asks
+for the same safe details below without collecting private content.
+
+Please include:
 
 - iPhone model and iOS version.
 - TestFlight build number.
@@ -130,6 +133,9 @@ Please do not send:
 - screenshots of private messages, email, contacts, notes, accounts, or
   browser history;
 - phone numbers, contact names, account names, or private app content.
+
+If a target app opens to private content, stop that task and report only that
+the surface was not sterile.
 
 ## Safe Claim
 

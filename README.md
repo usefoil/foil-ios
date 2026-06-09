@@ -34,6 +34,8 @@ The prototype supports:
 - `docs/` - iOS runbooks, TestFlight notes, host-app matrix, and acceptance
   evidence guidance.
 - `docs/goals/` - GoalBuddy boards and receipts from the iOS prototype work.
+- `.github/ISSUE_TEMPLATE/ios_beta_feedback.yml` - privacy-safe closed-beta
+  feedback form.
 
 ## Build And Test
 
@@ -47,6 +49,9 @@ xcodebuild test -project FoilIOS.xcodeproj -scheme FoilIOS \
 
 Physical-device testing requires the local WDA setup described in
 `docs/ios-physical-automation-runbook.md`.
+
+Closed-beta feedback triage is documented in
+`docs/ios-beta-feedback-triage.md`.
 
 ## Claim Boundary
 
