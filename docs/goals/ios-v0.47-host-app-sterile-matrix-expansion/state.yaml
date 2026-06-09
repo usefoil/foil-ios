@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.47-host-app-sterile-matrix-expansion"
   kind: specific
   tranche: "Safe host-app matrix expansion."
-  status: active
+  status: blocked
   oracle:
     signal: "Host-app claims match build-specific sterile receipts."
     cadence: "after each host-app row"
@@ -20,26 +20,46 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Identify sterile row setup for each target host app."
     acceptance_criteria:
       - "Receipt names rows, fixtures, private-content risks, and skip conditions."
+    receipt:
+      result: done
+      summary: "Mapped Safari, secure-field, Notes, Messages, Reminders/extra Apple surface, and Mail rows with sterile setup and privacy risks."
+      evidence:
+        - "docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T001-scout-receipt.md"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     objective: "Run and document sterile host-app rows."
     acceptance_criteria:
       - "Matrix is updated with build-specific row evidence and no unsafe claims."
+    receipt:
+      result: external_blocker
+      summary: "Matrix now records v0.47 rows as blocked/not-rerun, privacy-blocked, or deferred; physical rerun is blocked because WDA is not reachable."
+      evidence:
+        - "docs/ios-keyboard-host-app-matrix.md"
+        - "docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md"
+      next_owner: "operator"
+      next_action: "Restore WDA or equivalent physical automation, then rerun rows one at a time with sterile surfaces and sanitized receipts."
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: blocked
     objective: "Verify row classification and privacy."
     acceptance_criteria:
       - "No row overclaims delivery, private-thread safety, Mail, secure fields, or arbitrary support."
+    receipt:
+      result: external_blocker
+      summary: "Privacy and claim boundaries are documented, but the board oracle requires physical host-app receipts that cannot run until WDA is restored."
+      evidence:
+        - "docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md"
+      next_owner: "operator"
+      next_action: "Rerun v0.47 physical host-app matrix after WDA is reachable."
