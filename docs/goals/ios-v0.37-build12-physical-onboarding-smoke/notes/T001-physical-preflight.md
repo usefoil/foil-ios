@@ -1,6 +1,6 @@
 # T001 Physical Preflight
 
-## Decision
+## Initial Decision
 
 `blocked_by_locked_preview_iphone`
 
@@ -59,3 +59,27 @@ Action:
 
 After that, Codex should restart WDA, confirm `/status`, install/update Foil iOS
 to build `12`, and resume the v0.37 physical onboarding smoke.
+
+## Resume Decision
+
+`ready_for_physical_smoke`
+
+After the operator unlocked `iPhone-preview`, WDA launched successfully from the
+Appium-bundled WebDriverAgent project and reported:
+
+```text
+ServerURLHere->http://192.168.1.40:8100<-ServerURLHere
+```
+
+Verified resumed readiness:
+
+- `curl -sS --max-time 3 http://192.168.1.40:8100/status` returned WDA ready.
+- `scripts/ios-physical-harness.py status --wda-url http://192.168.1.40:8100`
+  reported WDA ready, WDA project present, and `iproxy` present.
+- `scripts/ios-physical-harness.py session --wda-url http://192.168.1.40:8100`
+  created session `181D521D-E0EC-4606-AEA7-3FF20B055610`.
+- `xcrun devicectl device process launch ... com.apple.TestFlight` launched
+  TestFlight from the Mac side.
+
+No private phone content was committed. Raw WDA sources stayed in `/tmp` and are
+represented in later receipts only by hashes and boolean UI assertions.

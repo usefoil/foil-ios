@@ -1,0 +1,100 @@
+{
+  "schema": "foil.iosBuild12PhysicalOnboarding.v1",
+  "capturedAt": "2026-06-09T01:01:00Z",
+  "device": {
+    "name": "iPhone-preview",
+    "coreDeviceIdentifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+    "hardwareUdid": "00008030-001A0C980A33C02E",
+    "osVersion": "26.5",
+    "reality": "physical"
+  },
+  "wda": {
+    "url": "http://192.168.1.40:8100",
+    "ready": true,
+    "sessionId": "181D521D-E0EC-4606-AEA7-3FF20B055610",
+    "statusCommand": "curl -sS --max-time 3 http://192.168.1.40:8100/status",
+    "harnessStatusCommand": "scripts/ios-physical-harness.py status --wda-url http://192.168.1.40:8100"
+  },
+  "testflight": {
+    "launchCommand": "xcrun devicectl device process launch --device 5320F5AD-2A71-50AC-94FE-207B544B6247 com.apple.TestFlight",
+    "sourceReceiptHash": "77ebc4306fe31be5025723d08e567de2f08666457062ddc9c376712467c253d9",
+    "sourceXmlHash": "740a2010f21876b194871ca8c681fe18d00ec941f7b7587eab33e0517bc459c2",
+    "assertions": {
+      "foilDictationTitleVisible": true,
+      "updateButtonEnabled": true,
+      "build12MetadataVisible": true
+    },
+    "tapMethod": "WDA element click on accessibility id TestFlight.offerButton.update"
+  },
+  "installedApp": {
+    "bundleIdentifier": "com.neonwatty.FoilIOS",
+    "version": "0.1.0",
+    "build": "12",
+    "metadataCommand": "xcrun devicectl device info apps --device 5320F5AD-2A71-50AC-94FE-207B544B6247 | rg -i '^Foil iOS|com\\\\.neonwatty\\\\.FoilIOS'"
+  },
+  "foilApp": {
+    "launchCommand": "xcrun devicectl device process launch --device 5320F5AD-2A71-50AC-94FE-207B544B6247 com.neonwatty.FoilIOS",
+    "sourceReceipts": [
+      {
+        "name": "top",
+        "receiptHash": "c68f1cca1dd7e3c12d9f011a9df94b077460f668551d5426d1d32271fb8e1404",
+        "sourceXmlHash": "7881fa705cc85f19ba42d2e69221e54a996d2506b0e0e652f836e373f189a5c3"
+      },
+      {
+        "name": "setupRows",
+        "receiptHash": "86c043d0edd90db97f35f819040d7c559d349c3f0bbb8c29814db0db4bceb735",
+        "sourceXmlHash": "4f439d3248b50698dcb55897c5728771f6deb670ed636f8fecbd8e0850ef658e"
+      },
+      {
+        "name": "resetRow",
+        "receiptHash": "bffefd6d781a7cd758933c59cbe9fb817b6b052ac465c4cf00fab5cae2fb379f",
+        "sourceXmlHash": "6b7ddde523fb0de33ba61e6155a34a16ce15a3bfff96af94d9360cb8c369ad8b"
+      },
+      {
+        "name": "targetRows",
+        "receiptHash": "50fcb17a39a3714ee4d085f612167569266d5eff26647257a6b919de685cc678",
+        "sourceXmlHash": "ad128b593c28c6e6a71079c7b87d0522a576edd0216e8d06d36dae4ccf32d633"
+      },
+      {
+        "name": "scopeAndRecoveryRows",
+        "receiptHash": "0751ed2596b7876a8b216e14a8dfa3ff66e8c36a0e39f119903eac09f6df734e",
+        "sourceXmlHash": "f25d506bef68b4c8fdf4c95f99b39b5d254f6d3318f7fc0dfc683c0e77ce61ce"
+      }
+    ],
+    "visibleAssertions": {
+      "closedBetaSetup": true,
+      "providerKey": true,
+      "microphone": true,
+      "addFoilKeyboard": true,
+      "allowFullAccess": true,
+      "recordInFoil": true,
+      "returnAndInsert": true,
+      "resetWhenStale": true,
+      "whereToTest": true,
+      "safeTargets": true,
+      "messagesDraftOnly": true,
+      "deferredTargets": true,
+      "narrowBeta": true,
+      "recovery": true
+    },
+    "scopeCopyAssertions": {
+      "safeTargetsCopyVisible": true,
+      "messagesDraftOnlyCopyVisible": true,
+      "mailDeferredSecureFieldsCopyVisible": true,
+      "notBroadIphoneSupportCopyVisible": true
+    }
+  },
+  "appGroup": {
+    "schema": "foil.iosPhysicalHarness.appGroupSummary.v1",
+    "phase": "idle",
+    "hasTranscript": false,
+    "snapshotHash": "b897bba750bcc3cd1423029e739223789064c9fc78370a9b3a7d87c086d9dc64"
+  },
+  "privacy": {
+    "rawWdaSourcesCommitted": false,
+    "screenshotsCommitted": false,
+    "privateContentCommitted": false,
+    "rawWdaSourceLocation": "/tmp only during run"
+  },
+  "verdict": "passed"
+}
