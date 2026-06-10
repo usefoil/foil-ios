@@ -100,6 +100,23 @@ struct FoilSetupChecklistItem: Equatable, Identifiable {
     var id: String { title }
 }
 
+enum FoilSetupRoute: String, CaseIterable, Identifiable {
+    case mac
+    case iphoneAPIKey
+
+    var id: String { rawValue }
+}
+
+struct FoilSetupRouteOption: Equatable, Identifiable {
+    var route: FoilSetupRoute
+    var title: String
+    var badge: String
+    var detail: String
+    var systemImage: String
+
+    var id: FoilSetupRoute { route }
+}
+
 struct FoilBetaGuidanceItem: Equatable, Identifiable {
     var title: String
     var detail: String
@@ -109,13 +126,52 @@ struct FoilBetaGuidanceItem: Equatable, Identifiable {
 }
 
 enum FoilDictationLoopPresenter {
-    static func setupChecklistPresentation() -> [FoilSetupChecklistItem] {
-        [
-            FoilSetupChecklistItem(
-                title: "Provider key",
-                detail: "Save your Groq provider key once so Foil can create transcripts.",
-                systemImage: "key"
-            ),
+    static func setupRouteOptions() -> [FoilSetupRouteOption] {
+        FoilSetupRoute.allCases.map { route in
+            switch route {
+            case .mac:
+                FoilSetupRouteOption(
+                    route: route,
+                    title: "Use my Mac",
+                    badge: "Primary",
+                    detail: "Future local pairing route. After pairing is available, Foil on your Mac can handle transcription while this iPhone keeps the keyboard handoff.",
+                    systemImage: "macbook.and.iphone"
+                )
+            case .iphoneAPIKey:
+                FoilSetupRouteOption(
+                    route: route,
+                    title: "Use an API key on this iPhone",
+                    badge: "Fallback",
+                    detail: "Works in this beta. Save a Groq key on this iPhone when you need standalone transcription before Mac pairing is ready.",
+                    systemImage: "key"
+                )
+            }
+        }
+    }
+
+    static func setupChecklistPresentation(route: FoilSetupRoute) -> [FoilSetupChecklistItem] {
+        var items: [FoilSetupChecklistItem] = []
+
+        switch route {
+        case .mac:
+            items.append(
+                FoilSetupChecklistItem(
+                    title: "Use my Mac",
+                    detail: "Start here for the upcoming local pairing flow. Choose the iPhone API-key fallback when you need to test transcription in this build.",
+                    systemImage: "macbook.and.iphone"
+                )
+            )
+        case .iphoneAPIKey:
+            items.append(
+                FoilSetupChecklistItem(
+                    title: "API key on this iPhone",
+                    detail: "Save your Groq provider key locally so Foil can create transcripts on this iPhone.",
+                    systemImage: "key"
+                )
+            )
+        }
+
+        items.append(contentsOf: [
             FoilSetupChecklistItem(
                 title: "Microphone",
                 detail: "Allow microphone access when prompted before recording.",
@@ -128,7 +184,7 @@ enum FoilDictationLoopPresenter {
             ),
             FoilSetupChecklistItem(
                 title: "Allow Full Access",
-                detail: "Enable Allow Full Access so Foil Keyboard can read and clear shared dictation state.",
+                detail: "Enable this for Foil Keyboard so the app and keyboard can share one pending transcript. Only use Foil Keyboard with test text you are comfortable sharing with this beta.",
                 systemImage: "checkmark.shield"
             ),
             FoilSetupChecklistItem(
@@ -146,7 +202,9 @@ enum FoilDictationLoopPresenter {
                 detail: "Use Reset shared state if the keyboard shows stale or incorrect text.",
                 systemImage: "arrow.counterclockwise"
             )
-        ]
+        ])
+
+        return items
     }
 
     static func betaGuidancePresentation() -> [FoilBetaGuidanceItem] {

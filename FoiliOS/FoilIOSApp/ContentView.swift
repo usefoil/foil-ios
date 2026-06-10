@@ -16,7 +16,8 @@ struct ContentView: View {
     @State private var secureEntry = ""
     @State private var providerKeyEntry = ""
     @State private var providerCredentialMessage = ""
-    @State private var showDiagnostics = false
+    @State private var selectedSetupRoute = FoilSetupRoute.mac
+    @State private var showAdvancedSupport = false
     @State private var lastHandledCommandID: String?
     private let refreshTimer = Timer.publish(every: 0.75, on: .main, in: .common).autoconnect()
 
@@ -36,7 +37,6 @@ struct ContentView: View {
                     }
 
                     setupChecklistPanel
-                    betaGuidancePanel
 
                     if let handoffGuidance {
                         VStack(alignment: .leading, spacing: 10) {
@@ -81,8 +81,15 @@ struct ContentView: View {
                         }
                     }
 
-                    DisclosureGroup("Diagnostics", isExpanded: $showDiagnostics) {
+                    DisclosureGroup("Advanced support", isExpanded: $showAdvancedSupport) {
                         VStack(alignment: .leading, spacing: 12) {
+                            betaGuidancePanel
+
+                            Divider()
+
+                            Text("Diagnostics")
+                                .font(.headline)
+
                             statusRow(storageReportSummary, systemImage: "externaldrive")
                                 .accessibilityIdentifier("keyboard-storage-report-summary")
                             if transcriptReviewPresentation != nil {
@@ -110,6 +117,7 @@ struct ContentView: View {
                         }
                         .padding(.top, 8)
                     }
+                    .accessibilityIdentifier("advanced-support-disclosure")
 
                     Spacer(minLength: 0)
                 }
@@ -336,15 +344,17 @@ struct ContentView: View {
     private var setupChecklistPanel: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Closed beta setup")
+                Text("Setup route")
                     .font(.headline)
-                Text("Complete these once, then use Foil from the keyboard in a safe text field.")
+                Text("Start with your Mac for the upcoming local pairing flow. Use the iPhone API-key fallback when you need this beta to transcribe today.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
 
+            setupRoutePicker
+
             VStack(alignment: .leading, spacing: 10) {
-                ForEach(FoilDictationLoopPresenter.setupChecklistPresentation()) { item in
+                ForEach(FoilDictationLoopPresenter.setupChecklistPresentation(route: selectedSetupRoute)) { item in
                     setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
                 }
             }
@@ -360,12 +370,20 @@ struct ContentView: View {
                     detail: microphonePermissionSummary,
                     systemImage: "mic"
                 )
-                setupRow(
-                    title: "Provider",
-                    detail: transcription.credentialSummary,
-                    systemImage: transcription.hasConfiguredAPIKey ? "key.fill" : "key"
-                )
-                providerCredentialEditor
+                if selectedSetupRoute == .iphoneAPIKey {
+                    setupRow(
+                        title: "Provider",
+                        detail: transcription.credentialSummary,
+                        systemImage: transcription.hasConfiguredAPIKey ? "key.fill" : "key"
+                    )
+                    providerCredentialEditor
+                } else {
+                    setupRow(
+                        title: "Mac pairing",
+                        detail: "Local pairing is the primary setup route, but it is not active in this build yet.",
+                        systemImage: "macbook.and.iphone"
+                    )
+                }
                 setupRow(
                     title: "Keyboard health",
                     detail: keyboardHealthSummary,
@@ -396,6 +414,52 @@ struct ContentView: View {
         )
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("closed-beta-setup-checklist")
+    }
+
+    private var setupRoutePicker: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(FoilDictationLoopPresenter.setupRouteOptions()) { option in
+                let isSelected = option.route == selectedSetupRoute
+                Button {
+                    selectedSetupRoute = option.route
+                } label: {
+                    Label {
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                Text(option.title)
+                                    .font(.callout.weight(.semibold))
+                                Text(option.badge)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(isSelected ? Color.accentColor : .secondary)
+                            }
+                            Text(option.detail)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(3)
+                                .minimumScaleFactor(0.85)
+                        }
+                    } icon: {
+                        Image(systemName: option.systemImage)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(10)
+                    .background(
+                        isSelected ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.08),
+                        in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .strokeBorder(
+                                isSelected ? Color.accentColor.opacity(0.45) : Color.secondary.opacity(0.16)
+                            )
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("setup-route-\(option.route.rawValue)-button")
+                .accessibilityValue(isSelected ? "Selected" : "Not selected")
+            }
+        }
+        .accessibilityIdentifier("setup-route-picker")
     }
 
     private var betaGuidancePanel: some View {

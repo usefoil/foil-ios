@@ -2,13 +2,26 @@ import XCTest
 @testable import FoilIOS
 
 final class FoilDictationLoopPresentationTests: XCTestCase {
-    func testSetupChecklistCoversClosedBetaJourneyInOrder() {
-        let items = FoilDictationLoopPresenter.setupChecklistPresentation()
+    func testSetupRouteOptionsPreferMacAndKeepIPhoneAPIKeyAsFallback() {
+        let options = FoilDictationLoopPresenter.setupRouteOptions()
+
+        XCTAssertEqual(options.map(\.route), [.mac, .iphoneAPIKey])
+        XCTAssertEqual(options[0].title, "Use my Mac")
+        XCTAssertEqual(options[0].badge, "Primary")
+        XCTAssertTrue(options[0].detail.contains("Future local pairing"))
+        XCTAssertTrue(options[0].detail.contains("After pairing is available"))
+        XCTAssertEqual(options[1].title, "Use an API key on this iPhone")
+        XCTAssertEqual(options[1].badge, "Fallback")
+        XCTAssertTrue(options[1].detail.contains("Works in this beta"))
+    }
+
+    func testMacSetupChecklistIsRouteFirstAndExplainsFullAccessPrivacy() {
+        let items = FoilDictationLoopPresenter.setupChecklistPresentation(route: .mac)
 
         XCTAssertEqual(
             items.map(\.title),
             [
-                "Provider key",
+                "Use my Mac",
                 "Microphone",
                 "Add Foil Keyboard",
                 "Allow Full Access",
@@ -17,13 +30,22 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
                 "Reset when stale"
             ]
         )
-        XCTAssertTrue(items[0].detail.contains("Save"))
+        XCTAssertTrue(items[0].detail.contains("upcoming local pairing"))
         XCTAssertTrue(items[1].detail.contains("Allow microphone"))
         XCTAssertTrue(items[2].detail.contains("Settings > General > Keyboard"))
-        XCTAssertTrue(items[3].detail.contains("read and clear shared dictation state"))
+        XCTAssertTrue(items[3].detail.contains("share one pending transcript"))
+        XCTAssertTrue(items[3].detail.contains("test text"))
         XCTAssertTrue(items[4].detail.contains("Create transcript"))
         XCTAssertTrue(items[5].detail.contains("Insert latest once"))
         XCTAssertTrue(items[6].detail.contains("Reset shared state"))
+    }
+
+    func testIPhoneAPIKeyChecklistKeepsProviderSetupAsFallback() {
+        let items = FoilDictationLoopPresenter.setupChecklistPresentation(route: .iphoneAPIKey)
+
+        XCTAssertEqual(items.first?.title, "API key on this iPhone")
+        XCTAssertTrue(items.first?.detail.contains("Save your Groq provider key locally") == true)
+        XCTAssertTrue(items.map(\.title).contains("Allow Full Access"))
     }
 
     func testBetaGuidanceNamesSafeTargetsAndClaimBoundaries() {
