@@ -1,0 +1,42 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 24,
+      "textSha256": "9094659807f52c60"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 17,
+      "textSha256": "30f6a2703489bbad"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 17,
+      "textSha256": "aaa099d87a16c6a8"
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "kind": "expectValueTextCount",
+      "passed": true,
+      "textLength": 38,
+      "textSha256": "e6fa5904a341e996"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "T020-safari-fixture-source.xml",
+    "nodeCount": 105,
+    "sha256": "33ef2c4b8a734cf95ac999178222f305748bf0820f00e4c3811ac1cf4c094aba"
+  },
+  "target": "safari-fixture-loaded-route-onboarding-proof"
+}

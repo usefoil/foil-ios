@@ -1,0 +1,3 @@
+2026-06-10 01:26:41.289 xcodebuild[92320:82114615] [MT] IDEDistribution: -[IDEDistributionLogging _createLoggingBundleAtPath:]: Created bundle at path "/var/folders/wt/nn4g5swd3gd139y9r6yw6x_80000gn/T/FoilIOS_2026-06-10_01-26-41.288.xcdistributionlogs".
+Exported FoilIOS to: /tmp/FoilIOS-TestFlightReadinessExport
+** EXPORT SUCCEEDED **

@@ -41,7 +41,8 @@ Safe follow-up asks:
 
 | Bucket | Signals | First action |
 | --- | --- | --- |
-| Setup | TestFlight, provider key, microphone, Add Keyboard, Full Access | Confirm setup state and point to handoff recovery steps. |
+| Setup route | Use my Mac, iPhone API key, Advanced / Support | Confirm which route was selected. For build `0.1.0 (13)`, API key on iPhone is the usable tester path; Mac pairing is future/recommended copy unless a Mac-pairing test is explicitly requested. |
+| Setup readiness | TestFlight, provider key, microphone, Add Keyboard, Full Access, Keyboard health | Confirm setup state and point to handoff recovery steps. Do not treat setup as complete unless Foil shows keyboard health ready after a real keyboard check-in. |
 | Recording | Recording did not start/finish, wrong microphone state | Ask for build/device/iOS and whether retry with a short safe phrase worked. |
 | Transcription | Transcript never appears, provider failure, network failure | Ask whether provider key is saved and whether recovery copy appeared. |
 | Keyboard refresh | Foil Keyboard missing, stale state, refocus/cycle required | Ask which refocus/cycle/reset step changed the state. |
@@ -51,5 +52,14 @@ Safe follow-up asks:
 ## Close Criteria
 
 A feedback issue is actionable when it includes build, device/iOS, target
-surface, sterile-field status, failed step, recovery step tried, and privacy
-confirmation. If any of those are missing, ask for only the missing safe fields.
+surface, setup route, keyboard health state, sterile-field status, failed step,
+recovery step tried, and privacy confirmation. If any of those are missing, ask
+for only the missing safe fields.
+
+## Build 13 Release Gate
+
+For build `0.1.0 (13)`, do not downgrade a tester report just because setup was
+not complete. The release gate intentionally proved that Foil refuses readiness
+when Foil Keyboard has not checked in recently, then becomes ready only after a
+sterile keyboard refresh. File stale-keyboard reports under **Keyboard refresh**
+unless the app claims setup complete while keyboard health is still stale.

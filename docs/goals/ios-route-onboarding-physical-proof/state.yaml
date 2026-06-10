@@ -1,0 +1,857 @@
+version: 2
+
+goal:
+  title: "Foil iOS Route Onboarding Physical Proof"
+  slug: "ios-route-onboarding-physical-proof"
+  kind: existing_plan
+  tranche: "Gather or exactly block physical proof for route-first onboarding completion gates after PR #40."
+  status: done
+  oracle:
+    signal: "Current-build physical evidence proves or exactly blocks Full Access, keyboard health, provider route, App Group state, and one exact-once sterile insertion row."
+    cadence: "before any claim that issue #39 acceptance evidence is physically closed"
+    final_proof: "Sanitized receipts for every gate, plus a final Judge audit mapping evidence to issue #39 and docs/acceptance-evidence.md."
+  intake:
+    original_request: "continue the GoalBuddy conveyor after PR #40"
+    interpreted_outcome: "Create the next measured child board for the residual physical proof gap left by route-first onboarding PR #40."
+    input_shape: existing_plan
+    audience: "Foil owner preparing route-first onboarding for real iPhone use"
+    authority: approved
+    proof_type: artifact
+    completion_proof: "Sanitized physical receipts or exact blocker receipts for all route-first onboarding completion gates."
+    likely_misfire: "Using simulator/unit proof to claim Full Access, keyboard health, or host-app insertion works on a physical iPhone."
+    blind_spots_considered:
+      - "A stale installed build can show old onboarding behavior."
+      - "Full Access can appear configured but the keyboard may not check in."
+      - "Provider key presence must be proven without exposing the key."
+      - "App Group state can remain stale after a failed host-app attempt."
+      - "Host apps can open to private content; proof must stop before insertion."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: queued
+    url: "http://goalbuddy.localhost:41737/ios-route-onboarding-physical-proof/"
+    command: "npx goalbuddy board docs/goals/ios-route-onboarding-physical-proof"
+
+active_task: null
+
+source_pr:
+  repo: "usefoil/foil-ios"
+  issue: 39
+  pr: 40
+  merged_commit: "80bd6018323f4ef9659e94b3fb6a09e9e51bcacf"
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: high
+    objective: "Preflight physical proof feasibility before touching Settings or host apps."
+    inputs:
+      - "scripts/ios-physical-harness.py"
+      - "docs/ios-physical-automation-runbook.md"
+      - "docs/acceptance-evidence.md"
+    constraints:
+      - "Read-only except sanitized notes/receipts under this goal if needed."
+      - "Do not open private app content."
+      - "Do not print provider keys, transcript bodies, raw WDA source, contacts, phone numbers, or screenshots with private content."
+    expected_output:
+      - "Device/WDA/tooling classification."
+      - "Whether physical proof can proceed safely."
+      - "Exact blocker with owner/action if not safe."
+      - "Recommended next task."
+    receipt:
+      result: done
+      outcome: external_blocker
+      summary: "Physical preflight failed closed before touching Settings or host apps: iPhone-preview is present and tooling/redaction self-test are healthy, but WDA is unreachable at http://127.0.0.1:8100."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T001-preflight.json"
+      classification: "wda_unreachable"
+      safe_to_touch_host_apps: false
+      privacy:
+        openedHostApps: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+      next_action: "Start or repair WDA, then rerun strict preflight before touching host apps."
+      next_task: "T008"
+
+  - id: T002
+    type: scout
+    assignee: Scout
+    status: blocked
+    reasoning_hint: medium
+    objective: "Prove current installed app/build identity and route-first onboarding visibility, or block stale-build proof."
+    constraints:
+      - "Use sanitized metadata and accessibility identifiers where possible."
+      - "No private screenshots in committed receipts."
+    expected_output:
+      - "Installed app version/build or exact blocker."
+      - "Route-first onboarding visibility: Use my Mac, Use an API key on this iPhone, Advanced / Support."
+      - "No false complete state observed without gates."
+    receipt:
+      result: upstream_blocker
+      summary: "Blocked because strict preflight is not healthy; route-first onboarding visibility on physical device should not proceed until WDA is reachable or an alternate sanitized physical proof route is approved."
+      evidence:
+        - "T001 preflight receipt"
+        - "T008 WDA recovery receipt"
+
+  - id: T003
+    type: scout
+    assignee: Scout
+    status: blocked
+    reasoning_hint: high
+    objective: "Verify or exactly block Full Access and Foil Keyboard health check-in."
+    constraints:
+      - "Settings/keyboard proof must be sanitized."
+      - "If toggling Full Access requires user action, record the blocker before guessing."
+    expected_output:
+      - "Full Access state proof or blocker."
+      - "Foil Keyboard health report proof or blocker."
+      - "Recovery instructions if blocked."
+    receipt:
+      result: upstream_blocker
+      summary: "Blocked before Settings/keyboard inspection because WDA is unreachable and safeToTouchHostApps=false."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+
+  - id: T004
+    type: scout
+    assignee: Scout
+    status: blocked
+    reasoning_hint: medium
+    objective: "Verify or exactly block provider route readiness without leaking API keys."
+    constraints:
+      - "No provider key, Authorization header, JWT, or raw provider response bodies in receipts."
+      - "Live provider proof is optional; key-presence and deterministic route state are acceptable if live proof is unsafe."
+    expected_output:
+      - "Provider configured/missing/blocked state."
+      - "Evidence source and sanitization method."
+    receipt:
+      result: upstream_blocker
+      summary: "Provider route readiness proof is deferred because the physical proof tranche is blocked at WDA preflight; no provider key or credential state was inspected."
+      evidence:
+        - "T008 WDA recovery receipt"
+
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: blocked
+    reasoning_hint: high
+    objective: "Reset and verify App Group idle/no-transcript state on the physical proof target."
+    allowed_files:
+      - "docs/goals/ios-route-onboarding-physical-proof/**"
+    verify:
+      - "Run the repo-approved harness or command-mailbox reset path."
+      - "Record sanitized before/after phase and hasTranscript booleans."
+      - "Do not store raw transcript text."
+    stop_if:
+      - "Reset path would expose private transcript text."
+      - "App Group container cannot be read safely."
+      - "Device automation is unavailable."
+    expected_output:
+      - "Sanitized App Group before/after receipt or exact blocker."
+    receipt:
+      result: upstream_blocker
+      summary: "App Group physical-target reset proof is blocked until WDA/physical automation is healthy or an approved non-WDA sanitized proof route is selected."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+
+  - id: T006
+    type: worker
+    assignee: Worker
+    status: blocked
+    reasoning_hint: high
+    objective: "Prove one sterile host-app Insert Latest exact-once row, or block before touching private content."
+    allowed_files:
+      - "docs/goals/ios-route-onboarding-physical-proof/**"
+      - "docs/ios-keyboard-host-app-matrix.md"
+    verify:
+      - "Use a sterile host surface such as Safari local normal field when available."
+      - "Require pre-insert keyboard readiness proof."
+      - "Require post-insert target value proof with count/hash only."
+      - "Require App Group idle/no-transcript after insertion or cleanup."
+    stop_if:
+      - "Host app opens to private content."
+      - "Foil Keyboard is unavailable or Full Access is off."
+      - "Target field cannot be proven sterile."
+      - "Any proof would require sending a message/email."
+    expected_output:
+      - "Exact-once insertion receipt or exact privacy/tooling blocker."
+    receipt:
+      result: upstream_blocker
+      summary: "Sterile host-app insertion proof is blocked before touching host apps because safeToTouchHostApps=false."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+
+  - id: T007
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: medium
+    objective: "Update issue #39 or the parent conveyor with the physical proof outcome."
+    constraints:
+      - "Do not close issue #39 unless Judge final audit proves the issue acceptance evidence is satisfied."
+      - "If blocked, record owner/action instead of closing."
+    expected_output:
+      - "Issue/parent-board update receipt or exact permission blocker."
+    receipt:
+      result: done
+      summary: "Updated the parent conveyor with the physical-proof blocker: WDA remains unreachable after one bounded recovery attempt and host-app/Settings proof must not proceed."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T008 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+      parent_update: "docs/goals/ios-autonomous-goalbuddy-conveyor/state.yaml T010 receipt"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit whether route-first onboarding physical proof is complete."
+    inputs:
+      - "All task receipts"
+      - "Issue #39 acceptance evidence"
+      - "docs/acceptance-evidence.md"
+    constraints:
+      - "Read-only."
+      - "Do not treat simulator proof as physical keyboard/host-app proof."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Gate-by-gate evidence table"
+      - "Missing evidence or next task"
+    receipt:
+      result: done
+      decision: "not_complete"
+      full_outcome_complete: false
+      summary: "Route-first onboarding physical proof is not complete. Strict preflight failed closed, one bounded WDA recovery attempt still left WDA unreachable, and no Settings, provider, App Group, or host-app insertion proof was attempted."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T001-preflight.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+        - "T001 preflight receipt"
+        - "T008 WDA recovery receipt"
+      gate_status:
+        current_build_onboarding_visibility: "blocked_by_wda_unreachable"
+        full_access: "blocked_by_wda_unreachable"
+        keyboard_health: "blocked_by_wda_unreachable"
+        provider_route: "deferred_not_inspected"
+        app_group_state: "blocked_by_wda_unreachable"
+        exact_once_insertion: "blocked_before_host_apps"
+      privacy:
+        openedHostApps: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+      next_active_task: "T009"
+
+  - id: T008
+    type: worker
+    assignee: Worker
+    status: blocked
+    reasoning_hint: high
+    objective: "Recover WDA reachability enough to rerun strict physical preflight."
+    allowed_files:
+      - "docs/goals/ios-route-onboarding-physical-proof/**"
+    verify:
+      - "scripts/ios-physical-harness.py wda-command"
+      - "Start or repair WDA using the repo runbook when safe."
+      - "python3 scripts/ios-physical-harness.py preflight --strict > docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+    stop_if:
+      - "Device requires unlock, trust, or manual preparation."
+      - "WDA signing/provisioning requires credentials or interactive approval."
+      - "WDA remains unreachable after one bounded recovery attempt."
+      - "Any step would open a private host app or print raw WDA source."
+    expected_output:
+      - "Healthy strict preflight receipt, or exact WDA recovery blocker."
+    receipt:
+      result: external_blocker
+      summary: "Bounded WDA recovery attempted the repo runbook xcodebuild command. WDA built/signed/launched, but XCTest timed out enabling automation mode, then prompted for a password; localhost WDA remained unreachable after the attempt."
+      evidence:
+        - "python3 scripts/ios-physical-harness.py wda-command"
+        - "xcrun devicectl list devices: iPhone-preview available (paired), identifier 5320F5AD-2A71-50AC-94FE-207B544B6247"
+        - "/tmp/foil-ios-wda.log: Timed out while enabling automation mode"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+      blocker:
+        classification: "wda_unreachable"
+        requires: "operator/device automation-mode or password/trust intervention, or an approved non-WDA sanitized proof route"
+      privacy:
+        openedHostApps: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+
+  - id: T009
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Resume strict physical preflight after operator/device automation recovery."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+      - "scripts/ios-physical-harness.py"
+      - "docs/ios-physical-automation-runbook.md"
+    constraints:
+      - "Read-only except writing a sanitized preflight receipt under this goal's notes directory."
+      - "Do not open Settings or host apps unless strict preflight says it is safe."
+      - "Do not print provider keys, transcript bodies, screenshots, or raw WDA source."
+      - "If WDA is still unreachable and no operator state has changed, record the repeated blocker and stop."
+    expected_output:
+      - "Fresh strict preflight receipt."
+      - "Decision to resume T002-T006 proof gates or keep the board blocked."
+      - "Exact owner/action if still blocked."
+    receipt:
+      result: done
+      outcome: repeated_external_blocker
+      summary: "Fresh strict preflight still classifies WDA as unreachable. No operator/device recovery state was visible, safeToTouchHostApps=false, and the board remains stopped before Settings, provider, App Group, or host-app proof."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T009-preflight-rerun.json"
+      classification: "wda_unreachable"
+      safe_to_touch_host_apps: false
+      blocked_audit_count: "2_of_3_goal_turns"
+      privacy:
+        openedHostApps: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+      next_owner: "operator"
+      next_action: "Unlock/prepare iPhone-preview or resolve automation-mode/password/trust prompt; next heartbeat should rerun strict preflight once more and mark the conveyor blocked if unchanged."
+      next_active_task: "T010"
+
+  - id: T010
+    type: scout
+    assignee: Scout
+    status: blocked
+    reasoning_hint: medium
+    objective: "Final blocked-audit preflight before marking the physical-proof board blocked."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T009-preflight-rerun.json"
+      - "scripts/ios-physical-harness.py"
+      - "docs/ios-physical-automation-runbook.md"
+    constraints:
+      - "Read-only except writing a sanitized preflight receipt under this goal's notes directory."
+      - "Do not open Settings or host apps unless strict preflight says safeToTouchHostApps=true."
+      - "If WDA is still unreachable, record the third consecutive blocker and prepare the board/parent for blocked status."
+      - "Do not print provider keys, transcript bodies, screenshots, or raw WDA source."
+    expected_output:
+      - "Fresh strict preflight receipt."
+      - "If healthy, resume T002-T006 proof gates."
+      - "If unchanged, exact third-strike blocker receipt suitable for marking the conveyor blocked."
+    receipt:
+      result: done
+      outcome: third_consecutive_external_blocker
+      summary: "Final blocked-audit preflight returned the same WDA blocker for the third consecutive goal turn: WDA is unreachable, safeToTouchHostApps=false, and physical proof cannot proceed without operator/device automation recovery."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T010-preflight-final.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T001-preflight.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T009-preflight-rerun.json"
+      classification: "wda_unreachable"
+      safe_to_touch_host_apps: false
+      blocked_audit_count: "3_of_3_goal_turns"
+      privacy:
+        openedHostApps: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+      blocked_owner: "operator"
+      blocked_action: "Unlock/prepare iPhone-preview or resolve automation-mode/password/trust prompt, then resume with strict preflight before touching Settings or host apps."
+
+  - id: T011
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Record healthy physical preflight after direct WDA URL and harness connected-state fix."
+    inputs:
+      - "scripts/ios-physical-harness.py"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T010-preflight-final.json"
+      - "PR #43"
+    constraints:
+      - "Read-only except sanitized notes/receipts under this goal."
+      - "Do not open Settings or host apps from this task."
+      - "Do not print provider keys, transcript bodies, screenshots, or raw WDA source."
+    expected_output:
+      - "Healthy strict preflight receipt."
+      - "Direct WDA URL used."
+      - "Next physical-proof gate activated."
+    receipt:
+      result: done
+      outcome: unblocked
+      summary: "After closing apps on iPhone-preview and accepting CoreDevice state connected in the harness, strict preflight with the direct WDA URL is healthy and safeToTouchHostApps=true."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T011-healthy-preflight.json"
+        - "https://github.com/usefoil/foil-ios/pull/43"
+      wda_url: "http://192.168.1.40:8100"
+      classification: "healthy"
+      safe_to_touch_host_apps: true
+      privacy:
+        openedHostApps: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+      next_active_task: "T012"
+
+  - id: T012
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: high
+    objective: "Prove current installed app/build identity and route-first onboarding visibility with sanitized WDA evidence."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T011-healthy-preflight.json"
+      - "scripts/ios-physical-harness.py"
+      - "docs/acceptance-evidence.md"
+    constraints:
+      - "Use sanitized metadata and accessibility identifiers where possible."
+      - "Do not commit raw WDA source or screenshots."
+      - "Stop if the app is not installed, stale, or route-first onboarding is not visible."
+    expected_output:
+      - "Installed app version/build or exact blocker."
+      - "Route-first onboarding visibility: Use my Mac, Use an API key on this iPhone, Advanced / Support."
+      - "No false complete state observed without gates."
+    receipt:
+      result: done
+      outcome: route_first_visible_after_current_install
+      summary: "The previously installed app showed stale pre-route-first onboarding. Built and installed the current app, relaunched Foil iOS, and generated a sanitized WDA receipt proving route-first onboarding is visible and setup is not falsely complete."
+      evidence:
+        - "xcodebuild -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'id=00008030-001A0C980A33C02E' -configuration Debug -derivedDataPath /tmp/foil-ios-current-build DEVELOPMENT_TEAM=B3A6AN2HA4 CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates build"
+        - "xcrun devicectl device install app --device 5320F5AD-2A71-50AC-94FE-207B544B6247 '/tmp/foil-ios-current-build/Build/Products/Debug-iphoneos/Foil iOS.app'"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T012-install-current.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T012-route-onboarding-current-receipt.json"
+      proven_identifiers:
+        - "route-first-onboarding"
+        - "route-choice-use-my-mac"
+        - "route-choice-iphone-api-key"
+        - "route-choice-advanced"
+        - "onboarding-not-ready"
+      forbidden_identifier_absent: "onboarding-ready"
+      privacy:
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+      next_active_task: "T013"
+
+  - id: T013
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: high
+    objective: "Verify or exactly block Full Access and Foil Keyboard health check-in on the current physical build."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T011-healthy-preflight.json"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T012-route-onboarding-current-receipt.json"
+      - "scripts/ios-physical-harness.py"
+    constraints:
+      - "Use sanitized UI/App Group evidence only."
+      - "Do not print provider keys, transcript bodies, raw WDA source, contacts, phone numbers, or screenshots."
+      - "If keyboard cycling or Full Access requires manual user action, record that exact blocker before guessing."
+    expected_output:
+      - "Full Access state proof or blocker."
+      - "Foil Keyboard health report proof or blocker."
+      - "Recovery instructions if blocked."
+    receipt:
+      result: done
+      outcome: blocked_by_missing_keyboard_checkin
+      summary: "Current physical build still refuses setup completion because Foil Keyboard has not checked in recently. Full Access is not proven from the current viewport, and keyboard health requires cycling to Foil Keyboard in a safe text field or operator confirmation."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T013-keyboard-health-blocker-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T013-keyboard-health-ui-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T013-app-group-summary.json"
+      gate_status:
+        full_access: "not_proven_current_viewport"
+        keyboard_health: "blocked_by_missing_keyboard_checkin"
+        app_group_idle: "phase idle, hasTranscript false"
+      recovery:
+        - "Open a sterile text field."
+        - "Switch to Foil Keyboard."
+        - "Confirm the app updates from missing keyboard check-in before claiming Full Access/keyboard health."
+      privacy:
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+      next_active_task: "T014"
+
+  - id: T014
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Verify or exactly block provider route readiness without leaking API keys."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T012-route-onboarding-current-receipt.json"
+      - "/tmp/foil-ios-current-source.json"
+    constraints:
+      - "No provider key, Authorization header, JWT, or raw provider response bodies in receipts."
+      - "Live provider proof is optional; key-presence and deterministic route state are acceptable if live proof is unsafe."
+      - "Do not print raw WDA source."
+    expected_output:
+      - "Provider configured/missing/blocked state."
+      - "Evidence source and sanitization method."
+    receipt:
+      result: done
+      outcome: blocked_by_missing_provider_key
+      summary: "API-key route can be selected and the provider key field is present, but provider route readiness is not complete: the secure field is still at the Groq API key placeholder, Save key is disabled, onboarding-ready is absent, and onboarding-not-ready remains present."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T014-provider-route-receipt.json"
+      gate_status:
+        selected_route: "iphone-api-key"
+        provider_key_field: "present"
+        save_provider_key_button: "disabled"
+        provider_route: "blocked_by_missing_key"
+      privacy:
+        providerKeyPrinted: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+      next_active_task: "T015"
+
+  - id: T015
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Reset and verify App Group idle/no-transcript state on the physical proof target."
+    allowed_files:
+      - "docs/goals/ios-route-onboarding-physical-proof/**"
+    verify:
+      - "python3 scripts/ios-physical-harness.py reset-transcript"
+      - "python3 scripts/ios-physical-harness.py app-group-summary"
+    stop_if:
+      - "Reset path would expose private transcript text."
+      - "App Group container cannot be read safely."
+      - "Device automation is unavailable."
+    expected_output:
+      - "Sanitized App Group before/after receipt or exact blocker."
+    receipt:
+      result: done
+      outcome: app_group_idle_verified
+      summary: "Reset the physical App Group snapshot and verified canonical state is idle with no transcript."
+      changed_files:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T015-reset-transcript.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T015-app-group-after-reset.json"
+      commands:
+        - cmd: "python3 scripts/ios-physical-harness.py reset-transcript > docs/goals/ios-route-onboarding-physical-proof/notes/T015-reset-transcript.json"
+          status: pass
+        - cmd: "python3 scripts/ios-physical-harness.py app-group-summary > docs/goals/ios-route-onboarding-physical-proof/notes/T015-app-group-after-reset.json"
+          status: pass
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T015-reset-transcript.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T015-app-group-after-reset.json"
+      app_group_state:
+        phase: "idle"
+        hasTranscript: false
+      privacy:
+        printedTranscriptBodies: false
+        printedRawWdaSource: false
+      next_active_task: "T016"
+
+  - id: T016
+    type: worker
+    assignee: Worker
+    status: blocked
+    reasoning_hint: high
+    objective: "Prove one sterile host-app Insert Latest exact-once row, or block before touching private content."
+    allowed_files:
+      - "docs/goals/ios-route-onboarding-physical-proof/**"
+      - "docs/ios-keyboard-host-app-matrix.md"
+    verify:
+      - "Use a sterile host surface such as Safari local normal field when available."
+      - "Require pre-insert keyboard readiness proof."
+      - "Require post-insert target value proof with count/hash only."
+      - "Require App Group idle/no-transcript after insertion or cleanup."
+    stop_if:
+      - "Foil Keyboard health is not proven."
+      - "Provider route is missing a key."
+      - "Host app opens to private content."
+      - "Target field cannot be proven sterile."
+      - "Any proof would require sending a message/email."
+    expected_output:
+      - "Exact-once insertion receipt or exact privacy/tooling blocker."
+    receipt:
+      result: done
+      outcome: blocked_by_unmet_prerequisites
+      summary: "Exact-once insertion proof is blocked before touching host apps because the current physical build has no recent Foil Keyboard check-in/Full Access proof and the selected API-key route is missing a provider key."
+      changed_files:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+      commands:
+        - "Reviewed T013 keyboard-health blocker receipt"
+        - "Reviewed T014 provider-route blocker receipt"
+        - "Reviewed T015 App Group idle receipt"
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T013-keyboard-health-blocker-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T014-provider-route-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T015-app-group-after-reset.json"
+      blockers:
+        - "Foil Keyboard has not checked in recently; Full Access/keyboard health not proven."
+        - "Provider route missing API key; Save key is disabled."
+      privacy:
+        openedHostAppsForInsertion: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+      next_active_task: "T017"
+
+  - id: T017
+    type: judge
+    assignee: Judge
+    status: blocked
+    reasoning_hint: high
+    objective: "Audit current physical-proof outcome and decide whether to keep waiting, block, or spawn the next operator-prep board."
+    inputs:
+      - "All physical-proof task receipts"
+      - "Issue #39 acceptance evidence"
+      - "docs/acceptance-evidence.md"
+    constraints:
+      - "Read-only."
+      - "Do not mark complete while Full Access, keyboard health, provider route, or exact-once insertion evidence is missing."
+      - "Do not treat App Group idle alone as insertion proof."
+    expected_output:
+      - "complete | not_complete | blocked"
+      - "Gate-by-gate evidence table"
+      - "Operator prerequisites or next board recommendation"
+    receipt:
+      result: done
+      decision: "blocked"
+      full_outcome_complete: false
+      summary: "Physical route-first onboarding proof is blocked on real setup prerequisites, not WDA: route-first onboarding is visible on the current build, App Group idle is proven, but Full Access/keyboard health is not proven, provider route is missing an API key, and exact-once insertion is blocked before host-app touch."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T011-healthy-preflight.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T012-route-onboarding-current-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T013-keyboard-health-blocker-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T014-provider-route-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T015-app-group-after-reset.json"
+      gate_status:
+        current_build_onboarding_visibility: "proven"
+        full_access: "not_proven"
+        keyboard_health: "blocked_by_missing_keyboard_checkin"
+        provider_route: "blocked_by_missing_api_key"
+        app_group_state: "idle_hasTranscript_false"
+        exact_once_insertion: "blocked_before_host_apps_by_unmet_prerequisites"
+      operator_prerequisites:
+        - "Enter/save a provider key on the iPhone API-key route without exposing it in receipts."
+        - "Open a sterile text field, switch to Foil Keyboard, and verify Foil Keyboard check-in/Full Access before insertion proof."
+      privacy:
+        openedHostAppsForInsertion: false
+        providerKeyPrinted: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+
+  - id: T018
+    type: scout
+    assignee: Scout
+    status: blocked
+    reasoning_hint: medium
+    objective: "Re-check provider-route readiness after the operator added a Groq API key on iOS."
+    inputs:
+      - "User reported a Groq API key was added on iOS."
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T018-provider-key-verification-preflight.json"
+      - "/tmp/foil-ios-wda-provider-verify.log"
+    constraints:
+      - "Do not print or infer the provider key."
+      - "Run strict WDA preflight before touching host apps or private surfaces."
+      - "Stop if WDA is not healthy."
+    expected_output:
+      - "Provider route readiness receipt or exact tooling blocker."
+    receipt:
+      result: done
+      outcome: blocked_by_wda_unreachable
+      summary: "Provider-key verification was resumed after the operator reported adding a Groq API key, but WDA did not become healthy. The device is present and paired, no automation processes are running, and strict preflight marked safeToTouchHostApps=false, so provider readiness and insertion proof remain unverified."
+      changed_files:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+      commands:
+        - "xcodebuild -project /Users/neonwatty/.appium/node_modules/appium-xcuitest-driver/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner-nodebug -destination 'id=00008030-001A0C980A33C02E' -configuration Debug DEVELOPMENT_TEAM=B3A6AN2HA4 CODE_SIGN_STYLE=Automatic PRODUCT_BUNDLE_IDENTIFIER=com.neonwatty.WebDriverAgentRunner -allowProvisioningUpdates test 2>&1 | tee /tmp/foil-ios-wda-provider-verify.log"
+        - "python3 scripts/ios-physical-harness.py preflight --strict --wda-url http://192.168.1.40:8100 > docs/goals/ios-route-onboarding-physical-proof/notes/T018-provider-key-verification-preflight.json"
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T018-provider-key-verification-preflight.json"
+        - "/tmp/foil-ios-wda-provider-verify.log: Timed out while enabling automation mode."
+      gate_status:
+        device_presence: "present_available_paired"
+        wda_health: "blocked_by_timeout_enabling_automation_mode"
+        provider_route: "not_rechecked_after_user_key_entry"
+        full_access: "not_rechecked"
+        keyboard_health: "not_rechecked"
+        exact_once_insertion: "blocked_before_host_apps_by_wda_unreachable"
+      blockers:
+        - "WDA failed to initialize for UI testing: Timed out while enabling automation mode."
+      next_action:
+        - "Unlock iPhone-preview, keep it on the Home Screen, close private apps, and retry WDA until /status is healthy."
+        - "After WDA is healthy, rerun provider-route proof without printing the key."
+      privacy:
+        openedHostApps: false
+        providerKeyPrinted: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+
+  - id: T019
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Verify provider-route readiness and keyboard health after the operator added the Groq key and unlocked the iPhone."
+    inputs:
+      - "User reported the Groq API key was added on iOS."
+      - "User reported iPhone-preview was unlocked."
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-unlocked-healthy-preflight.json"
+    constraints:
+      - "Do not print or infer the provider key."
+      - "Do not print raw WDA source or screenshots."
+      - "Require plain proof that onboarding no longer claims not-ready and that keyboard health is current."
+    expected_output:
+      - "Provider route and keyboard health receipts, or exact blocker."
+    receipt:
+      result: done
+      outcome: provider_route_and_keyboard_health_ready
+      summary: "After the phone was unlocked, WDA became healthy at the direct URL. Foil iOS launched on the current installed build; sanitized receipts prove the API-key route screen is ready, onboarding-not-ready is absent, onboarding-ready is present, and the app exposes recent Foil Keyboard check-in plus Full Access-on readiness text by hash."
+      changed_files:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+      commands:
+        - "python3 scripts/ios-physical-harness.py preflight --strict --wda-url http://192.168.1.40:8100 > docs/goals/ios-route-onboarding-physical-proof/notes/T019-unlocked-healthy-preflight.json"
+        - "xcrun devicectl device process launch --device 00008030-001A0C980A33C02E com.neonwatty.FoilIOS"
+        - "python3 scripts/ios-physical-harness.py receipt ... --require-identifier onboarding-ready --forbid-identifier onboarding-not-ready --write-json docs/goals/ios-route-onboarding-physical-proof/notes/T019-provider-route-ready-receipt.json"
+        - "python3 scripts/ios-physical-harness.py receipt ... --require-text 'Foil Keyboard checked in' --require-text 'Full Access on, ready for dictation.' --forbid-text stale/full-access-off warnings --write-json docs/goals/ios-route-onboarding-physical-proof/notes/T019-keyboard-health-ready-receipt.json"
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-unlocked-healthy-preflight.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-provider-route-ready-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-keyboard-health-ready-receipt.json"
+      gate_status:
+        wda_health: "healthy"
+        safe_to_touch_host_apps: true
+        provider_route: "ready_without_printing_key"
+        full_access: "plain_text_ready_signal_present_by_hash"
+        keyboard_health: "recent_checkin_signal_present_by_hash"
+        stale_not_ready: "absent"
+      privacy:
+        openedHostAppsForInsertion: false
+        providerKeyPrinted: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+
+  - id: T020
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: high
+    objective: "Prove exact-once insertion and App Group cleanup in a sterile Safari normal field."
+    inputs:
+      - "docs/ios-keyboard-host-app-matrix.md"
+      - "docs/goals/ios-v0.26-apple-host-app-matrix-rerun/notes/fixture/index.html"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-unlocked-healthy-preflight.json"
+    constraints:
+      - "Use only a sterile local Safari fixture."
+      - "Do not print screenshots, private host-app content, or raw WDA trees."
+      - "Record failed taps as failed proof, then require successful after-insert proof."
+      - "Require App Group idle/no-transcript after insertion."
+    expected_output:
+      - "Exact-once insertion receipt or exact blocker."
+    receipt:
+      result: done
+      outcome: exact_once_insertion_proven
+      summary: "Opened the sterile Safari fixture at http://192.168.1.34:8945/, focused the normal field, proved Foil Keyboard active with Insert latest disabled before staging, staged one sterile transcript in App Group, proved Insert latest enabled while the field still had zero copies, recorded a failed coordinate tap that left zero copies and staged App Group intact, then clicked the keyboard element by accessibility identifier. The final receipt proves exactly one copy in the field, Insert latest disabled, and App Group idle with no transcript."
+      changed_files:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+      commands:
+        - "python3 -m http.server 8945 --bind 0.0.0.0"
+        - "xcrun devicectl device process launch --device 00008030-001A0C980A33C02E --terminate-existing --payload-url http://192.168.1.34:8945/ com.apple.mobilesafari"
+        - "python3 scripts/ios-physical-harness.py stage-transcript --transcript-file /tmp/foil-route-onboarding-transcript.txt --message 'Route onboarding exact-once proof ready' > docs/goals/ios-route-onboarding-physical-proof/notes/T020-stage-transcript.json"
+        - "WDA element lookup/click for accessibility id foil-keyboard-insert-latest"
+        - "python3 scripts/ios-physical-harness.py app-group-summary > docs/goals/ios-route-onboarding-physical-proof/notes/T020-app-group-after-element-click.json"
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-fixture-loaded-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-normal-focused-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-stage-transcript.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-before-insert-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-after-insert-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-after-element-click-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-app-group-after-element-click.json"
+      gate_status:
+        sterile_fixture_loaded: "proven"
+        pre_stage_keyboard: "foil_keyboard_active_insert_disabled"
+        staged_transcript: "complete_hash_only_length_38"
+        pre_insert_field_count: 0
+        failed_coordinate_tap: "recorded_no_insert_app_group_still_staged"
+        final_field_count: 1
+        final_insert_button: "disabled"
+        final_app_group_phase: "idle"
+        final_app_group_has_transcript: false
+      privacy:
+        openedOnlySterileHostApp: true
+        providerKeyPrinted: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+
+  - id: T021
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit whether issue #39 physical completion gates are now proven without weak or private evidence."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/goal.md"
+      - "docs/acceptance-evidence.md"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T012-route-onboarding-current-receipt.json"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-provider-route-ready-receipt.json"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-keyboard-health-ready-receipt.json"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-after-element-click-receipt.json"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-app-group-after-element-click.json"
+    constraints:
+      - "Do not mark complete unless every gate has fresh physical proof or exact blocker."
+      - "Do not rely on optimistic setup-complete UI alone."
+      - "Do not include provider keys, raw WDA trees, screenshots, or private app content."
+    expected_output:
+      - "complete | not_complete"
+      - "Gate-by-gate evidence map."
+    receipt:
+      result: done
+      decision: "complete"
+      full_outcome_complete: true
+      summary: "The strongest false-complete mode is now ruled out by current physical receipts: route-first onboarding is visible on the current installed build; provider route readiness is proven after the key was added without exposing the key; Full Access and recent keyboard health are proven by explicit ready/check-in text hashes; App Group can stage and then returns idle/no transcript after insertion; and a sterile Safari normal field receives exactly one copy while Insert latest disables afterward."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T011-healthy-preflight.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T012-route-onboarding-current-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-unlocked-healthy-preflight.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-provider-route-ready-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-keyboard-health-ready-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-fixture-loaded-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-before-insert-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-after-element-click-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-app-group-after-element-click.json"
+      gate_status:
+        current_build_onboarding_visibility: "proven"
+        provider_route: "proven_ready_after_user_key_entry"
+        full_access: "proven_ready_text_hash"
+        keyboard_health: "proven_recent_checkin_text_hash"
+        app_group_state: "stage_complete_then_idle_no_transcript"
+        exact_once_insertion: "proven_sterile_safari_normal_field_count_1"
+      ruled_out_failure_modes:
+        - "Onboarding falsely says ready while provider route is missing: ruled out by onboarding-ready present, onboarding-not-ready absent, and API-key route controls present after user key entry."
+        - "Onboarding falsely says ready while Full Access or keyboard health is stale: ruled out by hashed ready/check-in text and absence of stale/full-access-off warnings."
+        - "Insertion appears successful without mutating the host field: ruled out by pre-insert count 0 and post-insert count 1 in the sterile Safari value attributes."
+        - "Transcript remains available for duplicate insertion: ruled out by Insert latest disabled and App Group idle/no transcript after element click."
+      privacy:
+        openedOnlySterileHostApp: true
+        providerKeyPrinted: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false

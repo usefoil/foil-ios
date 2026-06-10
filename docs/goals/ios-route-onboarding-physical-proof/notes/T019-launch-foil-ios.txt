@@ -1,0 +1,4 @@
+01:03:46  Acquired tunnel connection to device.
+01:03:46  Enabling developer disk image services.
+01:03:47  Acquired usage assertion.
+Launched application with com.neonwatty.FoilIOS bundle identifier.

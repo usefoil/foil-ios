@@ -1,0 +1,621 @@
+version: 2
+
+goal:
+  title: "Foil iOS Autonomous GoalBuddy Conveyor"
+  slug: "ios-autonomous-goalbuddy-conveyor"
+  kind: existing_plan
+  tranche: "Prepare and run the first autonomous conveyor cycle for Foil iOS PR follow-through and next-board handoff."
+  status: done
+  oracle:
+    signal: "The active child board has measured criteria, PR/CI/merge state receipts, and a timed reminder before the next board is activated."
+    cadence: "after every PR status change, merge attempt, conflict recovery, and child-board handoff"
+    final_proof: "PR #40 is merged or exactly blocked, local main is refreshed when possible, the next child prep board exists with acceptance criteria, and the timed reminder points at the next board."
+  intake:
+    original_request: "plan out a conveyor of GoalBuddy prep boards that you can run autonomously through creation of tasks, acceptance criteria, PRs, monitoring, CI/CD, merging, conflicts, and timed next-board handoff"
+    interpreted_outcome: "Create a GoalBuddy parent board that can autonomously drive PR follow-through and spawn the next measured prep board on a timer."
+    input_shape: existing_plan
+    audience: "Foil owner and autonomous Codex PM thread"
+    authority: approved
+    proof_type: artifact
+    completion_proof: "Board receipts prove PR #40 merge/blocker state, CI/conflict handling, next-board creation, and a live timed reminder."
+    likely_misfire: "The conveyor creates lots of board text but never proves PR/CI/merge state or wakes itself to continue."
+    blind_spots_considered:
+      - "GitHub checks can change after local verification."
+      - "Merge permissions or branch protection may require human action."
+      - "Conflict resolution can silently alter files outside the intended slice."
+      - "A timer can wake the thread but cannot safely merge without fresh green evidence."
+      - "Future boards should be created from measured residual work, not invented upfront."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  create_pr_per_child_board_when_files_change: true
+  merge_green_prs_before_next_board: true
+  timed_handoff_required: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: queued
+    url: "http://goalbuddy.localhost:41737/ios-autonomous-goalbuddy-conveyor/"
+    command: "npx goalbuddy board docs/goals/ios-autonomous-goalbuddy-conveyor"
+
+active_task: null
+
+conveyor:
+  current_pr:
+    repo: "usefoil/foil-ios"
+    number: 40
+    url: "https://github.com/usefoil/foil-ios/pull/40"
+    branch: "codex/ios-route-first-onboarding"
+    base: "main"
+  child_boards:
+    - slug: "ios-route-first-onboarding-followthrough"
+      status: done
+      purpose: "Monitor PR #40, repair CI/conflicts, merge when green, refresh local main, and discover the next board from residual work."
+    - slug: "ios-route-onboarding-physical-proof"
+      status: blocked
+      purpose: "Gather or exactly block physical proof for route-first onboarding completion gates after PR #40."
+    - slug: "ios-next-measured-residual-board"
+      status: deferred
+      purpose: "Created only after the physical-proof board records evidence or exact blockers."
+  timer:
+    desired_kind: "heartbeat"
+    desired_cadence: "every 30 minutes while this conveyor is active"
+    expected_prompt: "Wake this thread, inspect docs/goals/ios-autonomous-goalbuddy-conveyor/state.yaml, then continue docs/goals/ios-route-onboarding-physical-proof/goal.md from active task T017 and monitor PR #43."
+    automation_id: "goalbuddy-ios-conveyor-follow-up"
+    status: "paused_after_operator_prerequisites"
+
+tasks:
+  - id: T001
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: high
+    objective: "Create the first child prep board for PR #40 follow-through with measurable task criteria and merge gates."
+    inputs:
+      - "Parent conveyor charter"
+      - "Current PR #40 link"
+      - "Repo AGENTS.md burden-of-proof rules"
+    constraints:
+      - "Only edit docs/goals/ios-route-first-onboarding-followthrough/** and this parent board."
+      - "Do not inspect private app content or store secrets."
+      - "Do not merge or claim green CI from stale evidence."
+    expected_output:
+      - "Child board goal.md and state.yaml exist."
+      - "Child board has tasks for PR status scout, CI monitor, conflict recovery, merge gate, local main refresh, residual-work scout, next-board creation, and timed handoff."
+      - "Parent board receipt points to the child board."
+    receipt:
+      result: done
+      summary: "Created the first child prep board for PR #40 follow-through with measurable PR status, CI/CD, conflict recovery, merge, local refresh, residual-work, next-board, and timed-handoff gates."
+      changed_files:
+        - "docs/goals/ios-route-first-onboarding-followthrough/goal.md"
+        - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml"
+      next_active_task: "T002"
+
+  - id: T002
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Inspect current PR #40 status, checks, review state, mergeability, and conflicts with fresh GitHub evidence."
+    inputs:
+      - "https://github.com/usefoil/foil-ios/pull/40"
+      - "docs/goals/ios-route-first-onboarding-followthrough/goal.md"
+    constraints:
+      - "Read-only."
+      - "Do not treat local test results as current GitHub CI status."
+    expected_output:
+      - "PR state: open/draft/ready/merged/closed."
+      - "Check suite and failing check names."
+      - "Mergeability/conflict state."
+      - "Review or branch protection blockers."
+      - "Recommended next active task."
+    receipt:
+      result: done
+      summary: "Fresh PR #40 evidence collected through the child board: OPEN draft, MERGEABLE, mergeStateStatus UNSTABLE, no reviews, Analyze (python) success, Analyze (swift) in progress, aggregate CodeQL neutral."
+      evidence:
+        - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml T001 receipt"
+        - "https://github.com/usefoil/foil-ios/pull/40"
+      blockers:
+        - "Draft PR cannot be treated as merge-ready."
+        - "Analyze (swift) is still in progress."
+      recommended_next_task: "T008"
+
+  - id: T003
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: medium
+    objective: "Repair PR #40 if CI, review, or conflict evidence identifies a safe local fix."
+    allowed_files:
+      - "FoiliOS/**"
+      - "docs/goals/ios-route-first-onboarding-followthrough/**"
+      - "docs/goals/ios-autonomous-goalbuddy-conveyor/**"
+    verify:
+      - "git diff --check"
+      - "Run the focused failing command from CI or the closest local equivalent."
+      - "Run scripts/ios-simulator-sanity.sh when UI or shared presenter behavior changes."
+      - "git status --short --branch"
+    stop_if:
+      - "Fix requires files outside allowed_files."
+      - "GitHub failure cannot be reproduced or understood."
+      - "Merge conflict touches private artifacts or generated archive outputs."
+      - "Verification fails twice with the same unexplained failure."
+    expected_output:
+      - "Local fix committed and pushed, or exact blocker recorded."
+    receipt:
+      result: done
+      outcome: superseded_no_worker_repair_needed
+      summary: "Superseded by later conveyor receipts: PR #40 reached green and merged without a new Worker repair from this queued task. The only subsequent local code repair was handled in PR #43 and tracked by later PM receipts."
+      evidence:
+        - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml"
+        - "docs/goals/ios-autonomous-goalbuddy-conveyor/state.yaml T016"
+        - "docs/goals/ios-autonomous-goalbuddy-conveyor/state.yaml T017"
+
+  - id: T004
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Decide whether PR #40 is merge-ready based on fresh CI, review, conflict, and burden-of-proof evidence."
+    inputs:
+      - "Latest PR status receipt"
+      - "Latest local verification receipt"
+      - "Current git status"
+    constraints:
+      - "Read-only."
+      - "Do not approve merge from stale checks."
+    expected_output:
+      - "merge_ready | not_ready | blocked"
+      - "Fresh evidence used"
+      - "Missing evidence or exact blocker"
+      - "Next task recommendation"
+    receipt:
+      result: done
+      decision: "merge_ready"
+      summary: "Child board evidence proves PR #40 checks are successful and merge state is clean; proceed to the merge PM task with a fresh pre-merge recheck."
+      evidence:
+        - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml T008 receipt"
+        - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml T003 receipt"
+      next_task: "T005"
+
+  - id: T005
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: medium
+    objective: "Merge PR #40 when Judge says merge_ready, then refresh local main and record proof."
+    inputs:
+      - "Judge merge-ready receipt"
+      - "https://github.com/usefoil/foil-ios/pull/40"
+    constraints:
+      - "Only merge if fresh GitHub state is green and mergeable."
+      - "If permission is missing, block this task with the exact GitHub error and continue to T006."
+      - "After merge, switch local checkout back to main only when no uncommitted work would be lost."
+    expected_output:
+      - "PR merged or exact blocker receipt."
+      - "Local main refreshed or exact local blocker receipt."
+    receipt:
+      result: done
+      summary: "PR #40 was marked ready, merged, and local main was fast-forwarded to merge commit 80bd6018323f4ef9659e94b3fb6a09e9e51bcacf."
+      evidence:
+        - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml T004 receipt"
+        - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml T005 receipt"
+        - "https://github.com/usefoil/foil-ios/pull/40"
+      next_task: "T006"
+
+  - id: T006
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Discover measured residual work after PR #40 merge or blocker and recommend the next child prep board."
+    inputs:
+      - "Issue #39"
+      - "PR #40 receipts"
+      - "Shared contract usefoil/foil#298"
+      - "docs/acceptance-evidence.md"
+    constraints:
+      - "Read-only."
+      - "Prefer residual work with observable acceptance criteria."
+    expected_output:
+      - "Residual work candidates"
+      - "Recommended next board slug"
+      - "Oracle and acceptance criteria for the next board"
+      - "Risks and stop conditions"
+    receipt:
+      result: done
+      summary: "Measured residual work after PR #40 merge: issue #39 remains open because physical Full Access, keyboard health, App Group, provider-route, and host-app insertion proof are not freshly closed."
+      evidence:
+        - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml T006 receipt"
+        - "Issue #39 state: OPEN"
+        - "PR #40 merged at 2026-06-09T23:09:35Z, merge commit 80bd6018323f4ef9659e94b3fb6a09e9e51bcacf"
+      recommended_next_board: "ios-route-onboarding-physical-proof"
+      next_task: "T007"
+
+  - id: T007
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: high
+    objective: "Create the next GoalBuddy prep board from the residual-work scout receipt and update the timed handoff."
+    constraints:
+      - "Only create docs/goals/<next-slug>/goal.md, state.yaml, notes/, and update this parent board."
+      - "Do not execute next-board implementation in this task."
+    expected_output:
+      - "Next child board exists."
+      - "Parent conveyor points to the next child board."
+      - "Timed reminder prompt references the next active board."
+    receipt:
+      result: done
+      summary: "Created the next child board from measured residual work and updated the timed heartbeat to continue from physical-proof preflight."
+      changed_files:
+        - "docs/goals/ios-route-onboarding-physical-proof/goal.md"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+        - "docs/goals/ios-autonomous-goalbuddy-conveyor/state.yaml"
+      automation:
+        id: "goalbuddy-ios-conveyor-follow-up"
+        status: "updated"
+      next_child_board: "docs/goals/ios-route-onboarding-physical-proof/goal.md"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit whether the first conveyor cycle is complete and safe to continue autonomously."
+    inputs:
+      - "All task receipts"
+      - "Current PR #40 state"
+      - "Current timed reminder state"
+      - "Current git status"
+    constraints:
+      - "Read-only."
+      - "Do not mark complete if the next board lacks measurable acceptance criteria or the reminder is missing."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Missing evidence"
+      - "Next active task if not complete"
+    receipt:
+      result: done
+      decision: "not_complete"
+      full_outcome_complete: false
+      summary: "The first PR conveyor cycle is complete, but the broader issue #39 route-first onboarding outcome is not complete: the next physical-proof board is blocked before Settings/host-app proof because WDA is unreachable."
+      evidence:
+        - "PR #40 merged at 2026-06-09T23:09:35Z with merge commit 80bd6018323f4ef9659e94b3fb6a09e9e51bcacf"
+        - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml T999 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T001 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T008 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+      missing_evidence:
+        - "Physical Full Access state."
+        - "Physical Foil Keyboard health check-in."
+        - "Physical provider route readiness without key leakage."
+        - "Physical App Group idle/clean state."
+        - "One sterile exact-once host-app Insert Latest row."
+      next_active_task: "T011"
+
+  - id: T009
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: high
+    objective: "Continue the active physical-proof child board from docs/goals/ios-route-onboarding-physical-proof/goal.md."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+      - "docs/goals/ios-route-onboarding-physical-proof/goal.md"
+      - "goalbuddy-ios-conveyor-follow-up automation"
+    constraints:
+      - "Do not claim physical Full Access, keyboard health, provider route, App Group, or insertion proof without fresh evidence from the child board."
+      - "If physical proof is unavailable, record exact blockers and continue safe board work."
+    expected_output:
+      - "Physical-proof child board receipt updated."
+      - "Parent conveyor updated with child-board result or next active task."
+    receipt:
+      result: done
+      summary: "Continued the physical-proof child board through safe preflight. It failed closed with WDA unreachable and advanced to WDA recovery without touching Settings or host apps."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T001 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T001-preflight.json"
+      child_active_task: "docs/goals/ios-route-onboarding-physical-proof/state.yaml T008"
+
+  - id: T010
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: medium
+    objective: "Continue the physical-proof child board's WDA recovery task."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T008"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T001-preflight.json"
+    constraints:
+      - "Do not touch Settings or host apps until strict preflight is healthy."
+      - "Do not print raw WDA source or private screen content."
+      - "Record exact blocker if WDA repair needs device unlock, trust, credentials, or interactive approval."
+    expected_output:
+      - "WDA recovery receipt in physical-proof child board."
+      - "Parent conveyor updated with the result."
+    receipt:
+      result: done
+      outcome: external_blocker
+      summary: "Physical-proof child board ran safe preflight and one bounded WDA recovery attempt. WDA remains unreachable after an automation-mode timeout and password prompt, so Settings/host-app proof is blocked before private surfaces."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T001 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T008 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+      next_owner: "operator"
+      next_action: "Unlock/prepare iPhone-preview or resolve automation-mode/password/trust prompt, then rerun strict preflight before touching host apps."
+
+  - id: T011
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: medium
+    objective: "Resume the physical-proof child board on the timer after WDA/operator recovery evidence changes."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+      - "goalbuddy-ios-conveyor-follow-up automation"
+    constraints:
+      - "Do not touch Settings or host apps unless strict physical preflight reports safeToTouchHostApps=true."
+      - "Do not claim issue #39 complete until the physical-proof child board final audit is complete."
+      - "If the same WDA blocker repeats across three resumed goal turns, mark the conveyor precisely blocked instead of spinning."
+    expected_output:
+      - "Fresh child-board preflight receipt or exact unchanged-blocker receipt."
+      - "Parent board updated with child-board progress."
+      - "Timer remains pointed at the active child board while the outcome is incomplete."
+    receipt:
+      result: done
+      outcome: repeated_external_blocker
+      summary: "Timer wakeup resumed the physical-proof child board. Fresh strict preflight still reports WDA unreachable, safeToTouchHostApps=false, and no private Settings/host-app proof was attempted."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T009 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T009-preflight-rerun.json"
+      blocked_audit_count: "2_of_3_goal_turns"
+      next_child_task: "docs/goals/ios-route-onboarding-physical-proof/state.yaml T010"
+      next_action: "On the next heartbeat, rerun strict preflight. If unchanged, mark the conveyor blocked under the three-turn blocked audit rule."
+
+  - id: T012
+    type: pm
+    assignee: PM
+    status: blocked
+    reasoning_hint: medium
+    objective: "Run the final WDA blocked-audit checkpoint for the physical-proof child board."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T010"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T009-preflight-rerun.json"
+      - "goalbuddy-ios-conveyor-follow-up automation"
+    constraints:
+      - "Do not touch Settings or host apps unless strict physical preflight reports safeToTouchHostApps=true."
+      - "If WDA is still unreachable, record the third consecutive blocker and mark the active thread goal blocked."
+      - "If WDA is healthy, resume the physical-proof child board T002-T006 gates instead of marking blocked."
+    expected_output:
+      - "Fresh child-board preflight receipt."
+      - "Either physical-proof gate progression or exact blocked-status receipt."
+      - "Timer updated or paused according to the resulting state."
+    receipt:
+      result: done
+      outcome: third_consecutive_external_blocker
+      summary: "Final conveyor checkpoint reran strict physical preflight through the child board. WDA remains unreachable for the third consecutive goal turn, safeToTouchHostApps=false, and no Settings or host-app proof can proceed safely."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T010 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T010-preflight-final.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T009-preflight-rerun.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T008-preflight-rerun.json"
+      blocked_audit_count: "3_of_3_goal_turns"
+      blocked_owner: "operator"
+      blocked_action: "Resolve iPhone-preview WDA automation-mode/password/trust reachability, then resume the conveyor with strict preflight before touching private surfaces."
+      timer_action: "pause heartbeat to avoid unsafe/no-op retries until operator state changes"
+
+  - id: T013
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: medium
+    objective: "Resume the physical-proof child board after healthy direct-WDA preflight."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T011"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T011-healthy-preflight.json"
+      - "https://github.com/usefoil/foil-ios/pull/43"
+    constraints:
+      - "Do not claim issue #39 complete until the physical-proof child board final audit proves every gate."
+      - "Keep using sanitized receipts only."
+      - "If WDA drops again, record the exact blocker instead of touching private host apps."
+    expected_output:
+      - "Parent records the WDA unblock and active child task."
+      - "Timer is unpaused or exact automation blocker recorded."
+      - "Physical-proof child advances from preflight to route-first onboarding visibility proof."
+    receipt:
+      result: done
+      outcome: child_resumed
+      summary: "Reopened the physical-proof child board after PR #43 harness fix and healthy direct-WDA preflight. Installed the current app build and proved route-first onboarding is visible without falsely reporting setup complete."
+      evidence:
+        - "https://github.com/usefoil/foil-ios/pull/43"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T011-healthy-preflight.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T012 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T012-route-onboarding-current-receipt.json"
+      next_child_task: "docs/goals/ios-route-onboarding-physical-proof/state.yaml T013"
+      next_active_task: "T014"
+
+  - id: T014
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: medium
+    objective: "Continue the physical-proof child board's Full Access and keyboard-health gate."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T013"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T012-route-onboarding-current-receipt.json"
+      - "goalbuddy-ios-conveyor-follow-up automation"
+    constraints:
+      - "Do not claim issue #39 complete until every physical-proof gate has a receipt."
+      - "Use sanitized evidence only."
+      - "If keyboard or Settings proof needs manual action, record the exact blocker and keep the next task precise."
+    expected_output:
+      - "Full Access / keyboard-health receipt or exact blocker in the child board."
+      - "Parent board updated with child-board progress."
+    receipt:
+      result: done
+      outcome: child_progressed_to_insertion_gate
+      summary: "Continued physical proof after route-first visibility. Child board recorded keyboard health/Full Access not proven due missing keyboard check-in, provider route blocked by missing API key, and App Group reset/idle verified."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T013 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T014 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T015 receipt"
+      next_child_task: "docs/goals/ios-route-onboarding-physical-proof/state.yaml T016"
+      next_active_task: "T015"
+
+  - id: T015
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: high
+    objective: "Resolve or exactly block the physical-proof child insertion gate and monitor PR #43."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T016"
+      - "https://github.com/usefoil/foil-ios/pull/43"
+      - "goalbuddy-ios-conveyor-follow-up automation"
+    constraints:
+      - "Do not attempt exact-once insertion until keyboard health and provider route prerequisites are satisfied or explicitly marked as blockers."
+      - "Do not merge PR #43 unless fresh GitHub checks are green and mergeability is clean."
+      - "Keep receipts sanitized."
+    expected_output:
+      - "Exact insertion blocker or proof receipt."
+      - "Fresh PR #43 CI/merge status receipt."
+      - "Next task or final audit decision."
+    receipt:
+      result: done
+      outcome: insertion_blocked_pr_monitoring
+      summary: "Physical-proof child recorded exact-once insertion as blocked by missing keyboard-health/Full Access proof and missing provider key. Fresh PR #43 status shows draft PR, Analyze (python) success, Analyze (swift) still in progress, mergeStateStatus UNSTABLE."
+      evidence:
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T016 receipt"
+        - "gh pr view 43 --repo usefoil/foil-ios --json number,url,state,isDraft,headRefOid,mergeStateStatus,mergeable,reviewDecision,statusCheckRollup"
+        - "https://github.com/usefoil/foil-ios/pull/43"
+      pr43:
+        state: "OPEN"
+        isDraft: true
+        mergeStateStatus: "UNSTABLE"
+        analyzePython: "SUCCESS"
+        analyzeSwift: "IN_PROGRESS"
+      next_child_task: "docs/goals/ios-route-onboarding-physical-proof/state.yaml T017"
+      next_active_task: "T016"
+
+  - id: T016
+    type: pm
+    assignee: PM
+    status: blocked
+    reasoning_hint: high
+    objective: "Monitor PR #43 to green and audit the physical-proof child board."
+    inputs:
+      - "https://github.com/usefoil/foil-ios/pull/43"
+      - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T017"
+      - "goalbuddy-ios-conveyor-follow-up automation"
+    constraints:
+      - "Do not merge PR #43 unless fresh checks are green and mergeability is clean."
+      - "Do not claim issue #39 complete while physical-proof child audit is not complete."
+      - "Keep board receipts sanitized."
+    expected_output:
+      - "PR #43 merged or exact CI/merge blocker."
+      - "Physical-proof final audit receipt."
+      - "Next operator-prep board or exact blocker."
+    receipt:
+      result: done
+      decision: "blocked"
+      full_outcome_complete: false
+      summary: "PR #43 was marked ready and merged after fresh green checks and CLEAN mergeability; local main fast-forwarded. The conveyor is now blocked on physical setup prerequisites: missing provider key and missing Foil Keyboard health/Full Access check-in."
+      evidence:
+        - "https://github.com/usefoil/foil-ios/pull/43"
+        - "PR #43 merged at 2026-06-10T01:02:14Z with merge commit 64ddb0f450986dd55d8cdb9a83c27efe5b4f61d3"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T017 receipt"
+        - "/tmp/foil-ios-heartbeat-preflight.json classified WDA unreachable because WDA was stopped between runs"
+      pr43:
+        state: "MERGED"
+        mergeCommit: "64ddb0f450986dd55d8cdb9a83c27efe5b4f61d3"
+        checks: "SUCCESS"
+      operator_prerequisites:
+        - "Enter/save provider key on iPhone without exposing it."
+        - "Verify Foil Keyboard check-in/Full Access from a sterile text field."
+      timer_action: "pause heartbeat until operator prerequisites change"
+
+  - id: T017
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Close the parent conveyor after physical route-first onboarding proof is unblocked and complete."
+    inputs:
+      - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T019-T021"
+      - "https://github.com/usefoil/foil-ios/pull/43"
+      - "docs/goals/ios-autonomous-goalbuddy-conveyor/state.yaml T016"
+    constraints:
+      - "Do not claim completion from setup-ready UI alone."
+      - "Require fresh physical receipts for provider route, Full Access, keyboard health, App Group state, and exact-once insertion."
+      - "Keep provider keys, raw WDA source, screenshots, and transcript bodies out of committed receipts."
+    expected_output:
+      - "complete | not_complete"
+      - "Parent conveyor gate map."
+    receipt:
+      result: done
+      decision: "complete"
+      full_outcome_complete: true
+      summary: "The parent conveyor is complete: PR #40 is merged, PR #43 is merged, local main was refreshed, and the physical-proof child board now validates as done with fresh receipts proving provider readiness, Full Access/keyboard health, App Group staging/cleanup, and exact-once sterile Safari insertion."
+      evidence:
+        - "PR #40 merged at 2026-06-09T23:09:35Z with merge commit 80bd6018323f4ef9659e94b3fb6a09e9e51bcacf"
+        - "PR #43 merged at 2026-06-10T01:02:14Z with merge commit 64ddb0f450986dd55d8cdb9a83c27efe5b4f61d3"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml T021 receipt"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-provider-route-ready-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-keyboard-health-ready-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-after-element-click-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-app-group-after-element-click.json"
+      gate_status:
+        pr40: "merged"
+        pr43: "merged"
+        physical_proof_child: "done"
+        provider_route: "proven_ready_without_printing_key"
+        full_access_keyboard_health: "proven_ready_checkin_hashes"
+        app_group: "idle_no_transcript_after_insert"
+        exact_once_insertion: "sterile_safari_count_1_insert_disabled"
+      privacy:
+        providerKeyPrinted: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+
+  - id: T008
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: low
+    objective: "Heartbeat monitor for PR #40 while GitHub checks are still in progress."
+    inputs:
+      - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml"
+      - "https://github.com/usefoil/foil-ios/pull/40"
+    constraints:
+      - "Read-only."
+      - "Gather fresh GitHub evidence before any PR/CI/merge claim."
+      - "Do not mark ready or merge from this task."
+    expected_output:
+      - "Latest PR #40 check conclusions."
+      - "Whether the child board should activate repair, judge, or continued monitor."
+      - "Parent and child board receipts updated."
+    receipt:
+      result: done
+      summary: "Fresh monitor evidence shows PR #40 is clean and all checks have reached SUCCESS; child board advanced to merge transition."
+      evidence:
+        - "docs/goals/ios-route-first-onboarding-followthrough/state.yaml T008 receipt"
+      recommended_next_task: "T004"

@@ -1,7 +1,7 @@
 # Foil iOS v0.7 TestFlight Feedback Handoff
 
 > Superseded: this historical build-7 handoff is retained as receipt context.
-> Use `docs/ios-closed-beta-tester-handoff.md` for the current build-11 closed
+> Use `docs/ios-closed-beta-tester-handoff.md` for the current build-13 closed
 > beta tester instructions.
 
 Audience: internal TestFlight testers for Foil Dictation.

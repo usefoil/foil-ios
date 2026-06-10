@@ -1,0 +1,60 @@
+{
+  "buttons": [
+    {
+      "enabled": "true",
+      "height": "64",
+      "labelHash": "569ca49f4aaf7846",
+      "labelLen": 7,
+      "visible": "true",
+      "width": "378",
+      "x": "16",
+      "y": "359"
+    },
+    {
+      "enabled": "true",
+      "height": "64",
+      "labelHash": "569ca49f4aaf7846",
+      "labelLen": 7,
+      "visible": "true",
+      "width": "378",
+      "x": "16",
+      "y": "359"
+    }
+  ],
+  "markers": {
+    "0.1.0 (13)": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "Foil": {
+      "count": 1,
+      "visibleCount": 1
+    },
+    "Foil Dictation": {
+      "count": 1,
+      "visibleCount": 1
+    },
+    "Install": {
+      "count": 2,
+      "visibleCount": 2
+    },
+    "Open": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "TestFlight": {
+      "count": 8,
+      "visibleCount": 5
+    },
+    "Update": {
+      "count": 2,
+      "visibleCount": 0
+    }
+  },
+  "privacy": {
+    "rawSourcePrinted": false,
+    "screenshotTaken": false
+  },
+  "schema": "foil.testflightDeepLinkMarkers.v1",
+  "sourceSha256Prefix": "77c804b1fb2b98b8"
+}

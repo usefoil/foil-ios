@@ -1,0 +1,4 @@
+01:06:05  Acquired tunnel connection to device.
+01:06:05  Enabling developer disk image services.
+01:06:06  Acquired usage assertion.
+Launched application with com.apple.mobilesafari bundle identifier.

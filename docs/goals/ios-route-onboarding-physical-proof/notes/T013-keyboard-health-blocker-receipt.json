@@ -1,0 +1,32 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "onboarding-not-ready",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-ready",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 41,
+      "textSha256": "da49ffdff0f67e2a"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-ios-current-source.json",
+    "nodeCount": 89,
+    "sha256": "a46ce0e4f8e70aa2d1f04ddfec9335dfe389b5e95ddb29fea9a98e445c78dfb5"
+  },
+  "target": "keyboard-health-readiness"
+}
