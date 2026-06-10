@@ -139,7 +139,7 @@ enum FoilDictationLoopPresenter {
                 routeID: macRouteID,
                 title: "Use my Mac",
                 badge: "Recommended next",
-                detail: "Mac pairing is coming soon. This will send iPhone audio to your paired Mac, use the Mac's selected route, and show a RouteReceipt only after the Mac handles the request.",
+                detail: "Mac pairing is coming soon. After pairing is available, this route can send iPhone audio to your paired Mac, use the Mac's selected route, and show a RouteReceipt only after the Mac handles the request.",
                 systemImage: "desktopcomputer",
                 isRecommended: true,
                 isUsableNow: false

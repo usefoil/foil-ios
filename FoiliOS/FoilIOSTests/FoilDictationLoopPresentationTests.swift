@@ -17,6 +17,7 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         XCTAssertTrue(routes[0].isRecommended)
         XCTAssertFalse(routes[0].isUsableNow)
         XCTAssertTrue(routes[0].detail.contains("pairing is coming soon"))
+        XCTAssertTrue(routes[0].detail.contains("After pairing is available"))
         XCTAssertFalse(routes[0].detail.contains("Mac actually handled"))
         XCTAssertEqual(routes[1].routeID, "iphone-api-key")
         XCTAssertFalse(routes[1].isRecommended)

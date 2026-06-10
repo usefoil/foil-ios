@@ -125,6 +125,7 @@ struct ContentView: View {
                         }
                         .padding(.top, 8)
                     }
+                    .accessibilityIdentifier("advanced-support-disclosure")
 
                     Spacer(minLength: 0)
                 }
