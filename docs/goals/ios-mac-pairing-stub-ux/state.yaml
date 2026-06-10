@@ -1,0 +1,153 @@
+version: 2
+
+goal:
+  title: "Foil iOS Mac Pairing Stub UX"
+  slug: "ios-mac-pairing-stub-ux"
+  kind: existing_plan
+  tranche: "Implement the next product slice after build-13 readiness: a truthful Mac pairing stub UX that preserves API-key setup."
+  status: active
+  oracle:
+    signal: "Use my Mac is recommended but cannot falsely complete setup; API-key-on-iPhone remains fully usable; tests prove readiness gates still fail closed."
+    cadence: "after scout, after implementation, after focused tests, and before PR handoff"
+    final_proof: "Focused unit/UI tests plus simulator or physical smoke prove Mac stub behavior, API-key readiness, Advanced/Support containment, and no readiness false positives."
+  intake:
+    original_request: "start the next product slice"
+    interpreted_outcome: "Create a conveyor for the Mac pairing stub UX after the build-13 docs/evidence PR."
+    input_shape: existing_plan
+    audience: "Foil owner and future internal testers"
+    authority: approved
+    proof_type: test
+    completion_proof: "PR with implementation, tests, and final audit receipts."
+    likely_misfire: "Making the recommended Mac route look complete even though the Mac bridge is stubbed, thereby reintroducing the route-first onboarding false-ready failure mode."
+    blind_spots_considered:
+      - "The shared contract in usefoil/foil#298 may have changed and must be checked before naming bridge semantics."
+      - "A stub can accidentally satisfy readiness or hide API-key setup."
+      - "Route copy can overpromise privacy or Full Access behavior."
+      - "Diagnostics/demo tools can drift back into first-run setup."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  no_secret_printing: true
+  no_private_phone_content: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: queued
+    url: "http://goalbuddy.localhost:41737/ios-mac-pairing-stub-ux/"
+    command: "npx goalbuddy board docs/goals/ios-mac-pairing-stub-ux"
+
+active_task: T001
+
+source_context:
+  repo: "usefoil/foil-ios"
+  build13_docs_pr:
+    number: 44
+    url: "https://github.com/usefoil/foil-ios/pull/44"
+    status: "open"
+  route_first_issue:
+    number: 39
+    url: "https://github.com/usefoil/foil-ios/issues/39"
+    status: "closed"
+  shared_contract:
+    url: "https://github.com/usefoil/foil/pull/298"
+    note: "Must be re-read before implementing bridge-facing names or assumptions."
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    reasoning_hint: high
+    objective: "Refresh source context for the Mac pairing stub UX."
+    inputs:
+      - "AGENTS.md"
+      - "https://github.com/usefoil/foil-ios/issues/39"
+      - "https://github.com/usefoil/foil/pull/298"
+      - "FoiliOS/FoilIOSApp"
+      - "FoiliOS/Shared"
+      - "FoiliOS/FoilIOSTests"
+      - "docs/goals/ios-testflight-readiness-physical-gate/notes/T007-final-audit.md"
+    constraints:
+      - "Read-only except Scout notes under this board."
+      - "Do not print provider keys, App Store Connect secrets, raw WDA trees, or private phone content."
+      - "Do not infer current shared-contract details without re-reading PR #298."
+    expected_output:
+      - "Scout receipt mapping current route-choice code, readiness gates, tests, and Mac bridge contract assumptions."
+    receipt: null
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Approve the smallest safe Mac pairing stub behavior before implementation."
+    inputs:
+      - "T001 Scout receipt"
+      - "Current route-first onboarding code"
+      - "Shared contract PR #298"
+    constraints:
+      - "Reject any plan where a mocked Mac route can complete setup."
+      - "Reject any plan that weakens API-key setup or hides Advanced/Support boundaries."
+    expected_output:
+      - "Decision with exact UX states, local model shape, tests to add, and stop conditions."
+    receipt: null
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Implement the approved Mac pairing stub UX and tests."
+    allowed_files:
+      - "FoiliOS/**"
+      - "docs/goals/ios-mac-pairing-stub-ux/**"
+    verify:
+      - "Focused tests for route choice/readiness presentation."
+      - "Focused tests proving Mac stub does not satisfy setup completeness."
+      - "Focused tests proving API-key route remains usable when all readiness inputs are healthy."
+      - "Simulator sanity pass if feasible."
+    stop_if:
+      - "Implementation requires real Mac bridge credentials, network pairing, or non-stubbed cross-device behavior."
+      - "Tests reveal exact-once insertion or stale-state recovery behavior changed outside the requested slice."
+    expected_output:
+      - "Implementation receipt with changed files, tests, and residual risks."
+    receipt: null
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Run release-gate regression checks appropriate for the Mac stub slice."
+    allowed_files:
+      - "docs/goals/ios-mac-pairing-stub-ux/**"
+    verify:
+      - "Re-run focused unit/UI tests from T003."
+      - "Run simulator or physical smoke only if it adds proof beyond unit/UI checks."
+      - "Confirm no secrets/private phone artifacts were created."
+    expected_output:
+      - "Regression receipt or exact blocker."
+    receipt: null
+
+  - id: T005
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Final audit and PR handoff."
+    constraints:
+      - "Do not mark complete without proof that the Mac stub cannot falsely complete setup."
+      - "Do not mark complete if API-key setup regressed."
+      - "Open a PR only after tests and final audit are green."
+    expected_output:
+      - "Final verdict, PR URL, and evidence table."
+    receipt: null
