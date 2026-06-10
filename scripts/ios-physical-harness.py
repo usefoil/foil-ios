@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -110,13 +111,15 @@ def wda_ready(wda_url: str) -> tuple[bool, dict[str, Any]]:
 def parse_device_line(output: str, device_id: str) -> dict[str, Any]:
     for line in output.splitlines():
         if device_id in line:
-            parts = [part for part in line.split("   ") if part.strip()]
+            parts = [part.strip() for part in re.split(r"\s{2,}", line.strip()) if part.strip()]
+            state = parts[3] if len(parts) > 3 else ""
             return {
                 "present": True,
                 "rawLineSha256": short_hash(line),
-                "looksAvailable": "available" in line,
+                "state": state,
+                "looksAvailable": state == "connected" or state.startswith("available"),
             }
-    return {"present": False, "rawLineSha256": None, "looksAvailable": False}
+    return {"present": False, "rawLineSha256": None, "state": None, "looksAvailable": False}
 
 
 def snapshot_payload(phase: str, transcript: str | None, message: str) -> dict[str, Any]:
