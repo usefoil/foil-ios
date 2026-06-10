@@ -59,6 +59,9 @@ struct FoilKeyboardStorageReport: Codable, Equatable {
     var operation: String
     var phase: FoilKeyboardPhase
     var hasTranscript: Bool
+    var consumedPhase: FoilKeyboardPhase? = nil
+    var consumedHadInsertableTranscript: Bool? = nil
+    var insertedCharacterCount: Int? = nil
     var canonicalPath: String?
     var canonicalWriteSucceeded: Bool
     var canonicalWriteError: String?
@@ -73,6 +76,9 @@ struct FoilKeyboardStorageReport: Codable, Equatable {
             operation: "none",
             phase: .idle,
             hasTranscript: false,
+            consumedPhase: nil,
+            consumedHadInsertableTranscript: nil,
+            insertedCharacterCount: nil,
             canonicalPath: nil,
             canonicalWriteSucceeded: false,
             canonicalWriteError: nil,
@@ -238,7 +244,12 @@ struct FoilKeyboardBridge {
         saveKeyboardHealthReport(report)
     }
 
-    private func persist(_ snapshot: FoilKeyboardSnapshot, operation: String) {
+    private func persist(
+        _ snapshot: FoilKeyboardSnapshot,
+        operation: String,
+        consumedSnapshot: FoilKeyboardSnapshot? = nil,
+        insertedCharacterCount: Int? = nil
+    ) {
         guard let data = try? JSONEncoder().encode(snapshot) else { return }
         let removalResults = removeSnapshotFiles(Array(readableSnapshotFileURLs.dropFirst()))
         let writeResult = writeSnapshotFile(data)
@@ -247,6 +258,8 @@ struct FoilKeyboardBridge {
         saveStorageReport(
             snapshot: snapshot,
             operation: operation,
+            consumedSnapshot: consumedSnapshot,
+            insertedCharacterCount: insertedCharacterCount,
             writeResult: writeResult,
             defaultsWriteAttempted: true,
             removalResults: removalResults
@@ -304,7 +317,12 @@ struct FoilKeyboardBridge {
     func consumeTranscriptForInsertion() -> String? {
         let snapshot = load()
         let transcript = snapshot.insertableTranscript
-        persist(.initial, operation: "insert")
+        persist(
+            .initial,
+            operation: "insert",
+            consumedSnapshot: snapshot,
+            insertedCharacterCount: transcript?.count ?? 0
+        )
         let currentHealth = keyboardHealthReport()
         saveKeyboardHealthReport(
             FoilKeyboardHealthReport(
@@ -379,6 +397,8 @@ struct FoilKeyboardBridge {
     private func saveStorageReport(
         snapshot: FoilKeyboardSnapshot,
         operation: String,
+        consumedSnapshot: FoilKeyboardSnapshot?,
+        insertedCharacterCount: Int?,
         writeResult: FoilKeyboardStoragePathResult,
         defaultsWriteAttempted: Bool,
         removalResults: [FoilKeyboardStoragePathResult]
@@ -391,6 +411,9 @@ struct FoilKeyboardBridge {
             operation: operation,
             phase: snapshot.phase,
             hasTranscript: snapshot.transcript?.isEmpty == false,
+            consumedPhase: consumedSnapshot?.phase,
+            consumedHadInsertableTranscript: consumedSnapshot?.insertableTranscript != nil,
+            insertedCharacterCount: insertedCharacterCount,
             canonicalPath: snapshotFileURL?.path,
             canonicalWriteSucceeded: writeResult.succeeded,
             canonicalWriteError: writeResult.error,
