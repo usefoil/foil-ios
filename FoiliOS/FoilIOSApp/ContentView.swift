@@ -429,22 +429,29 @@ struct ContentView: View {
     }
 
     private var macRouteDetails: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        let preview = FoilDictationLoopPresenter.macPairingPreviewPresentation()
+
+        return VStack(alignment: .leading, spacing: 12) {
             setupRow(
-                title: "Mac pairing",
-                detail: "The Mac bridge can be mocked in this build. Foil will not call setup complete from this route until pairing, route receipt, keyboard health, and insertion are all proven.",
+                title: preview.title,
+                detail: preview.detail,
                 systemImage: "desktopcomputer"
             )
             setupRow(
-                title: "Future receipt",
-                detail: "When connected, Foil will say which Mac route handled transcription, such as Local whisper.cpp or Groq on your Mac.",
+                title: "Bridge contract",
+                detail: preview.contractDetail,
+                systemImage: "point.3.connected.trianglepath.dotted"
+            )
+            setupRow(
+                title: preview.receiptName,
+                detail: preview.receiptDetail,
                 systemImage: "doc.text.magnifyingglass"
             )
             readinessPanel
             Button {
                 selectedRouteID = FoilDictationLoopPresenter.iPhoneAPIKeyRouteID
             } label: {
-                Label("Set up API key on iPhone", systemImage: "iphone.gen3")
+                Label(preview.fallbackTitle, systemImage: "iphone.gen3")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)

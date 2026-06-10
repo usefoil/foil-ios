@@ -112,6 +112,18 @@ struct FoilSetupRoutePresentation: Equatable, Identifiable {
     var id: String { routeID }
 }
 
+struct FoilMacPairingPreviewPresentation: Equatable {
+    var protocolFamily: String
+    var requestedRouteID: String
+    var receiptName: String
+    var supportedRouteIDs: [String]
+    var title: String
+    var detail: String
+    var contractDetail: String
+    var receiptDetail: String
+    var fallbackTitle: String
+}
+
 struct FoilOnboardingReadinessPresentation: Equatable {
     var title: String
     var detail: String
@@ -132,6 +144,14 @@ enum FoilDictationLoopPresenter {
     static let macRouteID = "use-my-mac"
     static let iPhoneAPIKeyRouteID = "iphone-api-key"
     static let advancedRouteID = "advanced"
+    static let localBridgeProtocolFamily = "foil.localBridge"
+    static let macSelectedRouteID = "mac-selected"
+    static let routeReceiptName = "RouteReceipt"
+    static let macSupportedRouteIDs = [
+        "local-whisper-cpp",
+        "openai-whisper",
+        "custom-openai-compatible"
+    ]
 
     static func routeChoicePresentation() -> [FoilSetupRoutePresentation] {
         [
@@ -163,6 +183,20 @@ enum FoilDictationLoopPresenter {
                 isUsableNow: true
             )
         ]
+    }
+
+    static func macPairingPreviewPresentation() -> FoilMacPairingPreviewPresentation {
+        FoilMacPairingPreviewPresentation(
+            protocolFamily: localBridgeProtocolFamily,
+            requestedRouteID: macSelectedRouteID,
+            receiptName: routeReceiptName,
+            supportedRouteIDs: macSupportedRouteIDs,
+            title: "Mac pairing preview",
+            detail: "Mac pairing is not connected in this build. Foil will not call setup complete from this route until pairing, route receipt, keyboard health, and insertion are all proven.",
+            contractDetail: "Future bridge requests use \(localBridgeProtocolFamily) and default to \(macSelectedRouteID), so the Mac can resolve its selected transcription route.",
+            receiptDetail: "After a Mac handles the request, Foil will show a \(routeReceiptName) with the resolved route, such as \(macSupportedRouteIDs.joined(separator: ", ")).",
+            fallbackTitle: "Set up API key on iPhone"
+        )
     }
 
     static func iPhoneAPIKeySetupPresentation() -> [FoilSetupChecklistItem] {

@@ -26,6 +26,28 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         XCTAssertEqual(routes[2].routeID, "advanced")
     }
 
+    func testMacPairingPreviewExposesSharedContractNamesWithoutClaimingBridgeReady() {
+        let preview = FoilDictationLoopPresenter.macPairingPreviewPresentation()
+
+        XCTAssertEqual(preview.protocolFamily, "foil.localBridge")
+        XCTAssertEqual(preview.requestedRouteID, "mac-selected")
+        XCTAssertEqual(preview.receiptName, "RouteReceipt")
+        XCTAssertEqual(
+            preview.supportedRouteIDs,
+            [
+                "local-whisper-cpp",
+                "openai-whisper",
+                "custom-openai-compatible"
+            ]
+        )
+        XCTAssertTrue(preview.detail.contains("not connected in this build"))
+        XCTAssertTrue(preview.detail.contains("will not call setup complete"))
+        XCTAssertTrue(preview.contractDetail.contains("foil.localBridge"))
+        XCTAssertTrue(preview.contractDetail.contains("mac-selected"))
+        XCTAssertTrue(preview.receiptDetail.contains("RouteReceipt"))
+        XCTAssertTrue(preview.fallbackTitle.contains("API key"))
+    }
+
     func testIPhoneAPISetupChecklistExplainsFullAccessAndKeyboardVerification() {
         let items = FoilDictationLoopPresenter.iPhoneAPIKeySetupPresentation()
         let combined = items.map { "\($0.title) \($0.detail)" }.joined(separator: " ")
