@@ -2,42 +2,207 @@ import XCTest
 @testable import FoilIOS
 
 final class FoilDictationLoopPresentationTests: XCTestCase {
-    func testSetupRouteOptionsPreferMacAndKeepIPhoneAPIKeyAsFallback() {
-        let options = FoilDictationLoopPresenter.setupRouteOptions()
+    func testRouteChoicesPutMacFirstButKeepIPhoneAPIKeyUsable() {
+        let routes = FoilDictationLoopPresenter.routeChoicePresentation()
 
-        XCTAssertEqual(options.map(\.route), [.mac, .iphoneAPIKey])
-        XCTAssertEqual(options[0].title, "Use my Mac")
-        XCTAssertEqual(options[0].badge, "Primary")
-        XCTAssertTrue(options[0].detail.contains("Future local pairing"))
-        XCTAssertTrue(options[0].detail.contains("After pairing is available"))
-        XCTAssertEqual(options[1].title, "Use an API key on this iPhone")
-        XCTAssertEqual(options[1].badge, "Fallback")
-        XCTAssertTrue(options[1].detail.contains("Works in this beta"))
+        XCTAssertEqual(
+            routes.map(\.title),
+            [
+                "Use my Mac",
+                "Use an API key on this iPhone",
+                "Advanced, demo, and support"
+            ]
+        )
+        XCTAssertEqual(routes[0].routeID, "use-my-mac")
+        XCTAssertTrue(routes[0].isRecommended)
+        XCTAssertFalse(routes[0].isUsableNow)
+        XCTAssertTrue(routes[0].detail.contains("pairing is coming soon"))
+        XCTAssertFalse(routes[0].detail.contains("Mac actually handled"))
+        XCTAssertEqual(routes[1].routeID, "iphone-api-key")
+        XCTAssertFalse(routes[1].isRecommended)
+        XCTAssertTrue(routes[1].isUsableNow)
+        XCTAssertTrue(routes[1].detail.contains("fully usable today"))
+        XCTAssertEqual(routes[2].routeID, "advanced")
     }
 
-    func testMacSetupChecklistIsRouteFirstAndExplainsFullAccessPrivacy() {
-        let items = FoilDictationLoopPresenter.setupChecklistPresentation(route: .mac)
+    func testIPhoneAPISetupChecklistExplainsFullAccessAndKeyboardVerification() {
+        let items = FoilDictationLoopPresenter.iPhoneAPIKeySetupPresentation()
+        let combined = items.map { "\($0.title) \($0.detail)" }.joined(separator: " ")
 
         XCTAssertEqual(
             items.map(\.title),
             [
-                "Use my Mac",
-                "Microphone",
+                "Save an API key",
+                "Allow microphone",
                 "Add Foil Keyboard",
                 "Allow Full Access",
-                "Record in Foil",
-                "Return and insert",
-                "Reset when stale"
+                "Verify keyboard health",
+                "Record and insert once"
             ]
         )
-        XCTAssertTrue(items[0].detail.contains("upcoming local pairing"))
-        XCTAssertTrue(items[1].detail.contains("Allow microphone"))
-        XCTAssertTrue(items[2].detail.contains("Settings > General > Keyboard"))
-        XCTAssertTrue(items[3].detail.contains("share one pending transcript"))
-        XCTAssertTrue(items[3].detail.contains("test text"))
-        XCTAssertTrue(items[4].detail.contains("Create transcript"))
-        XCTAssertTrue(items[5].detail.contains("Insert latest once"))
-        XCTAssertTrue(items[6].detail.contains("Reset shared state"))
+        XCTAssertTrue(combined.contains("read and clear Foil's shared transcript state"))
+        XCTAssertTrue(combined.contains("Open a safe text field"))
+        XCTAssertTrue(combined.contains("Foil Keyboard checked in"))
+        XCTAssertTrue(combined.contains("Insert latest once"))
+    }
+
+    func testAdvancedSupportItemsHideDiagnosticsAndFakeTranscriptTools() {
+        let items = FoilDictationLoopPresenter.advancedSupportPresentation()
+        let combined = items.map { "\($0.title) \($0.detail)" }.joined(separator: " ")
+
+        XCTAssertTrue(combined.contains("Diagnostics"))
+        XCTAssertTrue(combined.contains("fake transcript"))
+        XCTAssertTrue(combined.contains("secure-field"))
+        XCTAssertTrue(combined.contains("Reset shared state"))
+    }
+
+    func testOnboardingReadinessDoesNotCompleteWhenAnyInsertionGateIsMissing() {
+        let freshEnabledHealth = FoilKeyboardHealthReport(
+            fullAccessState: .enabled,
+            snapshotPhase: .idle,
+            snapshotHasTranscript: false,
+            message: "Foil Keyboard verified",
+            updatedAt: Date(timeIntervalSince1970: 100)
+        )
+        let healthyStorage = FoilKeyboardStorageReport(
+            operation: "save",
+            phase: .idle,
+            hasTranscript: false,
+            canonicalPath: "/tmp/foil-keyboard-snapshot.json",
+            canonicalWriteSucceeded: true,
+            canonicalWriteError: nil,
+            canonicalVerificationPhase: .idle,
+            canonicalVerificationHasTranscript: false,
+            defaultsWriteAttempted: true,
+            fallbackRemovalResults: [],
+            updatedAt: Date(timeIntervalSince1970: 100)
+        )
+
+        let missingKey = FoilDictationLoopPresenter.onboardingReadinessPresentation(
+            selectedRouteID: "iphone-api-key",
+            hasConfiguredAPIKey: false,
+            microphoneAllowed: true,
+            keyboardHealth: freshEnabledHealth,
+            storageReport: healthyStorage,
+            snapshot: .initial,
+            now: Date(timeIntervalSince1970: 110)
+        )
+        XCTAssertFalse(missingKey.isComplete)
+        XCTAssertTrue(missingKey.blockers.contains("Save an API key on this iPhone."))
+
+        let fullAccessOff = FoilDictationLoopPresenter.onboardingReadinessPresentation(
+            selectedRouteID: "iphone-api-key",
+            hasConfiguredAPIKey: true,
+            microphoneAllowed: true,
+            keyboardHealth: FoilKeyboardHealthReport(
+                fullAccessState: .disabled,
+                snapshotPhase: .idle,
+                snapshotHasTranscript: false,
+                message: "Allow Full Access required",
+                updatedAt: Date(timeIntervalSince1970: 100)
+            ),
+            storageReport: healthyStorage,
+            snapshot: .initial,
+            now: Date(timeIntervalSince1970: 110)
+        )
+        XCTAssertFalse(fullAccessOff.isComplete)
+        XCTAssertTrue(fullAccessOff.blockers.contains("Enable Allow Full Access and verify Foil Keyboard."))
+
+        let badStorage = FoilDictationLoopPresenter.onboardingReadinessPresentation(
+            selectedRouteID: "iphone-api-key",
+            hasConfiguredAPIKey: true,
+            microphoneAllowed: true,
+            keyboardHealth: freshEnabledHealth,
+            storageReport: FoilKeyboardStorageReport(
+                operation: "save",
+                phase: .idle,
+                hasTranscript: false,
+                canonicalPath: nil,
+                canonicalWriteSucceeded: false,
+                canonicalWriteError: "Missing app group container",
+                canonicalVerificationPhase: nil,
+                canonicalVerificationHasTranscript: nil,
+                defaultsWriteAttempted: true,
+                fallbackRemovalResults: [],
+                updatedAt: Date(timeIntervalSince1970: 100)
+            ),
+            snapshot: .initial,
+            now: Date(timeIntervalSince1970: 110)
+        )
+        XCTAssertFalse(badStorage.isComplete)
+        XCTAssertTrue(badStorage.blockers.contains("Reset shared state so the keyboard bridge can write a clean App Group snapshot."))
+
+        let pendingTranscript = FoilDictationLoopPresenter.onboardingReadinessPresentation(
+            selectedRouteID: "iphone-api-key",
+            hasConfiguredAPIKey: true,
+            microphoneAllowed: true,
+            keyboardHealth: freshEnabledHealth,
+            storageReport: healthyStorage,
+            snapshot: FoilKeyboardSnapshot(
+                phase: .complete,
+                transcript: "waiting text",
+                message: "Ready",
+                updatedAt: Date(timeIntervalSince1970: 100)
+            ),
+            now: Date(timeIntervalSince1970: 110)
+        )
+        XCTAssertFalse(pendingTranscript.isComplete)
+        XCTAssertTrue(pendingTranscript.blockers.contains("Insert or reset the waiting transcript before calling setup complete."))
+    }
+
+    func testOnboardingReadinessCompletesOnlyForHealthyIPhoneAPIKeyRoute() {
+        let presentation = FoilDictationLoopPresenter.onboardingReadinessPresentation(
+            selectedRouteID: "iphone-api-key",
+            hasConfiguredAPIKey: true,
+            microphoneAllowed: true,
+            keyboardHealth: FoilKeyboardHealthReport(
+                fullAccessState: .enabled,
+                snapshotPhase: .idle,
+                snapshotHasTranscript: false,
+                message: "Foil Keyboard verified",
+                updatedAt: Date(timeIntervalSince1970: 100)
+            ),
+            storageReport: FoilKeyboardStorageReport(
+                operation: "reset",
+                phase: .idle,
+                hasTranscript: false,
+                canonicalPath: "/tmp/foil-keyboard-snapshot.json",
+                canonicalWriteSucceeded: true,
+                canonicalWriteError: nil,
+                canonicalVerificationPhase: .idle,
+                canonicalVerificationHasTranscript: false,
+                defaultsWriteAttempted: true,
+                fallbackRemovalResults: [],
+                updatedAt: Date(timeIntervalSince1970: 100)
+            ),
+            snapshot: .initial,
+            now: Date(timeIntervalSince1970: 110)
+        )
+
+        XCTAssertTrue(presentation.isComplete)
+        XCTAssertEqual(presentation.title, "Ready to dictate and insert")
+        XCTAssertTrue(presentation.blockers.isEmpty)
+    }
+
+    func testOnboardingReadinessNeverCompletesForStubbedMacRoute() {
+        let presentation = FoilDictationLoopPresenter.onboardingReadinessPresentation(
+            selectedRouteID: "use-my-mac",
+            hasConfiguredAPIKey: true,
+            microphoneAllowed: true,
+            keyboardHealth: FoilKeyboardHealthReport(
+                fullAccessState: .enabled,
+                snapshotPhase: .idle,
+                snapshotHasTranscript: false,
+                message: "Foil Keyboard verified",
+                updatedAt: Date(timeIntervalSince1970: 100)
+            ),
+            storageReport: .initial,
+            snapshot: .initial,
+            now: Date(timeIntervalSince1970: 110)
+        )
+
+        XCTAssertFalse(presentation.isComplete)
+        XCTAssertTrue(presentation.detail.contains("Mac pairing is not connected in this build"))
     }
 
     func testIPhoneAPIKeyChecklistKeepsProviderSetupAsFallback() {
