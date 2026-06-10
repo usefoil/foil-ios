@@ -1,0 +1,29 @@
+{
+  "activeApp": {
+    "bundleId": "com.neonwatty.FoilIOS",
+    "httpOk": true,
+    "pidPresent": true,
+    "sha256Prefix": "b4a8ad5e8d14c4d0"
+  },
+  "baseUrl": "http://192.168.1.40:8100",
+  "privacy": {
+    "rawActiveAppPrinted": false,
+    "rawSourcePrinted": false,
+    "rawStatusPrinted": false
+  },
+  "schema": "foil.testflightReadiness.wdaIdentity.v1",
+  "status": {
+    "httpOk": true,
+    "ready": true,
+    "sha256Prefix": "930b6201ef8a5fa9",
+    "valueKeys": [
+      "build",
+      "device",
+      "ios",
+      "message",
+      "os",
+      "ready",
+      "state"
+    ]
+  }
+}

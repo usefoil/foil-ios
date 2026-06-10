@@ -1,0 +1,53 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "onboarding-ready",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-not-ready",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 24,
+      "textSha256": "4c73a67cb1c5711c"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 36,
+      "textSha256": "3efd8cd7c0661f36"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 41,
+      "textSha256": "da49ffdff0f67e2a"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 24,
+      "textSha256": "27b5f75960524657"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-t006-return-foil-source.json",
+    "nodeCount": 114,
+    "sha256": "5c5836a0ac66148925f8cb39a9287c83c7a37b0bdde3b62f531aa5ffe6c988b1"
+  },
+  "target": "testflight-build13-foil-readiness-after-keyboard-refresh"
+}

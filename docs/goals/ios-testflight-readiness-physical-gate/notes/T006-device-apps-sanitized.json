@@ -1,0 +1,34 @@
+{
+  "bundles": {
+    "com.apple.TestFlight": {
+      "bundleIdentifier": "com.apple.TestFlight",
+      "bundleVersion": "628.1",
+      "jsonSha256Prefix": "9c6fe661b2d58db6",
+      "nameHash": "34682cc3412855ae",
+      "present": true,
+      "shortVersion": null
+    },
+    "com.neonwatty.FoilIOS": {
+      "bundleIdentifier": "com.neonwatty.FoilIOS",
+      "bundleVersion": "13",
+      "jsonSha256Prefix": "4754c8f0fb9f5054",
+      "nameHash": "369adeb3e35500eb",
+      "present": true,
+      "shortVersion": null
+    },
+    "com.neonwatty.FoilIOS.Keyboard": {
+      "bundleIdentifier": "com.neonwatty.FoilIOS.Keyboard",
+      "bundleVersion": null,
+      "jsonSha256Prefix": "90f0f5ec2d8d2bd6",
+      "nameHash": null,
+      "present": true,
+      "shortVersion": null
+    }
+  },
+  "device": "iPhone-preview",
+  "privacy": {
+    "privateAppNamesPrinted": false,
+    "rawAppListPrinted": false
+  },
+  "schema": "foil.testflightReadiness.deviceApps.v1"
+}

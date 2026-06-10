@@ -1,0 +1,12 @@
+{
+  "activeApp": {
+    "bundleId": "com.neonwatty.FoilIOS",
+    "httpOk": true,
+    "pidPresent": true,
+    "sha256Prefix": "00f08ac024c1a795"
+  },
+  "privacy": {
+    "rawActiveAppPrinted": false
+  },
+  "schema": "foil.testflightFoilOpenActiveApp.v1"
+}

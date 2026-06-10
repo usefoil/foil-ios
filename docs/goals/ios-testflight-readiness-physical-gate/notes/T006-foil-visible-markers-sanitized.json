@@ -1,0 +1,13 @@
+{
+  "httpOk": true,
+  "markers": {},
+  "parseErrorType": "ParseError",
+  "privacy": {
+    "rawSourcePersisted": false,
+    "rawSourcePrinted": false,
+    "screenshotsTaken": false
+  },
+  "schema": "foil.testflightReadiness.foilVisibleMarkers.v1",
+  "sourceSha256Prefix": "423a55c3acff123c",
+  "xmlParsed": false
+}

@@ -1,0 +1,70 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "route-choice-iphone-api-key",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "provider-key-field",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "save-provider-key-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-not-ready",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-ready",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "attribute": "value",
+      "expected": "1",
+      "identifier": "route-choice-iphone-api-key",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "1"
+      ],
+      "passed": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "save-provider-key-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 12,
+      "textSha256": "db96a8e2379b4e60"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-ios-current-source-api-route-tapped.json",
+    "nodeCount": 131,
+    "sha256": "14f5f6b061f5fc0163c0dfa6b1b88b91d58d2bc772a2d3ae541d367aebdd6ba4"
+  },
+  "target": "provider-route-readiness"
+}
