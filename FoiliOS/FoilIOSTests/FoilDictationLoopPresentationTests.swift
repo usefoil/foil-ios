@@ -395,6 +395,25 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         }
     }
 
+    func testKeyboardStaleCompleteTranscriptDoesNotAdvertiseInsertLatest() {
+        let presentation = FoilDictationLoopPresenter.keyboardPresentation(
+            snapshot: FoilKeyboardSnapshot(
+                phase: .complete,
+                transcript: "older transcript",
+                message: "Ready",
+                updatedAt: Date(timeIntervalSince1970: 100)
+            ),
+            fullAccessEnabled: true,
+            now: Date(timeIntervalSince1970: 500),
+            staleAfter: 120
+        )
+
+        XCTAssertEqual(presentation.status, "Transcript may be stale")
+        XCTAssertEqual(presentation.insertTitle, "Stale transcript")
+        XCTAssertTrue(presentation.message.contains("Clear latest"))
+        XCTAssertFalse(presentation.message.contains("Insert latest"))
+    }
+
     func testKeyboardFullAccessOffTellsUserToEnableAndCycleBack() {
         let presentation = FoilDictationLoopPresenter.keyboardPresentation(
             snapshot: .initial,
