@@ -1,0 +1,336 @@
+version: 2
+
+goal:
+  title: "Foil iOS Route-First Onboarding Followthrough"
+  slug: "ios-route-first-onboarding-followthrough"
+  kind: existing_plan
+  tranche: "Follow PR #40 through CI/CD, merge readiness, conflict repair, merge/blocker, and next-board handoff."
+  status: done
+  oracle:
+    signal: "Fresh GitHub PR/check/mergeability state plus board receipts prove whether PR #40 merged or is exactly blocked."
+    cadence: "on every timed wakeup, after every push, and immediately before any merge claim"
+    final_proof: "PR #40 merged or exactly blocked, local main refreshed when possible, residual work discovered, parent board updated, and timed reminder active."
+  intake:
+    original_request: "autonomous conveyor through PRs, monitoring, CI/CD, merging when green, conflicts, and next prep board on a timer"
+    interpreted_outcome: "Use a child board to carry the open route-first onboarding PR through fresh GitHub gates and hand off measured residual work."
+    input_shape: existing_plan
+    audience: "Foil owner and autonomous Codex PM thread"
+    authority: approved
+    proof_type: artifact
+    completion_proof: "GitHub PR state receipt, local git receipt, next-board receipt, and timed reminder receipt."
+    likely_misfire: "Treating the draft PR or local tests as enough proof to merge, or creating the next board before knowing what PR/CI actually needs."
+    blind_spots_considered:
+      - "Draft PRs may have checks that have not completed yet."
+      - "Branch protection may prevent merge even when local checks pass."
+      - "A conflict fix can accidentally revert user changes."
+      - "A next board must be based on residual work after PR status is known."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  merge_green_prs_before_next_board: true
+  timed_handoff_required: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: queued
+    url: "http://goalbuddy.localhost:41737/ios-route-first-onboarding-followthrough/"
+    command: "npx goalbuddy board docs/goals/ios-route-first-onboarding-followthrough"
+
+active_task: null
+
+pr:
+  repo: "usefoil/foil-ios"
+  number: 40
+  url: "https://github.com/usefoil/foil-ios/pull/40"
+  branch: "codex/ios-route-first-onboarding"
+  base: "main"
+  last_known_state: "merged"
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Fetch fresh PR #40 status, checks, review state, mergeability, and conflict evidence."
+    inputs:
+      - "https://github.com/usefoil/foil-ios/pull/40"
+      - "Current local branch and git status"
+    constraints:
+      - "Read-only."
+      - "Use GitHub/gh evidence for PR checks; local simulator sanity is not CI status."
+      - "Do not mark merge-ready."
+    expected_output:
+      - "PR open/draft/ready/merged/closed state"
+      - "Check names, conclusions, and URLs when available"
+      - "Mergeability/conflict state"
+      - "Review and branch protection blockers"
+      - "Recommended next task: monitor, repair, conflict recovery, ready-for-review, merge gate, or blocker"
+    receipt:
+      result: done
+      summary: "Fresh GitHub PR #40 status: OPEN draft, head codex/ios-route-first-onboarding at 63924a82, base main, mergeable MERGEABLE, mergeStateStatus UNSTABLE, no reviews, and no failing checks yet."
+      evidence:
+        - "gh pr view 40 --repo usefoil/foil-ios --json number,title,state,isDraft,mergeStateStatus,mergeable,reviewDecision,headRefName,baseRefName,url,commits,latestReviews,statusCheckRollup"
+        - "Analyze (python): SUCCESS, completed 2026-06-09T22:52:41Z"
+        - "Analyze (swift): IN_PROGRESS, started 2026-06-09T22:51:53Z"
+        - "CodeQL aggregate check: NEUTRAL, completed 2026-06-09T22:52:35Z"
+      blockers:
+        - "PR is still draft."
+        - "Analyze (swift) is still in progress, so CI/CD is not green yet."
+        - "mergeStateStatus is UNSTABLE until checks settle."
+      recommended_next_task: "T008"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: blocked
+    reasoning_hint: medium
+    objective: "Repair PR #40 if the PR status scout identifies a safe CI, review, or conflict fix."
+    allowed_files:
+      - "FoiliOS/**"
+      - "docs/goals/ios-route-first-onboarding-followthrough/**"
+      - "docs/goals/ios-autonomous-goalbuddy-conveyor/**"
+    verify:
+      - "git diff --check"
+      - "Run the focused failing command from CI or the closest local equivalent."
+      - "For onboarding UI/presenter changes, run: xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+      - "For bridge/exact-once changes, run: xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+      - "For broad UI/shared behavior changes, run: IOS_SIMULATOR_DESTINATION='platform=iOS Simulator,name=iPhone 17,OS=26.5' scripts/ios-simulator-sanity.sh"
+      - "git status --short --branch"
+    stop_if:
+      - "Fix requires files outside allowed_files."
+      - "Failure cannot be reproduced or mapped to a likely cause."
+      - "Conflict resolution would discard user changes."
+      - "Verification fails twice with the same unexplained failure."
+    expected_output:
+      - "Committed and pushed fix, or exact blocker receipt."
+    receipt:
+      result: not_required
+      summary: "No CI, review, or conflict repair was required before merge; all checks reached SUCCESS and mergeStateStatus became CLEAN."
+      evidence:
+        - "T008 monitor receipt"
+        - "T003 Judge merge_ready receipt"
+
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Decide whether PR #40 can be marked ready and/or merged based on fresh evidence."
+    inputs:
+      - "T001 PR status receipt"
+      - "Any T002 repair receipt"
+      - "Current GitHub checks and mergeability"
+    constraints:
+      - "Read-only."
+      - "Do not approve merge from stale evidence."
+      - "Draft PRs must not be merged until intentionally marked ready or repo policy allows draft completion."
+    expected_output:
+      - "decision: monitor | repair | mark_ready | merge_ready | blocked"
+      - "fresh evidence used"
+      - "missing evidence or exact blocker"
+      - "next active task recommendation"
+    receipt:
+      result: done
+      decision: "merge_ready"
+      summary: "PR #40 can be intentionally marked ready and merged if a fresh pre-merge recheck still shows open PR, all checks successful, mergeable MERGEABLE, mergeStateStatus CLEAN, and no new review blocker."
+      evidence:
+        - "T008 monitor receipt"
+        - "All statusCheckRollup entries SUCCESS: Analyze (python), Analyze (swift), CodeQL."
+        - "mergeable MERGEABLE and mergeStateStatus CLEAN."
+      required_pre_merge_recheck:
+        - "PR remains open and head remains codex/ios-route-first-onboarding."
+        - "Checks remain successful."
+        - "No new review or branch-protection blocker appears."
+      next_task: "T004"
+
+  - id: T004
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: medium
+    objective: "Perform the approved PR state transition: mark ready, merge, or record exact blocker."
+    inputs:
+      - "T003 Judge decision"
+      - "https://github.com/usefoil/foil-ios/pull/40"
+    constraints:
+      - "Only mark ready if Judge says mark_ready or merge_ready."
+      - "Only merge if Judge says merge_ready and fresh GitHub state still agrees."
+      - "If GitHub rejects the action, record exact error and continue to residual-work prep."
+    expected_output:
+      - "PR state transition receipt with URL and GitHub output."
+      - "Exact blocker if not permitted."
+    receipt:
+      result: done
+      summary: "Marked PR #40 ready for review, then merged it after a fresh pre-merge gate still showed all checks successful, MERGEABLE, and CLEAN."
+      evidence:
+        - "gh pr ready 40 --repo usefoil/foil-ios"
+        - "gh pr merge 40 --repo usefoil/foil-ios --merge --match-head-commit 63924a82b344f03897c2ee65099df92b00d1f198"
+        - "gh pr view 40 --repo usefoil/foil-ios --json state,isDraft,mergedAt,mergeCommit,url,headRefName,baseRefName,mergeStateStatus,mergeable"
+      pr_state:
+        state: "MERGED"
+        isDraft: false
+        mergedAt: "2026-06-09T23:09:35Z"
+        mergeCommit: "80bd6018323f4ef9659e94b3fb6a09e9e51bcacf"
+      next_task: "T005"
+
+  - id: T005
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: medium
+    objective: "Refresh local main after merge when safe, or record why local refresh is blocked."
+    inputs:
+      - "T004 merge receipt or blocker"
+      - "Current local git status"
+    constraints:
+      - "Do not discard uncommitted work."
+      - "Do not use destructive checkout/reset commands."
+    expected_output:
+      - "Local main fast-forward receipt, or exact blocker."
+    receipt:
+      result: done
+      summary: "Fetched origin/main, switched to local main, and fast-forwarded from bc88567 to merged PR #40 commit 80bd601 without touching untracked GoalBuddy board files."
+      evidence:
+        - "git fetch origin main"
+        - "git switch main"
+        - "git pull --ff-only"
+      local_main: "80bd6018323f4ef9659e94b3fb6a09e9e51bcacf"
+      next_task: "T006"
+
+  - id: T006
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Identify measured residual work for the next child board after PR #40 merge or blocker."
+    inputs:
+      - "Issue #39"
+      - "PR #40 receipts"
+      - "Shared contract usefoil/foil#298"
+      - "docs/acceptance-evidence.md"
+    constraints:
+      - "Read-only."
+      - "Recommend only work with observable acceptance criteria."
+    expected_output:
+      - "Residual work candidates"
+      - "Recommended next board slug"
+      - "Oracle and acceptance criteria"
+      - "Likely misfire and stop conditions"
+    receipt:
+      result: done
+      summary: "PR #40 is merged, but issue #39 remains open and the PR residual risk explicitly says physical-device Full Access and host-app insertion proof were not rerun."
+      evidence:
+        - "gh issue view 39 --repo usefoil/foil-ios --json number,title,state,body,comments,labels,url"
+        - "Issue #39 state: OPEN"
+        - "gh pr view 40 --repo usefoil/foil-ios --json number,title,state,body,mergedAt,mergeCommit,url"
+        - "PR #40 residual risk: physical-device Full Access and host-app insertion proof were not rerun; simulator lane does not prove physical keyboard insertion."
+        - "docs/acceptance-evidence.md settings/onboarding and keyboard insertion evidence rows"
+      recommended_next_board:
+        slug: "ios-route-onboarding-physical-proof"
+        oracle: "Physical or exactly-blocked proof that route-first onboarding does not claim completion when Full Access, keyboard health, provider route, App Group state, or insertion fails."
+      acceptance_criteria:
+        - "Record current build/app state and avoid stale-build proof."
+        - "Prove or exactly block Full Access and Foil Keyboard health verification."
+        - "Prove or exactly block API-key provider route readiness without leaking keys."
+        - "Prove or exactly block App Group idle/clean state after reset."
+        - "Prove or exactly block one sterile host-app Insert latest exact-once row."
+      next_task: "T007"
+
+  - id: T007
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: high
+    objective: "Create the next child prep board and update the parent conveyor plus timed reminder."
+    constraints:
+      - "Only edit docs/goals/<next-slug>/**, docs/goals/ios-autonomous-goalbuddy-conveyor/**, and this child board."
+      - "Do not execute the next board's implementation work."
+      - "Timed reminder prompt must require fresh evidence before PR/CI/merge claims."
+    expected_output:
+      - "Next board goal.md/state.yaml/notes exist."
+      - "Parent board points at next board."
+      - "Timed reminder is active or exact blocker recorded."
+    receipt:
+      result: done
+      summary: "Created the next child board for PR #40 residual physical-proof work and updated the parent conveyor/timed reminder to point at it."
+      changed_files:
+        - "docs/goals/ios-route-onboarding-physical-proof/goal.md"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+        - "docs/goals/ios-autonomous-goalbuddy-conveyor/state.yaml"
+      automation:
+        id: "goalbuddy-ios-conveyor-follow-up"
+        status: "updated"
+      next_board: "docs/goals/ios-route-onboarding-physical-proof/goal.md"
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit whether the PR #40 followthrough board is complete."
+    inputs:
+      - "All receipts"
+      - "Current PR #40 GitHub state"
+      - "Current timed reminder state"
+      - "Current git status"
+    constraints:
+      - "Read-only."
+      - "Do not mark complete unless merge/blocker, residual work, parent update, and reminder are all proven."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "missing evidence"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "complete"
+      full_outcome_complete: true
+      summary: "PR #40 followthrough is complete: fresh checks were monitored to success, PR was marked ready and merged, local main was refreshed, residual physical-proof work was identified, the next child board was created, and the timer was updated."
+      evidence:
+        - "T004 PR transition receipt"
+        - "T005 local main refresh receipt"
+        - "T006 residual-work receipt"
+        - "T007 next-board/timer receipt"
+
+  - id: T008
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: low
+    objective: "Monitor PR #40 until the in-progress Analyze (swift) check reaches a terminal conclusion."
+    inputs:
+      - "https://github.com/usefoil/foil-ios/pull/40"
+      - "T001 PR status receipt"
+    constraints:
+      - "Read-only."
+      - "Use fresh GitHub evidence."
+      - "Do not mark ready or merge."
+    expected_output:
+      - "Latest check conclusions for Analyze (python), Analyze (swift), and CodeQL."
+      - "Current mergeStateStatus and mergeable values."
+      - "Recommended next task: T002 repair, T003 judge, or another monitor receipt."
+    receipt:
+      result: done
+      summary: "Fresh monitor check shows PR #40 still OPEN draft, mergeable MERGEABLE, mergeStateStatus CLEAN, no reviews, and all CodeQL checks successful."
+      evidence:
+        - "gh pr view 40 --repo usefoil/foil-ios --json number,state,isDraft,mergeStateStatus,mergeable,reviewDecision,headRefName,baseRefName,url,latestReviews,statusCheckRollup"
+        - "Analyze (python): SUCCESS, completed 2026-06-09T22:52:41Z"
+        - "Analyze (swift): SUCCESS, completed 2026-06-09T23:07:18Z"
+        - "CodeQL: SUCCESS, completed 2026-06-09T22:52:35Z"
+      recommended_next_task: "T003"

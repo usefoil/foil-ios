@@ -5,7 +5,7 @@ goal:
   slug: "ios-v0.41-closed-beta-polish-conveyor"
   kind: existing_plan
   tranche: "Large end-to-end closed-beta polish conveyor after build 12 readiness."
-  status: active
+  status: done
   oracle:
     signal: "Every closed-beta polish child board is merged or exactly blocked, and the final audit gives an evidence-backed invite/hold decision."
     cadence: "after each child board and before every beta-readiness claim"
@@ -53,7 +53,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-v0-41-closed-beta-polish-conveyor/"
     command: "npx goalbuddy board docs/goals/ios-v0.41-closed-beta-polish-conveyor"
 
-active_task: T003
+active_task: null
 
 tasks:
   - id: T001
@@ -123,7 +123,7 @@ tasks:
   - id: T003
     type: worker
     assignee: Worker
-    status: active
+    status: blocked
     reasoning_hint: high
     objective: "Run the keyboard setup, Full Access, and recovery child board."
     child_board: "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/goal.md"
@@ -141,11 +141,18 @@ tasks:
       - "Full Access cannot be toggled without user action."
     acceptance_criteria:
       - "A tester can recover from the common keyboard-extension failure modes using in-app guidance and verified handoff steps."
+    receipt:
+      result: external_blocker
+      summary: "Draft PR #29 remains open for keyboard setup recovery; merge is blocked until physical setup/Full Access proof can be captured safely."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/29"
+      next_owner: "operator"
+      next_action: "Restore healthy physical UI automation or provide guided physical proof for Add Keyboard, Allow Full Access, cycling/refocus, stale recovery, and disabled Insert Latest states."
 
   - id: T004
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Run the recording and transcription quality-loop child board."
     child_board: "docs/goals/ios-v0.45-recording-transcription-quality-loop/goal.md"
@@ -163,11 +170,18 @@ tasks:
       - "Physical microphone permission requires user intervention."
     acceptance_criteria:
       - "The app makes transcription status legible and recoverable, with evidence for three repeated safe real-audio cycles plus realistic failure paths."
+    receipt:
+      result: external_blocker
+      summary: "Draft PR #30 remains open for recording quality-loop recovery; merge is blocked until current physical/live audio proof can be captured without private speech or credential exposure."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/30"
+      next_owner: "operator"
+      next_action: "Provide a safe physical audio proof path or restore WDA/app automation for three sanitized record/transcribe/insert/reset cycles."
 
   - id: T005
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Run the Insert Latest usage UX child board."
     child_board: "docs/goals/ios-v0.46-insert-latest-usage-ux/goal.md"
@@ -184,11 +198,18 @@ tasks:
       - "App Group state cannot be inspected without leaking transcript text."
     acceptance_criteria:
       - "Insert Latest feels predictable and cannot silently double-insert or expose stale text in the tested safe paths."
+    receipt:
+      result: external_blocker
+      summary: "Draft PR #31 remains open for Insert Latest freshness; local tests passed, but merge is blocked until physical host-field exact-once/stale/reset proof can be captured safely."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/31"
+      next_owner: "operator"
+      next_action: "Restore healthy WDA/physical host-field proof or run a guided sterile host-app insertion proof."
 
   - id: T006
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Run the host-app sterile matrix expansion child board."
     child_board: "docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/goal.md"
@@ -206,11 +227,17 @@ tasks:
       - "Any row would require sending a message/email."
     acceptance_criteria:
       - "The host-app matrix clearly separates pass, expected rejection, deferred, and privacy-blocked rows with build-specific receipts."
+    receipt:
+      result: done
+      summary: "PR #32 merged; matrix rows now record v0.47 blocked/not-rerun, privacy-blocked, and deferred classifications without unsafe host-app claims."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/32"
+        - "docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md"
 
   - id: T007
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     reasoning_hint: medium
     objective: "Run the physical automation hardening child board."
     child_board: "docs/goals/ios-v0.48-physical-automation-hardening/goal.md"
@@ -228,11 +255,17 @@ tasks:
       - "Automation captures private screen contents."
     acceptance_criteria:
       - "A future autonomous run can tell whether physical UI automation is healthy before touching private host apps."
+    receipt:
+      result: done
+      summary: "PR #33 merged; `scripts/ios-physical-harness.py preflight` now fails closed when WDA is unreachable and reports sanitized readiness without touching host apps."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/33"
+        - "docs/goals/ios-v0.48-physical-automation-hardening/notes/T003-healthy-path-blocker.md"
 
   - id: T008
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     reasoning_hint: medium
     objective: "Run the beta feedback intake loop child board."
     child_board: "docs/goals/ios-v0.49-beta-feedback-intake-loop/goal.md"
@@ -249,11 +282,17 @@ tasks:
       - "Feedback path would request private transcripts, screenshots, contacts, messages, emails, or credentials."
     acceptance_criteria:
       - "Closed beta testers have a low-friction, privacy-safe way to report setup, recording, insertion, and recovery outcomes."
+    receipt:
+      result: done
+      summary: "PR #34 merged; privacy-safe beta feedback issue form and triage guidance are in place."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/34"
+        - "docs/goals/ios-v0.49-beta-feedback-intake-loop/notes/T003-judge-audit.md"
 
   - id: T009
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     reasoning_hint: medium
     objective: "Run the simulator sanity regression child board."
     child_board: "docs/goals/ios-v0.50-simulator-sanity-regression/goal.md"
@@ -269,11 +308,17 @@ tasks:
       - "Simulator proof would be used to claim physical keyboard-extension behavior."
     acceptance_criteria:
       - "Simulator coverage catches regressions quickly while preserving physical-device proof boundaries."
+    receipt:
+      result: done
+      summary: "PR #35 merged; simulator sanity lane runs full simulator tests plus unsigned generic iOS build and explicitly does not claim physical keyboard/host-app behavior."
+      evidence:
+        - "https://github.com/mean-weasel/foil-ios/pull/35"
+        - "docs/goals/ios-v0.50-simulator-sanity-regression/notes/T003-judge-audit.md"
 
   - id: T010
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Run the evidence hygiene audit child board."
     child_board: "docs/goals/ios-v0.51-evidence-hygiene-audit/goal.md"
@@ -290,11 +335,17 @@ tasks:
       - "Any copy converts blocked Notes/Messages/Mail rows into beta claims."
     acceptance_criteria:
       - "Evidence is safe to keep in-repo and strong enough to support or block beta claims."
+    receipt:
+      result: done
+      summary: "v0.51 redacted legacy transcript/host-field bodies to metadata and passed post-redaction hygiene scans for tracked repo artifacts."
+      evidence:
+        - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T010-v0.51-done.md"
+        - "docs/goals/ios-v0.51-evidence-hygiene-audit/notes/T003-final-audit.md"
 
   - id: T011
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Run the TestFlight beta launch rehearsal child board."
     child_board: "docs/goals/ios-v0.52-testflight-beta-launch-rehearsal/goal.md"
@@ -313,11 +364,19 @@ tasks:
       - "The build would ship with unverified or overbroad beta copy."
     acceptance_criteria:
       - "The candidate closed-beta TestFlight build is uploaded, internally available, installed on preview iPhone, and smoke-tested with scoped release notes."
+    receipt:
+      result: external_blocker
+      summary: "Build 0.1.0 (13) archives/exports locally with metadata/icon/signing proof, but App Store Connect upload and preview-iPhone TestFlight smoke are blocked on safe auth inputs and physical automation health."
+      evidence:
+        - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T011-v0.52-blocker.md"
+        - "docs/goals/ios-v0.52-testflight-beta-launch-rehearsal/notes/T004-final-audit.md"
+      next_owner: "operator"
+      next_action: "Provide App Store Connect auth command inputs through a safe channel, upload build 13, then restore preview-iPhone/WDA for post-update smoke."
 
   - id: T012
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Run the final closed-beta readiness audit child board."
     child_board: "docs/goals/ios-v0.53-closed-beta-final-readiness-audit/goal.md"
@@ -337,3 +396,9 @@ tasks:
       - "Any public or tester-facing copy overclaims unsupported behavior."
     acceptance_criteria:
       - "Final audit gives invite/hold recommendation and a tester scope that matches only proven behavior."
+    receipt:
+      result: invite_narrow_internal_only
+      summary: "Final audit completed the conveyor by mapping v0.42-v0.52 to merged receipts or accepted blockers and aligning tester/public copy with proven build-scoped behavior."
+      evidence:
+        - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T012-v0.53-done.md"
+        - "docs/goals/ios-v0.53-closed-beta-final-readiness-audit/notes/T003-final-recommendation.md"

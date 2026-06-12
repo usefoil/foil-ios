@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.51-evidence-hygiene-audit"
   kind: audit
   tranche: "Privacy, credential, and claim hygiene before beta widening."
-  status: active
+  status: done
   oracle:
     signal: "Tracked evidence is safe and claims match receipts."
     cadence: "after host-app, audio, feedback, and TestFlight evidence changes"
@@ -20,26 +20,41 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: judge
     assignee: Judge
-    status: active
+    status: done
     objective: "Scan tracked docs/receipts/artifacts for private content and unsafe claims."
     acceptance_criteria:
       - "Receipt lists exact commands and any findings with owner/action."
+    receipt:
+      result: findings_requires_redaction
+      summary: "Tracked media had only app icons and simulator/landing screenshots. Raw WDA and secret scans found policy prose, scripts, placeholders, and code templates only. Transcript scan found legacy raw transcript/host-field bodies requiring safe redaction."
+      evidence:
+        - "docs/goals/ios-v0.51-evidence-hygiene-audit/notes/T001-audit-receipt.md"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Fix safe docs/receipt hygiene issues discovered by the audit."
     acceptance_criteria:
       - "Only safe, non-destructive redactions or claim corrections are made."
+    receipt:
+      result: done
+      summary: "Legacy raw transcript and host-field bodies were replaced with length/hash metadata while preserving proof value and residual-risk notes."
+      evidence:
+        - "docs/goals/ios-v0.51-evidence-hygiene-audit/notes/T002-redaction-receipt.md"
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Re-run hygiene scan and issue pass/block decision."
     acceptance_criteria:
       - "No tracked private content, secrets, raw WDA source, stale current build claim, or unsupported host-app claim remains."
+    receipt:
+      result: pass_for_current_scope
+      summary: "Post-redaction scans found no committed raw transcript bodies, raw WDA source files, secret values, unsafe media artifacts, or unsupported current beta claims."
+      evidence:
+        - "docs/goals/ios-v0.51-evidence-hygiene-audit/notes/T003-final-audit.md"

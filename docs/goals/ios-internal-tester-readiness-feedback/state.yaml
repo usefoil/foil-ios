@@ -1,0 +1,155 @@
+version: 2
+
+goal:
+  title: "Foil iOS Internal Tester Readiness And Feedback"
+  slug: "ios-internal-tester-readiness-feedback"
+  kind: existing_plan
+  tranche: "Convert the green build 13 TestFlight gate into tester handoff and feedback triage docs."
+  status: done
+  oracle:
+    signal: "Tester handoff and triage docs are current for build 0.1.0 (13), route-first setup, Full Access, keyboard health recovery, and privacy boundaries."
+    cadence: "after release-gate review, after doc edits, and during final audit"
+    final_proof: "GoalBuddy checker passes; docs diff inspection shows build 13 route/health guidance; final audit maps claims to sanitized release-gate receipts."
+  intake:
+    original_request: "ok do this"
+    interpreted_outcome: "Start the next tester-readiness conveyor after the TestFlight physical gate."
+    input_shape: existing_plan
+    audience: "Foil owner and internal TestFlight testers"
+    authority: approved
+    proof_type: artifact
+    completion_proof: "Updated tester handoff and feedback triage docs plus final board audit."
+    likely_misfire: "Shipping tester instructions that still describe build 12, imply Mac pairing works now, or let setup look complete while keyboard health is stale."
+    blind_spots_considered:
+      - "Tester docs can overclaim host-app support relative to the physical proof."
+      - "Full Access copy can become broad or alarming instead of narrow and truthful."
+      - "Feedback requests can accidentally solicit private phone content or keys."
+      - "The TestFlight readiness proof includes a stale-keyboard failure before recovery; tester docs must preserve that behavior."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  no_secret_printing: true
+  no_private_phone_content: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: queued
+    url: "http://goalbuddy.localhost:41737/ios-internal-tester-readiness-feedback/"
+    command: "npx goalbuddy board docs/goals/ios-internal-tester-readiness-feedback"
+
+active_task: null
+
+source_context:
+  release_gate:
+    board: "docs/goals/ios-testflight-readiness-physical-gate/state.yaml"
+    status: "done"
+    final_receipt: "docs/goals/ios-testflight-readiness-physical-gate/notes/T007-final-audit.md"
+    build: "0.1.0 (13)"
+  route_first_physical_gate:
+    board: "docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+    status: "done"
+    issue: "https://github.com/usefoil/foil-ios/issues/39"
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Map current tester docs and build-13 proof before edits."
+    receipt:
+      result: done
+      outcome: stale_build12_docs_found
+      summary: "The current tester handoff still named build 0.1.0 (12), while the completed release gate proves build 0.1.0 (13) is valid, internally attached, TestFlight-installable on the preview phone, and physically ready after keyboard-health refresh."
+      commands:
+        - cmd: "sed -n '1,240p' docs/ios-closed-beta-tester-handoff.md"
+          status: pass
+        - cmd: "sed -n '1,220p' docs/ios-beta-feedback-triage.md"
+          status: pass
+        - cmd: "sed -n '1,220p' docs/ios-testflight-feedback-v0.7.md"
+          status: pass
+        - cmd: "Review docs/goals/ios-testflight-readiness-physical-gate/state.yaml and notes/T007-final-audit.md"
+          status: pass
+      evidence:
+        - "docs/ios-closed-beta-tester-handoff.md named current beta target 0.1.0 (12)."
+        - "docs/ios-testflight-feedback-v0.7.md superseded note pointed to current build-11 closed beta instructions."
+        - "docs/ios-beta-feedback-triage.md did not yet include setup route or build-13 stale-keyboard release-gate guidance."
+        - "Build 13 release gate status is done and final audit verdict is ready."
+      next_active_task: "T002"
+      privacy:
+        secretsPrinted: false
+        privatePhoneContentPrinted: false
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Update tester handoff and feedback triage docs for build 13 route-first onboarding."
+    allowed_files:
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "docs/ios-beta-feedback-triage.md"
+      - "docs/ios-testflight-feedback-v0.7.md"
+      - "docs/goals/ios-internal-tester-readiness-feedback/**"
+    receipt:
+      result: done
+      outcome: tester_docs_updated
+      summary: "Updated the current tester handoff to build 0.1.0 (13), added route-choice guidance that keeps API-key-on-iPhone as the usable current beta path while positioning Mac pairing as future/recommended copy, narrowed Full Access explanation to Foil shared transcript state, added guided keyboard health verification and stale-health recovery, and updated feedback triage to capture setup route and keyboard health without soliciting private material."
+      changed_files:
+        - "docs/ios-closed-beta-tester-handoff.md"
+        - "docs/ios-beta-feedback-triage.md"
+        - "docs/ios-testflight-feedback-v0.7.md"
+      commands:
+        - cmd: "apply_patch docs/ios-closed-beta-tester-handoff.md docs/ios-beta-feedback-triage.md docs/ios-testflight-feedback-v0.7.md"
+          status: pass
+      evidence:
+        - "docs/ios-closed-beta-tester-handoff.md now names current beta target 0.1.0 (13)."
+        - "Setup now directs build-13 testers to Use an API key on this iPhone and labels Use my Mac as future/recommended, not current proof."
+        - "Full Access copy says Foil Keyboard uses it to read and clear Foil's shared transcript state and does not make secure/password fields available."
+        - "Keyboard health verification now includes the recent-check-in and Full Access-off recovery paths."
+        - "Feedback template now asks for setup route and keyboard health state."
+        - "docs/ios-beta-feedback-triage.md adds setup-route/setup-readiness buckets and build-13 release-gate guidance."
+      next_active_task: "T003"
+      privacy:
+        secretsPrinted: false
+        privatePhoneContentPrinted: false
+
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Final audit for tester readiness docs."
+    receipt:
+      result: done
+      outcome: ready
+      decision: "complete"
+      full_outcome_complete: true
+      summary: "Final audit accepts the tester-readiness docs. The strongest false-ready mode was stale build-12 or overbroad setup guidance; direct diff/text inspection shows build 13, API-key current path, Mac-pairing future boundary, narrow Full Access wording, keyboard-health verification, and privacy-safe feedback fields. The release-gate receipts remain the source of truth for physical proof."
+      commands:
+        - cmd: "rg -n '0.1.0 \\(12\\)|build-11|Use my Mac|Use an API key|Full Access|Keyboard health|private transcript|provider key' docs/ios-closed-beta-tester-handoff.md docs/ios-beta-feedback-triage.md docs/ios-testflight-feedback-v0.7.md"
+          status: pass
+        - cmd: "Run focused secret-pattern scan over edited tester docs and this board"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-internal-tester-readiness-feedback/state.yaml"
+          status: pass
+      evidence:
+        - "No provider keys, private keys, JWTs, or private phone content are present in the edited docs or board."
+        - "The docs keep unsafe claims out of scope: broad iPhone compatibility, Mail support, Messages delivery, and existing private threads."
+        - "The handoff explicitly treats stale keyboard health as a setup state requiring keyboard refresh rather than setup completion."
+      verdict: "ready"
+      residual_risks:
+        - "This docs pass did not rerun a new physical smoke beyond the completed build-13 release gate; it intentionally cites that gate as the source of proof."
+      privacy:
+        secretsPrinted: false
+        privatePhoneContentPrinted: false
+        rawWdaSourceCommitted: false
+        screenshotsCommitted: false

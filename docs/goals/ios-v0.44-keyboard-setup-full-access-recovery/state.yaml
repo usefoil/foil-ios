@@ -59,6 +59,20 @@ tasks:
     receipt:
       result: done
       summary: "Polished setup/recovery copy to explicitly name choosing Foil Keyboard, refocusing the target field, and using globe/Next Keyboard to cycle back after Full Access or stale keyboard states."
+      changed_files:
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "docs/ios-closed-beta-tester-handoff.md"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/state.yaml"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+          status: pass
+        - cmd: "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
       evidence:
         - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/T002-worker-receipt.md"
         - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"

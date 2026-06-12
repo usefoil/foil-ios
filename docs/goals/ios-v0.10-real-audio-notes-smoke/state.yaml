@@ -169,14 +169,16 @@ tasks:
       task_id: T004
       summary: "Inserted a real provider transcript into a fresh sterile Notes note through Foil Keyboard, with one audio-quality retry."
       expected_phrase: "foil audio smoke test"
-      inserted_transcript: "Foil audio smoke test. Foil audio smoke test. Foil audio smoke test."
+      inserted_transcript_redacted: true
+      inserted_transcript_length: 68
+      inserted_transcript_sha256: "7b5c1be7907e5c4f"
       evidence:
-        - "First insertion proved the real path but produced a non-matching transcript: 'Yeah, and you might be a real odd horse ground position.'"
+        - "First insertion proved the real path but produced a non-matching transcript, which is redacted with length 56 and sha256 31c09c1c23ffb044."
         - "Treated the first insertion as an audio pickup/recognition failure, not final success."
         - "Retried with louder, slower, repeated sterile phrase using macOS text-to-speech."
         - "Created a fresh Notes note after the retry transcript was ready."
         - "Before retry insertion, fresh Notes editor was blank and Foil Keyboard showed Transcript ready with Insert latest enabled."
-        - "After tapping Insert latest, Notes text view value was 'Foil audio smoke test. Foil audio smoke test. Foil audio smoke test.'"
+        - "After tapping Insert latest, Notes text view value matched the expected sterile phrase metadata: length 68, sha256 7b5c1be7907e5c4f."
         - "After retry insertion, Foil Keyboard showed No transcript yet disabled and Dictate in Foil available."
       privacy: "Only sterile test-note values were quoted; no private Notes, Messages, or third-party app content was used."
 
@@ -204,7 +206,7 @@ tasks:
         - "Foil app shared-state row showed Ready, no transcript."
         - "Tapped the Foil app Reset shared state control."
         - "Foil app reported Storage reset: file ok, defaults written, verified Ready no transcript."
-        - "Returning to Notes showed the fresh note still contained 'Foil audio smoke test. Foil audio smoke test. Foil audio smoke test.'"
+        - "Returning to Notes showed the fresh note still contained the expected sterile phrase metadata: length 68, sha256 7b5c1be7907e5c4f."
         - "Foil Keyboard in Notes showed Ready to dictate, No transcript yet disabled, Clear disabled, and Dictate in Foil available."
       conclusion: "The real transcript was consumed after insertion and reset did not resurrect stale text."
 
@@ -261,7 +263,7 @@ tasks:
         - "First attempt proved the real path but produced a non-matching transcript, so it was rejected as final proof."
         - "Retry used louder, slower, repeated sterile phrase and produced a provider transcript matching the phrase."
         - "Fresh Notes note after retry was blank before insertion and Foil Keyboard showed Transcript ready with Insert latest enabled."
-        - "After tapping Insert latest, Notes text view value was 'Foil audio smoke test. Foil audio smoke test. Foil audio smoke test.'"
+        - "After tapping Insert latest, Notes text view value matched the expected sterile phrase metadata: length 68, sha256 7b5c1be7907e5c4f."
         - "After insertion/reset, Foil app showed Ready, no transcript and Foil Keyboard showed No transcript yet disabled."
         - "No fake transcript diagnostics path was used as final proof."
         - "No Messages, private Notes, or third-party app content was used."

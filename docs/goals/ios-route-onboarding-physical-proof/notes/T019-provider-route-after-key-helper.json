@@ -1,0 +1,8 @@
+{
+  "helper": "/Users/neonwatty/Desktop/Foil Project/foil-ios/scripts/ios-physical-wda-evidence.py",
+  "returncode": 1,
+  "schema": "foil.iosPhysicalHarness.receipt.v1",
+  "stderrSha256": null,
+  "stdoutBytes": 0,
+  "writeJson": "docs/goals/ios-route-onboarding-physical-proof/notes/T019-provider-route-after-key-receipt.json"
+}

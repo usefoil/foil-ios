@@ -302,9 +302,9 @@ tasks:
         - "Tapped Record dictation, played sterile phrase through macOS speech, then tapped Finish recording."
         - "Post-record source showed Recording saved and Transcribe/Create transcript enabled."
         - "Tapped Create transcript and poll 1 showed Transcript ready, Groq transcript ready, Transcription complete, and Shared state Transcript pending."
-        - "Canonical App Group snapshot before insert showed phase complete and transcript Foiled lift dictation violet cactus."
+        - "Canonical App Group snapshot before insert showed phase complete, hasTranscript true, transcriptLength 35, and transcriptSha256 970f0a3da4478d9d."
         - "Notes fresh note source showed Foil Keyboard visible with Transcript Ready, Groq transcript ready message, and Insert latest enabled."
-        - "After tapping Insert latest, Notes TextView value was exactly Foiled lift dictation violet cactus."
+        - "After tapping Insert latest, Notes TextView value matched the copied App Group transcript hash/length."
         - "After insertion, Foil Keyboard showed Ready, No transcript disabled, Clear disabled."
         - "Canonical App Group snapshot after insertion showed phase idle, message Ready, and no transcript field."
       artifacts:
@@ -330,12 +330,12 @@ tasks:
         - cmd: "xcrun devicectl device copy from appGroupDataContainer after insert"
           status: pass
       strongest_failure_modes:
-        - "The app could show Transcript ready from stale fake data: ruled out by recording a new sterile phrase, seeing Groq transcript ready after Create transcript, and copying App Group transcript Foiled lift dictation violet cactus before insert."
-        - "Keyboard could insert something other than the App Group transcript: ruled out by Notes TextView value exactly matching the copied App Group transcript."
+        - "The app could show Transcript ready from stale fake data: ruled out by recording a new sterile phrase, seeing Groq transcript ready after Create transcript, and copying App Group transcript metadata before insert."
+        - "Keyboard could insert something other than the App Group transcript: ruled out by Notes TextView value matching the copied App Group transcript hash/length."
         - "Keyboard could visually reset while canonical App Group transcript remains stale: ruled out by post-insert App Group copy showing idle/Ready/no transcript."
         - "The current branch might only be simulator-proven: ruled out by direct physical-device build/install and WDA proof on iPhone-preview."
       residual_risk:
-        - "Mac speaker-to-phone microphone audio caused a minor recognition mismatch from the spoken phrase, producing Foiled lift instead of Foil live. This still proves real-provider insertion; future UX polish should add a clearer live-audio fixture or direct audio injection for exact-phrase accuracy."
+        - "Mac speaker-to-phone microphone audio caused a minor recognition mismatch from the spoken phrase. The mismatch body is redacted; this still proves real-provider insertion, and future UX polish should add a clearer live-audio fixture or direct audio injection for exact-phrase accuracy."
 
   - id: T999
     type: judge
@@ -366,9 +366,9 @@ tasks:
           - failure: "Provider upload code is malformed even though UI proof passed once."
             evidence: "FoilTranscriptionClientTests assert endpoint, POST method, Authorization header, multipart boundary, model part, file part, audio bytes, response trimming, and HTTP error behavior."
           - failure: "Physical phone proof used stale/fake transcript instead of live Groq."
-            evidence: "T005 recorded sterile phrase, tapped Create transcript, saw Groq transcript ready/Transcription complete, and copied App Group snapshot with real transcript Foiled lift dictation violet cactus before insertion."
+            evidence: "T005 recorded sterile phrase, tapped Create transcript, saw Groq transcript ready/Transcription complete, and copied App Group snapshot with hasTranscript true, transcriptLength 35, and transcriptSha256 970f0a3da4478d9d before insertion."
           - failure: "Keyboard inserted text but failed to clear canonical App Group state."
-            evidence: "After Insert latest, WDA source showed Notes TextView value Foiled lift dictation violet cactus and keyboard reset; copied App Group snapshot showed phase idle, message Ready, and no transcript field."
+            evidence: "After Insert latest, WDA source showed the Notes TextView matched the copied transcript hash/length and keyboard reset; copied App Group snapshot showed phase idle, message Ready, and no transcript field."
           - failure: "Project/test wiring broke the app or keyboard extension."
             evidence: "FoilIOSTests passed, FoilIOS simulator build passed, and physical-device build/install/launch passed."
           - failure: "Secrets or private data leaked into committed artifacts."

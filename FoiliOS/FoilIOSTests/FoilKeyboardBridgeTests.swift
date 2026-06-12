@@ -20,12 +20,23 @@ final class FoilKeyboardBridgeTests: XCTestCase {
         bridge.complete(transcript: "Foil one shot insert", message: "Ready")
 
         XCTAssertEqual(bridge.consumeTranscriptForInsertion(), "Foil one shot insert")
+        let firstInsertReport = bridge.storageReport()
+        XCTAssertEqual(firstInsertReport.operation, "insert")
+        XCTAssertEqual(firstInsertReport.consumedPhase, .complete)
+        XCTAssertEqual(firstInsertReport.consumedHadInsertableTranscript, true)
+        XCTAssertEqual(firstInsertReport.insertedCharacterCount, "Foil one shot insert".count)
+        XCTAssertFalse(encodedReport(firstInsertReport).contains("Foil one shot insert"))
+
         XCTAssertNil(bridge.consumeTranscriptForInsertion())
+        let duplicateInsertReport = bridge.storageReport()
+        XCTAssertEqual(duplicateInsertReport.operation, "insert")
+        XCTAssertEqual(duplicateInsertReport.consumedPhase, .idle)
+        XCTAssertEqual(duplicateInsertReport.consumedHadInsertableTranscript, false)
+        XCTAssertEqual(duplicateInsertReport.insertedCharacterCount, 0)
 
         let snapshot = bridge.load()
         XCTAssertEqual(snapshot.phase, .idle)
         XCTAssertNil(snapshot.transcript)
-        XCTAssertEqual(bridge.storageReport().operation, "insert")
     }
 
     func testConsumeTranscriptForInsertionIgnoresEmptyTranscript() {
@@ -34,7 +45,11 @@ final class FoilKeyboardBridgeTests: XCTestCase {
         XCTAssertNil(bridge.consumeTranscriptForInsertion())
 
         XCTAssertEqual(bridge.load().phase, .idle)
-        XCTAssertEqual(bridge.storageReport().operation, "insert")
+        let report = bridge.storageReport()
+        XCTAssertEqual(report.operation, "insert")
+        XCTAssertEqual(report.consumedPhase, .complete)
+        XCTAssertEqual(report.consumedHadInsertableTranscript, false)
+        XCTAssertEqual(report.insertedCharacterCount, 0)
     }
 
     func testConsumeTranscriptForInsertionIgnoresNonCompleteLeftoverTranscripts() {
@@ -53,8 +68,37 @@ final class FoilKeyboardBridgeTests: XCTestCase {
             XCTAssertNil(bridge.consumeTranscriptForInsertion(), "Expected \(phase.rawValue) to be non-insertable.")
             XCTAssertEqual(bridge.load().phase, .idle)
             XCTAssertNil(bridge.load().transcript)
-            XCTAssertEqual(bridge.storageReport().operation, "insert")
+            let report = bridge.storageReport()
+            XCTAssertEqual(report.operation, "insert")
+            XCTAssertEqual(report.consumedPhase, phase)
+            XCTAssertEqual(report.consumedHadInsertableTranscript, false)
+            XCTAssertEqual(report.insertedCharacterCount, 0)
+            XCTAssertFalse(encodedReport(report).contains("leftover transcript"))
         }
+    }
+
+    func testStorageReportDecodesLegacyPayloadWithoutInsertionReceipt() throws {
+        let payload = """
+        {
+          "operation": "insert",
+          "phase": "idle",
+          "hasTranscript": false,
+          "canonicalPath": null,
+          "canonicalWriteSucceeded": true,
+          "canonicalWriteError": null,
+          "canonicalVerificationPhase": "idle",
+          "canonicalVerificationHasTranscript": false,
+          "defaultsWriteAttempted": true,
+          "fallbackRemovalResults": [],
+          "updatedAt": 0
+        }
+        """.data(using: .utf8)!
+
+        let report = try JSONDecoder().decode(FoilKeyboardStorageReport.self, from: payload)
+
+        XCTAssertNil(report.consumedPhase)
+        XCTAssertNil(report.consumedHadInsertableTranscript)
+        XCTAssertNil(report.insertedCharacterCount)
     }
 
     func testInsertableTranscriptRequiresCompleteNonEmptyTranscript() {
@@ -85,5 +129,10 @@ final class FoilKeyboardBridgeTests: XCTestCase {
                 updatedAt: Date()
             ).insertableTranscript
         )
+    }
+
+    private func encodedReport(_ report: FoilKeyboardStorageReport) -> String {
+        let data = try! JSONEncoder().encode(report)
+        return String(data: data, encoding: .utf8)!
     }
 }

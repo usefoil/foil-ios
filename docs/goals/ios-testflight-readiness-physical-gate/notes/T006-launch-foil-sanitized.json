@@ -1,0 +1,11 @@
+{
+  "bundleId": "com.neonwatty.FoilIOS",
+  "jsonSha256Prefix": "cf9e1ae688c6184f",
+  "launchCommandReturned": true,
+  "privacy": {
+    "rawLaunchJsonPrinted": false,
+    "stdoutStderrPrinted": false
+  },
+  "processIdentifierPresent": true,
+  "schema": "foil.testflightReadiness.launch.v1"
+}

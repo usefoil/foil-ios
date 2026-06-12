@@ -79,7 +79,7 @@ tasks:
       summary: "Defined the safe first row as a Safari local web fixture because Notes/Reminders/Messages may expose private state. WDA was ready, iPhone-preview had the known useful transcript staged, and a sterile local fixture was practical from the phone over the Mac Wi-Fi address."
       target_app_facts:
         - "WDA status ready true at http://192.168.1.40:8100/status."
-        - "Staged App Group snapshot before insertion had phase complete and normalized transcript violet cactus number one violet cactus number one."
+        - "Staged App Group snapshot before insertion had phase complete, hasTranscript true, and expected sterile phrase markers without preserving the raw transcript body."
         - "iPhone-preview process list showed MobileSafari, MobileNotes, Reminders, WebDriverAgentRunner, and Foil iOS, so private app surfaces were plausible and should be avoided without a sterile fixture."
         - "Mac en0 address was 192.168.1.34."
       selected_first_row:
@@ -127,7 +127,7 @@ tasks:
           status: pass
       evidence:
         - "Before tap, WDA source showed foil-keyboard-root, Transcript ready, Insert latest, foil-keyboard-insert-latest, Clear latest, and Dictate again in Foil."
-        - "After tap, WDA source showed the fixture value length 51 and value Violet cactus number one violet cactus number one ."
+        - "After tap, WDA source showed the fixture value length 51 and expected sterile phrase marker counts; raw value body is not preserved in this receipt."
         - "After tap, WDA source showed Foil Keyboard insert title No transcript yet."
         - "Copied App Group snapshot after insertion had phase idle, message Ready, hasTranscript false, transcriptLength 0."
       artifacts:

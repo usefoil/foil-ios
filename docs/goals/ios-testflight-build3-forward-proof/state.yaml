@@ -222,7 +222,7 @@ tasks:
         - "Mailbox action=startRecording changed the App Group snapshot to phase listening."
         - "Sterile phrase: Foil build three forward update audio proof. Green canyon marble."
         - "Mailbox action=stopRecording changed the App Group snapshot to phase processing with recording saved."
-        - "Mailbox action=transcribeLatest changed the App Group snapshot to phase complete with transcript `Foil build 3 forward update audio prove green canyon marble`."
+        - "Mailbox action=transcribeLatest changed the App Group snapshot to phase complete with the expected sterile phrase metadata: length 59, sha256 b98771a4bf2ce577."
         - "Notes launched, WDA switched from system keyboard to Foil Keyboard, and Foil Keyboard showed Transcript Ready with enabled Insert latest."
         - "After tapping Insert latest, the Notes TextView contained the build-3 transcript appended to the sterile test note."
         - "Foil Keyboard reset to Ready with disabled Insert latest (no transcript), and the copied App Group snapshot showed phase idle and message Ready."
