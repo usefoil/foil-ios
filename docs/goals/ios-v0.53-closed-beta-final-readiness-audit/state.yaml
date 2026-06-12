@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.53-closed-beta-final-readiness-audit"
   kind: audit
   tranche: "Final closed-beta go/hold decision."
-  status: active
+  status: done
   oracle:
     signal: "Final recommendation is backed by child-board receipts and overclaim scans."
     cadence: "after all child boards and before any invite recommendation"
@@ -20,26 +20,42 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: judge
     assignee: Judge
-    status: active
+    status: done
     objective: "Audit child-board completion and evidence strength."
     acceptance_criteria:
       - "Receipt maps v0.42-v0.52 to merged PRs, receipts, and exact blockers."
+    receipt:
+      result: pass_with_accepted_blockers
+      summary: "Every v0.42-v0.52 board is mapped to a merged PR/receipt or an accepted blocker; the ledger supports narrow internal beta only."
+      evidence:
+        - "docs/goals/ios-v0.53-closed-beta-final-readiness-audit/notes/T001-child-board-audit.md"
   - id: T002
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Scan tester-facing and public-facing copy for stale or unsafe claims."
     acceptance_criteria:
       - "Scans cover iOS repo docs/README plus Foil landing/SEO copy."
+    receipt:
+      result: pass_after_companion_public_copy_fix
+      summary: "iOS repo copy stays build-scoped and public Foil copy was tightened in mean-weasel/foil#288 before the final recommendation."
+      evidence:
+        - "docs/goals/ios-v0.53-closed-beta-final-readiness-audit/notes/T002-copy-scan.md"
+        - "https://github.com/mean-weasel/foil/pull/288"
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Issue final invite/hold recommendation."
     acceptance_criteria:
       - "Recommendation names tester scope, remaining blockers, and strongest realistic failure mode ruled out by evidence."
+    receipt:
+      result: invite_narrow_internal_only
+      summary: "Keep narrow internal build 12 feedback moving, but hold broader closed beta on draft UX PRs, build 13 TestFlight upload, and physical host-app smoke."
+      evidence:
+        - "docs/goals/ios-v0.53-closed-beta-final-readiness-audit/notes/T003-final-recommendation.md"

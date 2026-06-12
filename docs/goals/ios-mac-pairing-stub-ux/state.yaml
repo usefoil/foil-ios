@@ -1,0 +1,275 @@
+version: 2
+
+goal:
+  title: "Foil iOS Mac Pairing Stub UX"
+  slug: "ios-mac-pairing-stub-ux"
+  kind: existing_plan
+  tranche: "Implement the next product slice after build-13 readiness: a truthful Mac pairing stub UX that preserves API-key setup."
+  status: done
+  oracle:
+    signal: "Use my Mac is recommended but cannot falsely complete setup; API-key-on-iPhone remains fully usable; tests prove readiness gates still fail closed."
+    cadence: "after scout, after implementation, after focused tests, and before PR handoff"
+    final_proof: "Focused unit/UI tests plus simulator or physical smoke prove Mac stub behavior, API-key readiness, Advanced/Support containment, and no readiness false positives."
+  intake:
+    original_request: "start the next product slice"
+    interpreted_outcome: "Create a conveyor for the Mac pairing stub UX after the build-13 docs/evidence PR."
+    input_shape: existing_plan
+    audience: "Foil owner and future internal testers"
+    authority: approved
+    proof_type: test
+    completion_proof: "PR with implementation, tests, and final audit receipts."
+    likely_misfire: "Making the recommended Mac route look complete even though the Mac bridge is stubbed, thereby reintroducing the route-first onboarding false-ready failure mode."
+    blind_spots_considered:
+      - "The shared contract in usefoil/foil#298 may have changed and must be checked before naming bridge semantics."
+      - "A stub can accidentally satisfy readiness or hide API-key setup."
+      - "Route copy can overpromise privacy or Full Access behavior."
+      - "Diagnostics/demo tools can drift back into first-run setup."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  no_secret_printing: true
+  no_private_phone_content: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: queued
+    url: "http://goalbuddy.localhost:41737/ios-mac-pairing-stub-ux/"
+    command: "npx goalbuddy board docs/goals/ios-mac-pairing-stub-ux"
+
+active_task: null
+
+source_context:
+  repo: "usefoil/foil-ios"
+  build13_docs_pr:
+    number: 44
+    url: "https://github.com/usefoil/foil-ios/pull/44"
+    status: "merged"
+  route_first_issue:
+    number: 39
+    url: "https://github.com/usefoil/foil-ios/issues/39"
+    status: "closed"
+  shared_contract:
+    url: "https://github.com/usefoil/foil/pull/298"
+    note: "Must be re-read before implementing bridge-facing names or assumptions."
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: high
+    objective: "Refresh source context for the Mac pairing stub UX."
+    inputs:
+      - "AGENTS.md"
+      - "https://github.com/usefoil/foil-ios/issues/39"
+      - "https://github.com/usefoil/foil/pull/298"
+      - "FoiliOS/FoilIOSApp"
+      - "FoiliOS/Shared"
+      - "FoiliOS/FoilIOSTests"
+      - "docs/goals/ios-testflight-readiness-physical-gate/notes/T007-final-audit.md"
+    constraints:
+      - "Read-only except Scout notes under this board."
+      - "Do not print provider keys, App Store Connect secrets, raw WDA trees, or private phone content."
+      - "Do not infer current shared-contract details without re-reading PR #298."
+    expected_output:
+      - "Scout receipt mapping current route-choice code, readiness gates, tests, and Mac bridge contract assumptions."
+    receipt:
+      result: done
+      outcome: scout_complete
+      summary: "Current route-first code already puts Use my Mac first, keeps API-key setup usable, hides diagnostics under Advanced / Support, and fails closed for Mac route readiness. Shared contract PR #298 is merged and defines foil.localBridge, RouteReceipt, mac-selected, local-whisper-cpp, openai-whisper, custom-openai-compatible, and related failure/receipt language. The remaining aligned gap is a deterministic presenter-level Mac pairing preview seam carrying those contract names instead of only copy strings."
+      changed_files:
+        - "docs/goals/ios-mac-pairing-stub-ux/notes/T001-scout.md"
+        - "docs/goals/ios-mac-pairing-stub-ux/state.yaml"
+      commands:
+        - cmd: "sed -n '1,220p' AGENTS.md"
+          status: pass
+        - cmd: "gh issue view 39 --repo usefoil/foil-ios --json number,state,closedAt,title,url,body --comments"
+          status: pass
+        - cmd: "gh pr view 298 --repo usefoil/foil --json number,state,title,url,body,files,comments"
+          status: pass
+        - cmd: "gh pr diff 298 --repo usefoil/foil | rg contract identifiers"
+          status: pass
+        - cmd: "rg route/readiness symbols in FoiliOS/FoilIOSApp FoiliOS/Shared FoiliOS/FoilIOSTests"
+          status: pass
+      evidence:
+        - "docs/goals/ios-mac-pairing-stub-ux/notes/T001-scout.md"
+        - "PR #298 state MERGED; contract identifiers include foil.localBridge, RouteReceipt, mac-selected, local-whisper-cpp, openai-whisper, custom-openai-compatible."
+        - "FoilDictationLoopPresenter.onboardingReadinessPresentation returns isComplete=false for macRouteID and advancedRouteID."
+        - "FoilDictationLoopPresentationTests already cover route order, API-key readiness, and Mac route false-complete blocking."
+      next_active_task: "T002"
+      privacy:
+        secretsPrinted: false
+        privatePhoneContentPrinted: false
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Approve the smallest safe Mac pairing stub behavior before implementation."
+    inputs:
+      - "T001 Scout receipt"
+      - "Current route-first onboarding code"
+      - "Shared contract PR #298"
+    constraints:
+      - "Reject any plan where a mocked Mac route can complete setup."
+      - "Reject any plan that weakens API-key setup or hides Advanced/Support boundaries."
+    expected_output:
+      - "Decision with exact UX states, local model shape, tests to add, and stop conditions."
+    receipt:
+      result: done
+      outcome: approved_smallest_safe_slice
+      summary: "Approved a presenter-level Mac pairing preview model that exposes the shared-contract names while keeping the bridge stubbed and fail-closed. Rejected any real network pairing, credential handoff, or route receipt that claims a Mac handled audio."
+      changed_files:
+        - "docs/goals/ios-mac-pairing-stub-ux/notes/T002-judge.md"
+        - "docs/goals/ios-mac-pairing-stub-ux/state.yaml"
+      commands:
+        - cmd: "Review T001 Scout receipt and current presenter/tests"
+          status: pass
+      evidence:
+        - "docs/goals/ios-mac-pairing-stub-ux/notes/T002-judge.md"
+      decision: "proceed"
+      next_active_task: "T003"
+      privacy:
+        secretsPrinted: false
+        privatePhoneContentPrinted: false
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Implement the approved Mac pairing stub UX and tests."
+    allowed_files:
+      - "FoiliOS/**"
+      - "docs/goals/ios-mac-pairing-stub-ux/**"
+    verify:
+      - "Focused tests for route choice/readiness presentation."
+      - "Focused tests proving Mac stub does not satisfy setup completeness."
+      - "Focused tests proving API-key route remains usable when all readiness inputs are healthy."
+      - "Simulator sanity pass if feasible."
+    stop_if:
+      - "Implementation requires real Mac bridge credentials, network pairing, or non-stubbed cross-device behavior."
+      - "Tests reveal exact-once insertion or stale-state recovery behavior changed outside the requested slice."
+    expected_output:
+      - "Implementation receipt with changed files, tests, and residual risks."
+    receipt:
+      result: done
+      outcome: mac_pairing_stub_preview_implemented
+      summary: "Added a deterministic presenter-level Mac pairing preview model carrying the shared-contract names from PR #298, rendered it in the Mac route details, and added a focused test proving the names are exposed without claiming the bridge is ready. Existing readiness tests still prove the stubbed Mac route cannot complete setup and the API-key route completes only when healthy."
+      changed_files:
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "docs/goals/ios-mac-pairing-stub-ux/notes/T003-implementation.md"
+        - "docs/goals/ios-mac-pairing-stub-ux/state.yaml"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,id=8A7EA28F-4690-4816-B650-38648E6F44FB' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests CODE_SIGNING_ALLOWED=NO"
+          status: pass
+          notes: "Executed 21 FoilDictationLoopPresentationTests with 0 failures."
+      evidence:
+        - "docs/goals/ios-mac-pairing-stub-ux/notes/T003-implementation.md"
+        - "Initial verification against destination name iPhone 16 failed because that simulator was unavailable locally; rerunning against installed iPhone 17 simulator passed."
+        - "New test testMacPairingPreviewExposesSharedContractNamesWithoutClaimingBridgeReady passed."
+        - "Existing tests testOnboardingReadinessNeverCompletesForStubbedMacRoute and testOnboardingReadinessCompletesOnlyForHealthyIPhoneAPIKeyRoute passed."
+      next_active_task: "T004"
+      privacy:
+        secretsPrinted: false
+        privatePhoneContentPrinted: false
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Run release-gate regression checks appropriate for the Mac stub slice."
+    allowed_files:
+      - "docs/goals/ios-mac-pairing-stub-ux/**"
+    verify:
+      - "Re-run focused unit/UI tests from T003."
+      - "Run simulator or physical smoke only if it adds proof beyond unit/UI checks."
+      - "Confirm no secrets/private phone artifacts were created."
+    expected_output:
+      - "Regression receipt or exact blocker."
+    receipt:
+      result: done
+      outcome: regression_checks_passed
+      summary: "Repeated the focused route/readiness tests and ran the full local Foil iOS unit suite. The broader suite covers exact-once insertion and stale/non-complete transcript recovery, with no failures. Hygiene checks found no whitespace errors and no secret values in touched files."
+      changed_files:
+        - "docs/goals/ios-mac-pairing-stub-ux/notes/T004-regression.md"
+        - "docs/goals/ios-mac-pairing-stub-ux/state.yaml"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,id=8A7EA28F-4690-4816-B650-38648E6F44FB' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests CODE_SIGNING_ALLOWED=NO"
+          status: pass
+          notes: "Executed 21 focused presentation tests with 0 failures."
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,id=8A7EA28F-4690-4816-B650-38648E6F44FB' CODE_SIGNING_ALLOWED=NO"
+          status: pass
+          notes: "Executed 43 FoilIOSTests with 0 failures."
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "rg secret-pattern scan over FoiliOS docs"
+          status: pass
+          notes: "Broad scan found only expected fake unit-test strings, environment-variable names, and documentation guardrails."
+        - cmd: "rg secret-pattern scan over touched product/test/board files"
+          status: pass
+          notes: "No key-like values found; only this board's privacy sentence matched JWT as a forbidden artifact class."
+      evidence:
+        - "docs/goals/ios-mac-pairing-stub-ux/notes/T004-regression.md"
+        - "Full FoilIOSTests run passed 43 tests with 0 failures, including FoilKeyboardBridgeTests."
+      next_active_task: "T005"
+      privacy:
+        secretsPrinted: false
+        privatePhoneContentPrinted: false
+
+  - id: T005
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Final audit and PR handoff."
+    constraints:
+      - "Do not mark complete without proof that the Mac stub cannot falsely complete setup."
+      - "Do not mark complete if API-key setup regressed."
+      - "Open a PR only after tests and final audit are green."
+    expected_output:
+      - "Final verdict, PR URL, and evidence table."
+    receipt:
+      result: done
+      outcome: ready_for_pr_handoff
+      decision: complete
+      summary: "Final audit passed: the Mac pairing path remains recommended but fail-closed, API-key setup remains usable, exact-once/stale-state tests passed, diagnostics remain behind Advanced / Support, and no secret/private artifacts were introduced."
+      changed_files:
+        - "docs/goals/ios-mac-pairing-stub-ux/notes/T005-final-audit.md"
+        - "docs/goals/ios-mac-pairing-stub-ux/state.yaml"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,id=8A7EA28F-4690-4816-B650-38648E6F44FB' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests CODE_SIGNING_ALLOWED=NO"
+          status: pass
+          notes: "Executed 21 focused presentation tests with 0 failures."
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,id=8A7EA28F-4690-4816-B650-38648E6F44FB' CODE_SIGNING_ALLOWED=NO"
+          status: pass
+          notes: "Executed 43 FoilIOSTests with 0 failures."
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "GoalBuddy state checker"
+          status: pass
+          notes: "Run after final state update."
+      evidence:
+        - "docs/goals/ios-mac-pairing-stub-ux/notes/T005-final-audit.md"
+        - "PR #45: https://github.com/usefoil/foil-ios/pull/45"
+      pr:
+        number: 45
+        url: "https://github.com/usefoil/foil-ios/pull/45"
+      privacy:
+        secretsPrinted: false
+        privatePhoneContentPrinted: false
+        archiveArtifactsCommitted: false
+        ipaCommitted: false

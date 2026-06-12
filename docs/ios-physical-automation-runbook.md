@@ -71,6 +71,29 @@ It prints sanitized JSON for device visibility, WDA reachability, WDA project
 presence, and `iproxy` presence. It hashes the raw device line instead of
 printing the full `devicectl` row.
 
+Before touching any host app, use the stricter preflight gate:
+
+```bash
+scripts/ios-physical-harness.py preflight
+```
+
+It classifies the run as `healthy`, `device_unavailable`, `tooling_missing`,
+`redaction_self_test_failed`, or `wda_unreachable`. The receipt includes device
+visibility, `iproxy`, WDA project presence, WDA reachability, fixture-only
+redaction self-test status, automation-process hashes/counts, and explicit
+privacy booleans. It does not start WDA, install apps, open host apps, print raw
+WDA source, print screenshots, or print transcript bodies.
+
+Use strict mode as an automation gate:
+
+```bash
+scripts/ios-physical-harness.py preflight --strict
+```
+
+Strict mode exits non-zero unless the classification is `healthy`; record that
+receipt and stop before opening Safari, Notes, Messages, Reminders, Mail, or any
+other host app.
+
 ## Start WDA
 
 Use the Appium-bundled WebDriverAgent project and keep this command running

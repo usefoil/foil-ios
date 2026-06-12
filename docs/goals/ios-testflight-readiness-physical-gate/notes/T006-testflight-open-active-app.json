@@ -1,0 +1,13 @@
+{
+  "activeApp": {
+    "bundleId": "co.tryqc.app",
+    "httpOk": true,
+    "pidPresent": true,
+    "sha256Prefix": "2d1ddca99a3a1866"
+  },
+  "privacy": {
+    "rawActiveAppPrinted": false,
+    "rawSourcePrinted": false
+  },
+  "schema": "foil.testflightOpenActiveApp.v1"
+}

@@ -141,10 +141,10 @@ unzip -q '/tmp/FoilIOS-TestFlightReadinessExport/Foil iOS.ipa' \
   '/tmp/FoilIOS-TestFlightReadinessIPA/Payload/Foil iOS.app/PlugIns/Foil Keyboard.appex/Info.plist'
 ```
 
-Expected values:
+Expected values for the current source candidate:
 
-- app version `0.1.0`, build `1`
-- keyboard extension version `0.1.0`, build `1`
+- app version `0.1.0`, build `13`
+- keyboard extension version `0.1.0`, build `13`
 - app plist has `CFBundleIconName` set to `AppIcon`
 - app bundle contains `AppIcon60x60@2x.png`, `AppIcon76x76@2x~ipad.png`, and
   `Assets.car`

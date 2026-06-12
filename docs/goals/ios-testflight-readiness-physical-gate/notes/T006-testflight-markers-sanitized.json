@@ -1,0 +1,55 @@
+{
+  "markers": {
+    "0.1.0": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "13": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "Accept": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "Continue": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "Foil": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "Foil Dictation": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "Foil iOS": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "Install": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "Open": {
+      "count": 0,
+      "visibleCount": 0
+    },
+    "TestFlight": {
+      "count": 1,
+      "visibleCount": 0
+    },
+    "Update": {
+      "count": 0,
+      "visibleCount": 0
+    }
+  },
+  "privacy": {
+    "rawSourcePrinted": false,
+    "screenshotTaken": false
+  },
+  "schema": "foil.testflightAppMarkers.v1",
+  "sourceSha256Prefix": "1beebc4dc01e3a27",
+  "visibleControls": []
+}

@@ -141,8 +141,8 @@ tasks:
       evidence:
         - "WDA source after transcription found Ready for keyboard, Insert latest, Groq transcript ready, and Transcription complete."
         - "Sanitized App Group snapshot had phase complete, message Groq transcript ready. Switch back and tap Insert latest., hasTranscript true."
-        - "Sterile transcript was Violet cactus number one violet cactus number one ."
-        - "Normalized transcript was violet cactus number one violet cactus number one and contained violet, cactus, and number one."
+        - "Sterile transcript body was redacted; metadata recorded length 51 and expected markers violet, cactus, and number one."
+        - "Normalized transcript contained violet, cactus, and number one."
       artifacts:
         - "docs/goals/ios-useful-dictation-quality-proof/notes/visual/known-phrase-ready-for-keyboard.png"
       residual_risk:
@@ -172,7 +172,7 @@ tasks:
       strongest_failure_modes:
         - failure_mode: "Provider plumbing could succeed while useful dictation still returns only punctuation."
           ruled_out_by:
-            - "The App Group snapshot transcript was Violet cactus number one violet cactus number one ., not punctuation-only."
+            - "The App Group snapshot transcript was not punctuation-only; raw body redacted with length 51 and expected markers violet, cactus, and number one."
             - "Normalized transcript contained violet, cactus, and number one."
         - failure_mode: "The proof might bypass the physical phone microphone."
           ruled_out_by:

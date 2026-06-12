@@ -1,0 +1,37 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "install",
+      "app",
+      "--device",
+      "5320F5AD-2A71-50AC-94FE-207B544B6247",
+      "/tmp/foil-ios-current-build/Build/Products/Debug-iphoneos/Foil iOS.app",
+      "--json-output",
+      "/tmp/foil-ios-install-current.json"
+    ],
+    "commandType" : "devicectl.device.install.app",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 3,
+    "outcome" : "success",
+    "version" : "518.31"
+  },
+  "result" : {
+    "deviceIdentifier" : "5320F5AD-2A71-50AC-94FE-207B544B6247",
+    "installedApplications" : [
+      {
+        "bundleID" : "com.neonwatty.FoilIOS",
+        "databaseSequenceNumber" : 1656,
+        "databaseUUID" : "D9714D96-4675-409B-B44B-E68AA4130F8B",
+        "installationURL" : "file:///private/var/containers/Bundle/Application/D18F5B77-5C89-471B-B05D-BBD2604D1077/Foil%20iOS.app/",
+        "launchServicesIdentifier" : "unknown",
+        "options" : {
+
+        }
+      }
+    ]
+  }
+}

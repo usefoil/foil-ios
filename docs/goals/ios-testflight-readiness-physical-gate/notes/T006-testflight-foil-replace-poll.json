@@ -1,0 +1,55 @@
+{
+  "privacy": {
+    "rawSourcePrinted": false,
+    "screenshotTaken": false
+  },
+  "results": [
+    {
+      "markers": {
+        "Apple Account": {
+          "count": 0,
+          "visibleCount": 0
+        },
+        "Cancel": {
+          "count": 0,
+          "visibleCount": 0
+        },
+        "Foil Dictation": {
+          "count": 1,
+          "visibleCount": 1
+        },
+        "Install": {
+          "count": 0,
+          "visibleCount": 0
+        },
+        "Installing": {
+          "count": 0,
+          "visibleCount": 0
+        },
+        "Open": {
+          "count": 2,
+          "visibleCount": 2
+        },
+        "Password": {
+          "count": 0,
+          "visibleCount": 0
+        },
+        "Replace": {
+          "count": 0,
+          "visibleCount": 0
+        },
+        "Sign In": {
+          "count": 0,
+          "visibleCount": 0
+        },
+        "Update": {
+          "count": 2,
+          "visibleCount": 0
+        }
+      },
+      "poll": 0,
+      "sourceSha256Prefix": "8955fa1b64c14035"
+    }
+  ],
+  "schema": "foil.testflightFoilReplacePoll.v1"
+}

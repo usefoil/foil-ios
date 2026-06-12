@@ -107,9 +107,11 @@ tasks:
       result: done
       task_id: T002
       summary: "Created a deterministic safe transcript using Foil's app-supported diagnostics path."
-      safe_transcript: "Foil keyboard shell"
+      safe_transcript_redacted: true
+      safe_transcript_length: 19
+      safe_transcript_sha256: "f698b7a670a73cf9"
       evidence:
-        - "Source constant FoilIOSConstants.fakeTranscript is 'Foil keyboard shell'."
+        - "Source constant FoilIOSConstants.fakeTranscript was used; raw fake body redacted with length 19 / sha256 f698b7a670a73cf9."
         - "Foil app diagnostics exposes complete-fake-transcript-button."
         - "Tapped the Complete diagnostic button on iPhone-preview."
         - "Filtered WDA source after tapping Complete showed Fake transcript ready, Transcript pending, and Transcript is ready for the keyboard."
@@ -135,13 +137,15 @@ tasks:
       result: done
       task_id: T003
       summary: "Inserted the deterministic safe transcript into a sterile Apple Notes note using Foil Keyboard on iPhone-preview."
-      expected_transcript: "Foil keyboard shell"
+      expected_transcript_redacted: true
+      expected_transcript_length: 19
+      expected_transcript_sha256: "f698b7a670a73cf9"
       evidence:
         - "Before insertion, filtered WDA source for the fresh Notes editor showed Note text view, Foil Keyboard root, Transcript ready, and Insert latest enabled."
         - "Tapped the visible Insert latest row in the Foil Keyboard area."
-        - "After insertion, filtered WDA source showed the Notes XCUIElementTypeTextView value as 'Foil keyboard shell'."
+        - "After insertion, filtered WDA source showed the Notes text value matched deterministic fake transcript metadata length 19 / sha256 f698b7a670a73cf9."
         - "After insertion, Foil Keyboard source changed to No transcript yet with Insert latest disabled and Dictate in Foil available."
-      privacy: "Only the sterile note value 'Foil keyboard shell' was quoted; existing private Notes content was not printed or recorded."
+      privacy: "Only deterministic fake transcript metadata was recorded; existing private Notes content was not printed or recorded."
 
   - id: T004
     type: worker
@@ -168,7 +172,7 @@ tasks:
         - "Foil shared-state row showed Ready, no transcript."
         - "Tapped Foil app Reset shared state."
         - "Foil app reported Storage reset: file ok, defaults written, verified Ready no transcript."
-        - "Returning to Notes showed the sterile note still contained 'Foil keyboard shell'."
+        - "Returning to Notes showed the sterile note still contained deterministic fake transcript metadata length 19 / sha256 f698b7a670a73cf9."
         - "Foil Keyboard showed Ready to dictate, No transcript yet disabled, Clear disabled, and Dictate in Foil available."
       conclusion: "The inserted transcript was consumed and reset did not resurrect stale text."
 
@@ -222,9 +226,9 @@ tasks:
       evidence:
         - "devicectl device app listing reported Foil iOS version=0.1.0 bundleVersion=8."
         - "A fresh Notes note was created via the Notes New note control; only the sterile test note value was quoted."
-        - "Foil diagnostics seeded the deterministic safe transcript 'Foil keyboard shell'."
+        - "Foil diagnostics seeded the deterministic fake transcript metadata length 19 / sha256 f698b7a670a73cf9."
         - "Before insertion, Foil Keyboard in Notes showed Transcript ready and Insert latest enabled."
-        - "After tapping Insert latest, Notes text view value was exactly 'Foil keyboard shell'."
+        - "After tapping Insert latest, Notes text view value matched deterministic fake transcript metadata length 19 / sha256 f698b7a670a73cf9."
         - "After insertion, Foil Keyboard showed No transcript yet disabled, proving the transcript was consumed."
         - "Foil app reset reported verified Ready no transcript, and returning to Notes still showed No transcript yet disabled."
         - "No Messages or third-party target app content was inspected or used."

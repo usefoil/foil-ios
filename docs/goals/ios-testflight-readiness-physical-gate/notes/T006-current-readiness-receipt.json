@@ -1,0 +1,53 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "onboarding-ready",
+      "kind": "requireIdentifier",
+      "passed": false,
+      "present": false
+    },
+    {
+      "identifier": "onboarding-not-ready",
+      "kind": "forbidIdentifier",
+      "passed": false,
+      "present": true
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 24,
+      "textSha256": "4c73a67cb1c5711c"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": false,
+      "present": false,
+      "textLength": 36,
+      "textSha256": "3efd8cd7c0661f36"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": false,
+      "present": true,
+      "textLength": 41,
+      "textSha256": "da49ffdff0f67e2a"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 24,
+      "textSha256": "27b5f75960524657"
+    }
+  ],
+  "passed": false,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-t006-current-source.json",
+    "nodeCount": 128,
+    "sha256": "bc7ac037497d75a888c50b13191bf79b5d299765e11bc843c72bea757ba43af0"
+  },
+  "target": "testflight-build13-foil-readiness-current"
+}

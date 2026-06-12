@@ -29,13 +29,13 @@ Strongest realistic failure mode: The UI shows a transcript from stale shared st
 Evidence:
 
 - App launched with `DEVICECTL_CHILD_FOIL_IOS_GROQ_API_KEY` populated from Keychain; the command output did not print the key.
-- WDA showed `Groq transcript ready`, `Transcription complete`, and transcript text containing `Foil preview test June 4th`.
-- App Group snapshot copied from `Library/foil-keyboard-snapshot.json` showed `phase = complete`, `message = Groq transcript ready`, and transcript `Whatcha doing here? Foil preview test June 4th.`
+- WDA showed `Groq transcript ready`, `Transcription complete`, and transcript metadata containing the expected sterile target marker without preserving the raw body.
+- App Group snapshot copied from `Library/foil-keyboard-snapshot.json` showed `phase = complete`, `message = Groq transcript ready`, `transcriptLength = 47`, and `transcriptSha256 = 8bb6981e486f87c4`.
 - Screenshot: ![Spoken transcript](visual/usability-spoken-transcript.png)
 
 Residual risk / follow-up:
 
-- The transcript included environmental pre-roll (`Whatcha doing here?`) before the target phrase. Dictation quality and endpoint prompt cleanup are still separate product work.
+- The transcript included environmental pre-roll before the target phrase. Dictation quality and endpoint prompt cleanup are still separate product work; the raw body is redacted in this receipt.
 
 ### Insertion Matrix
 
@@ -47,8 +47,8 @@ Evidence:
 
 | Target | Field | Result | Evidence |
 | --- | --- | --- | --- |
-| Notes | Safe test note | Pass | WDA source showed the Notes `TextView` value append `Whatcha doing here? Foil preview test June 4th.` after tapping `foil-keyboard-insert-latest`. Screenshot: ![Notes insertion](visual/usability-notes-spoken-insert.png) |
-| Safari | Address/search field | Pass | After clearing the address field, WDA showed the Safari URL text field value set to `Whatcha doing here? Foil preview test June 4th.` The raw Safari tree exposed private browsing context, so no screenshot or dump is preserved. |
+| Notes | Safe test note | Pass | WDA source showed the Notes `TextView` value append the redacted transcript metadata length 47 / sha256 8bb6981e486f87c4 after tapping `foil-keyboard-insert-latest`. Screenshot was not committed. |
+| Safari | Address/search field | Pass | After clearing the address field, WDA showed the Safari URL text field value set to the same redacted transcript metadata length 47 / sha256 8bb6981e486f87c4. The raw Safari tree exposed private browsing context, so no screenshot or dump is preserved. |
 
 Residual risk / follow-up:
 
@@ -62,7 +62,7 @@ Strongest realistic failure mode: Reset looks successful in one surface but stal
 
 Evidence:
 
-- Final fresh seed used transcript `Whatcha doing here? Foil preview test June 4th.` with `updatedAt = 802287798.319`.
+- Final fresh seed used redacted transcript metadata length 47 / sha256 8bb6981e486f87c4 with `updatedAt = 802287798.319`.
 - After tapping `foil-keyboard-insert-latest` in Notes, WDA source showed:
   - `keyboard_status=Ready`
   - `keyboard_message=Ready`
