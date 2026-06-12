@@ -39,11 +39,32 @@ tasks:
     assignee: Worker
     status: done
     objective: "Implement or document hardened automation checks."
+    allowed_files:
+      - "scripts/ios-physical-harness.py"
+      - "docs/ios-physical-automation-runbook.md"
+      - "docs/goals/ios-v0.48-physical-automation-hardening/state.yaml"
+      - "docs/goals/ios-v0.48-physical-automation-hardening/**"
     acceptance_criteria:
       - "Runbook/helper can classify locked device, missing tunnel, dead WDA, wrong app build, private surface, and teardown state."
     receipt:
       result: done
       summary: "Added privacy-safe preflight command and runbook guidance; proven against fixture-only redaction self-test and current WDA-unreachable state."
+      changed_files:
+        - "scripts/ios-physical-harness.py"
+        - "docs/ios-physical-automation-runbook.md"
+        - "docs/goals/ios-v0.48-physical-automation-hardening/state.yaml"
+        - "docs/goals/ios-v0.48-physical-automation-hardening/notes/T002-worker-receipt.md"
+      commands:
+        - cmd: "scripts/ios-physical-harness.py self-test"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py preflight --wda-url http://192.168.1.40:8100"
+          status: pass
+        - cmd: "! scripts/ios-physical-harness.py preflight --strict --wda-url http://192.168.1.40:8100"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py --help"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py preflight --help"
+          status: pass
       evidence:
         - "docs/goals/ios-v0.48-physical-automation-hardening/notes/T002-worker-receipt.md"
       verification:
