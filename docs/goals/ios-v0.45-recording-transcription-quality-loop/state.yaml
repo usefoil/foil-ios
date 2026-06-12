@@ -103,3 +103,25 @@ tasks:
         - "scripts/ios-physical-harness.py status"
       next_owner: "operator"
       next_action: "Restore WDA or equivalent physical automation and approve safe-phrase physical audio proof."
+  - id: T004
+    type: judge
+    assignee: PM
+    status: blocked
+    objective: "Collect physical recording/cancel surface receipts after WDA recovery."
+    acceptance_criteria:
+      - "Receipts prove the cancel control exists with sane pre-recording state on the physical app."
+      - "If live audio proof is not run, receipts name the exact microphone/provider/keyboard/App Group blockers."
+    receipt:
+      result: external_blocker
+      summary: "Physical iPhone receipts prove the #30 build exposes the recording/cancel/transcribe controls with safe initial enabled states, and identify the remaining physical blockers. Live microphone/cancel/transcription proof was intentionally not run without explicit safe-phrase approval."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T004-physical-receipt.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T004-recording-surface.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T004-physical-blockers.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T004-app-group-initial.json"
+      missing:
+        - "Physical cancel-during-active-recording receipt with explicit safe-phrase microphone approval."
+        - "Physical transcription retry/failure/reset receipt with provider route ready."
+        - "Three consecutive safe real-audio insert cycles."
+      next_owner: "operator"
+      next_action: "Approve a sterile safe-phrase microphone run, grant microphone if prompted, ensure provider/keyboard/App Group gates are ready, then rerun live cancel/transcription/insert-cycle receipts."
