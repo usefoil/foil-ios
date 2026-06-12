@@ -30,7 +30,7 @@ tasks:
     acceptance_criteria:
       - "Receipt proves upload is safe to attempt or names exact Apple/signing blocker."
     receipt:
-      result: upload_blocker_identified
+      result: done
       summary: "Local build/signing tooling is present and build 13 prep is safe, but App Store Connect validation/upload requires API key/issuer or Apple ID app-password/provider inputs not safely discoverable from repo/env."
       evidence:
         - "docs/goals/ios-v0.52-testflight-beta-launch-rehearsal/notes/T001-preflight-receipt.md"
@@ -70,7 +70,8 @@ tasks:
     acceptance_criteria:
       - "Release notes and docs claim only the behaviors proven by the candidate build."
     receipt:
-      result: blocked_before_upload
+      result: done
+      decision: blocked_before_upload
       summary: "Final audit limits the claim to local build-13 archive/export readiness and explicitly rejects uploaded/available/installed/smoked claims."
       evidence:
         - "docs/goals/ios-v0.52-testflight-beta-launch-rehearsal/notes/T004-final-audit.md"
