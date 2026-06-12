@@ -1,0 +1,117 @@
+name: iOS beta feedback
+description: Report Foil iOS setup, recording, keyboard insertion, or recovery results without private content.
+title: "[iOS beta] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing Foil iOS. Please do not include private transcript text, screenshots of private apps, phone numbers, contacts, messages, email content, account names, provider keys, or credentials.
+  - type: input
+    id: build
+    attributes:
+      label: TestFlight build
+      description: "Example: 0.1.0 (12)"
+      placeholder: 0.1.0 (12)
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and iOS version
+      description: "Example: iPhone 15 Pro, iOS 26.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target app or surface
+      options:
+        - Safari normal text field
+        - Safari secure/password field
+        - Blank Notes editor
+        - Messages fake/dedicated draft, not sent
+        - Other safe non-private text field
+        - Setup only
+    validations:
+      required: true
+  - type: dropdown
+    id: field_privacy
+    attributes:
+      label: Was the target surface sterile?
+      description: Sterile means blank or test-only, with no private content visible.
+      options:
+        - Yes, blank or test-only
+        - No, I stopped before testing
+        - Not sure
+    validations:
+      required: true
+  - type: checkboxes
+    id: setup
+    attributes:
+      label: Setup state
+      options:
+        - label: Foil app installed or updated from TestFlight
+        - label: Provider key saved, if requested
+        - label: Microphone permission allowed
+        - label: Foil Keyboard added
+        - label: Allow Full Access enabled
+        - label: Keyboard cycling or refocus was needed
+  - type: checkboxes
+    id: loop_results
+    attributes:
+      label: What happened?
+      options:
+        - label: Recording started
+        - label: Recording finished
+        - label: Transcript was created
+        - label: Insert latest was enabled
+        - label: Text inserted exactly once
+        - label: Insert latest was disabled after insert
+        - label: Reset shared state worked
+        - label: Secure/password field rejected Foil Keyboard as expected
+  - type: dropdown
+    id: failure_area
+    attributes:
+      label: If something failed, where?
+      options:
+        - Nothing failed
+        - TestFlight install or update
+        - Provider key setup
+        - Microphone permission
+        - Recording
+        - Transcription
+        - Keyboard setup or Full Access
+        - Keyboard cycling or refocus
+        - Insert latest
+        - Reset/recovery
+        - Target app was not sterile
+    validations:
+      required: true
+  - type: checkboxes
+    id: recovery
+    attributes:
+      label: Recovery steps tried
+      options:
+        - label: Reopened Foil
+        - label: Refocused the target field
+        - label: Cycled away from Foil Keyboard and back
+        - label: Enabled Allow Full Access
+        - label: Used Reset shared state
+        - label: Recorded a shorter safe phrase
+        - label: Stopped because private content appeared
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes without private content
+      description: Describe symptoms, button states, and recovery results. Do not paste transcript text or private app content.
+      placeholder: Insert latest stayed disabled after I cycled keyboards twice.
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy_confirmation
+    attributes:
+      label: Privacy confirmation
+      options:
+        - label: I did not include private transcript text, screenshots, contacts, messages, email content, account names, phone numbers, provider keys, or credentials.
+          required: true

@@ -608,7 +608,7 @@ tasks:
           - "T006 post-insert snapshot /tmp/foil-t006-snapshot-after-insert-sanitized.json showed phase idle, message Ready, hasTranscript false."
         safari:
           - "Safari address/search before/after source hashes changed from 95fba4c6cfd05fcb8f2247497615e27abf4813420fb709f9fb3feb9214afd67e to eec87b325739b67f9ea903eb6871fbc8052ad1d3b6148843201dbad02d15a320."
-          - "Safari URL field included the safe seeded transcript Foil keyboard shell after insert; keyboard showed Insert latest (no transcript), enabled false."
+          - "Safari URL field included deterministic fake transcript metadata length 19 / sha256 f698b7a670a73cf9 after insert; keyboard showed Insert latest (no transcript), enabled false."
           - "Sanitized snapshot /tmp/foil-t007-snapshot-after-safari-sanitized.json showed phase idle, message Ready, hasTranscript false."
         secure_field:
           - "Focused secure-rejection-field; sanitized WDA extraction showed secure_field_focused true, foil_keyboard_present false, insert_button_present false, system_keyboard_seen true."

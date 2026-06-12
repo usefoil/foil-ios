@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -110,13 +111,15 @@ def wda_ready(wda_url: str) -> tuple[bool, dict[str, Any]]:
 def parse_device_line(output: str, device_id: str) -> dict[str, Any]:
     for line in output.splitlines():
         if device_id in line:
-            parts = [part for part in line.split("   ") if part.strip()]
+            parts = [part.strip() for part in re.split(r"\s{2,}", line.strip()) if part.strip()]
+            state = parts[3] if len(parts) > 3 else ""
             return {
                 "present": True,
                 "rawLineSha256": short_hash(line),
-                "looksAvailable": "available" in line,
+                "state": state,
+                "looksAvailable": state == "connected" or state.startswith("available"),
             }
-    return {"present": False, "rawLineSha256": None, "looksAvailable": False}
+    return {"present": False, "rawLineSha256": None, "state": None, "looksAvailable": False}
 
 
 def snapshot_payload(phase: str, transcript: str | None, message: str) -> dict[str, Any]:
@@ -201,6 +204,100 @@ def sanitized_process_result(result: subprocess.CompletedProcess[str]) -> dict[s
         "stdoutBytes": len(result.stdout.encode("utf-8")),
         "stderrBytes": len(result.stderr.encode("utf-8")),
     }
+
+
+def automation_process_summary() -> dict[str, Any]:
+    result = run_command(
+        [
+            "pgrep",
+            "-af",
+            "WebDriverAgent.xcodeproj.*WebDriverAgentRunner-nodebug|xcodebuild.*WebDriverAgent|iproxy.*8100",
+        ],
+        timeout=10,
+    )
+    lines = [line for line in result.stdout.splitlines() if line.strip()] if result.returncode == 0 else []
+    return {
+        "returncode": result.returncode,
+        "count": len(lines),
+        "lineHashes": [short_hash(line) for line in lines],
+        "printedCommandLines": False,
+    }
+
+
+def classify_preflight(
+    device_summary: dict[str, Any],
+    iproxy_present: bool,
+    wda_project_present: bool,
+    wda_ready_state: bool,
+    self_test_passed: bool,
+) -> tuple[str, str]:
+    if not device_summary.get("present") or not device_summary.get("looksAvailable"):
+        return "device_unavailable", "Unlock/connect iPhone-preview and confirm Xcode device preparation is healthy."
+    if not iproxy_present or not wda_project_present:
+        return "tooling_missing", "Install/repair iproxy or the Appium WebDriverAgent project before physical testing."
+    if not self_test_passed:
+        return "redaction_self_test_failed", "Fix the sanitized evidence helper before collecting physical receipts."
+    if not wda_ready_state:
+        return "wda_unreachable", "Start or repair WDA, then rerun preflight before touching host apps."
+    return "healthy", "Proceed only with sterile host-app fixtures and sanitized receipts."
+
+
+def cmd_preflight(args: argparse.Namespace) -> int:
+    devicectl = run_command(["xcrun", "devicectl", "list", "devices"], timeout=20)
+    device_summary = (
+        parse_device_line(devicectl.stdout, args.device_id)
+        if devicectl.returncode == 0
+        else {"present": False, "rawLineSha256": None, "looksAvailable": False}
+    )
+    ready, wda_payload = wda_ready(args.wda_url)
+    self_test = run_command([sys.executable, str(Path(__file__).resolve()), "self-test"], timeout=30)
+    self_test_passed = self_test.returncode == 0
+    iproxy_path = shutil.which("iproxy")
+    classification, next_action = classify_preflight(
+        device_summary=device_summary,
+        iproxy_present=iproxy_path is not None,
+        wda_project_present=WDA_PROJECT.exists(),
+        wda_ready_state=ready,
+        self_test_passed=self_test_passed,
+    )
+    receipt = {
+        "schema": "foil.iosPhysicalHarness.preflight.v1",
+        "classification": classification,
+        "safeToTouchHostApps": classification == "healthy",
+        "nextAction": next_action,
+        "device": {
+            "name": DEVICE_NAME,
+            "identifier": args.device_id,
+            "devicectlReturncode": devicectl.returncode,
+            "summary": device_summary,
+        },
+        "tooling": {
+            "iproxyPresent": iproxy_path is not None,
+            "iproxyPath": iproxy_path,
+            "wdaProjectPresent": WDA_PROJECT.exists(),
+            "wdaCommandAvailable": True,
+        },
+        "wda": {
+            "url": args.wda_url,
+            "ready": ready,
+            "status": wda_payload,
+        },
+        "redaction": {
+            "selfTestPassed": self_test_passed,
+            "selfTest": sanitized_process_result(self_test),
+        },
+        "automationProcesses": automation_process_summary(),
+        "privacy": {
+            "openedHostApps": False,
+            "printedRawWdaSource": False,
+            "printedScreenshots": False,
+            "printedTranscriptBodies": False,
+        },
+    }
+    write_json(receipt)
+    if args.strict and classification != "healthy":
+        return 1
+    return 0
 
 
 def wda_command_lines() -> list[str]:
@@ -519,6 +616,12 @@ def build_parser() -> argparse.ArgumentParser:
     add_common_device_args(status)
     add_common_wda_args(status)
     status.set_defaults(func=cmd_status)
+
+    preflight = subparsers.add_parser("preflight", help="Classify physical automation health before private surfaces.")
+    add_common_device_args(preflight)
+    add_common_wda_args(preflight)
+    preflight.add_argument("--strict", action="store_true", help="Exit non-zero unless classification is healthy.")
+    preflight.set_defaults(func=cmd_preflight)
 
     wda_command = subparsers.add_parser("wda-command", help="Print the foreground WDA xcodebuild command.")
     wda_command.set_defaults(func=cmd_wda_command)

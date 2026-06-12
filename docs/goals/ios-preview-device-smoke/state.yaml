@@ -324,7 +324,7 @@ tasks:
       evidence:
         - "Device process list showed MobileNotes and /Foil iOS.app/PlugIns/Foil Keyboard.appex/Foil Keyboard active."
         - "Operator report: physical Notes insertion worked from the visible Insert latest button."
-        - "App Group file Library/foil-keyboard-snapshot.json existed with transcript Foil keyboard shell before/after insertion."
+        - "App Group file Library/foil-keyboard-snapshot.json existed with deterministic fake transcript metadata length 19 / sha256 f698b7a670a73cf9 before/after insertion."
       residual_risk:
         - "I could not directly screenshot/tap the physical phone with available tools; visual proof is operator-attested plus process/file evidence."
         - "Keyboard reset did not clear the file-backed snapshot after insertion; repeat insertion may remain possible until fixed."
@@ -439,13 +439,17 @@ tasks:
     receipt:
       result: done
       task_id: T006
-      summary: "Physical-device insertion matrix first row passed in Notes using the Groq transcript produced by T005. WDA focused the safe test note, Foil Keyboard appeared as the active custom keyboard, Insert latest was tapped by accessibility id, and the Notes text view value changed by appending the latest transcript '.'."
+      summary: "Physical-device insertion matrix first row passed in Notes using the Groq transcript produced by T005. WDA focused the safe test note, Foil Keyboard appeared as the active custom keyboard, Insert latest was tapped by accessibility id, and the Notes text view value changed by appending the latest redacted transcript."
       matrix:
         - app: "Apple Notes"
           field: "Existing privacy-safe test note"
           result: pass
-          before_value: "Foil keyboard shellFoil keyboard shell"
-          after_value: "Foil keyboard shellFoil keyboard shell."
+          before_value_redacted: true
+          before_value_length: 38
+          before_value_sha256: "528cb3e677cdf93a"
+          after_value_redacted: true
+          after_value_length: 39
+          after_value_sha256: "0448f576de1ec518"
           keyboard_state: "Transcript Ready / Groq transcript ready"
       commands:
         - cmd: "xcrun devicectl device process launch --device 5320F5AD-2A71-50AC-94FE-207B544B6247 --terminate-existing --activate com.apple.mobilenotes --timeout 10"
@@ -464,10 +468,10 @@ tasks:
         - "Before screenshot: /tmp/foil-device-screens/notes-before-groq-insert.png."
         - "After screenshot: /tmp/foil-device-screens/notes-after-groq-insert.png."
         - "WDA tree before tap exposed Foil Keyboard controls including foil-keyboard-insert-latest and keyboard message Groq transcript ready."
-        - "WDA tree after tap showed the exact Notes text view value recorded in after_value, including the appended period."
+        - "WDA tree after tap showed the exact Notes text view value recorded in after_value, including the appended redacted transcript metadata."
       residual_risk:
         - "Only Notes was exercised in this matrix row; Safari, Reminders, Messages, and secure-field rejection behavior remain follow-up rows."
-        - "The latest transcript was a single '.' because the T005 recording was mostly silence."
+        - "The latest transcript was a single punctuation character because the T005 recording was mostly silence; raw body redacted with length 1 and sha256 cdb4ee2aea69cc6a."
 
   - id: T007
     type: worker
@@ -626,9 +630,9 @@ tasks:
             - "Screenshot: /tmp/foil-device-screens/foil-transcription-complete.png."
         - failure_mode: "The custom keyboard displayed stale state or did not actually insert into another app."
           evidence:
-            - "Notes WDA tree before insertion showed text view value Foil keyboard shellFoil keyboard shell."
+            - "Notes WDA tree before insertion showed redacted text view metadata length 38 / sha256 528cb3e677cdf93a."
             - "Foil Keyboard WDA tree showed Transcript Ready / Groq transcript ready and hittable foil-keyboard-insert-latest."
-            - "After tapping foil-keyboard-insert-latest, Notes WDA tree showed after_value Foil keyboard shellFoil keyboard shell."
+            - "After tapping foil-keyboard-insert-latest, Notes WDA tree showed redacted after_value metadata length 39 / sha256 0448f576de1ec518."
             - "Screenshot: /tmp/foil-device-screens/notes-after-groq-insert.png."
         - failure_mode: "The installed app/keyboard did not carry the App Group or device signing needed for real sharing."
           evidence:

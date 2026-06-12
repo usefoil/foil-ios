@@ -1,0 +1,10 @@
+{
+  "builtByDeveloper": true,
+  "bundleId": "com.neonwatty.FoilIOS",
+  "bundleVersion": "13",
+  "jsonSha256Prefix": "5f594cc89f9ef948",
+  "present": true,
+  "rawPrinted": false,
+  "schema": "foil.testflightReadiness.deviceAppAfterTestFlightInstall.v1",
+  "shortVersion": "0.1.0"
+}

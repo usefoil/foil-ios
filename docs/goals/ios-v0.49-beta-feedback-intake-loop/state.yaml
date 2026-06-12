@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.49-beta-feedback-intake-loop"
   kind: specific
   tranche: "Closed-beta feedback intake and privacy guardrails."
-  status: active
+  status: done
   oracle:
     signal: "Feedback path is actionable and privacy-safe."
     cadence: "after template/handoff changes"
@@ -20,26 +20,47 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map current feedback paths and privacy risks."
     acceptance_criteria:
       - "Receipt identifies missing templates, labels, and unsafe asks."
+    receipt:
+      result: done
+      summary: "Mapped missing issue template, generic labels, and private-content risks in free-form tester feedback."
+      evidence:
+        - "docs/goals/ios-v0.49-beta-feedback-intake-loop/notes/T001-scout-receipt.md"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Create or polish beta feedback intake artifacts."
     acceptance_criteria:
       - "Feedback form captures setup state, build, target app, field type, result, recovery, and logs status safely."
+    receipt:
+      result: done
+      summary: "Added iOS beta feedback issue form, triage guide, and handoff/README pointers."
+      evidence:
+        - ".github/ISSUE_TEMPLATE/ios_beta_feedback.yml"
+        - "docs/ios-beta-feedback-triage.md"
+        - "docs/goals/ios-v0.49-beta-feedback-intake-loop/notes/T002-worker-receipt.md"
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Verify feedback intake safety."
     acceptance_criteria:
       - "Scan rules out private-content requests and ambiguous tester instructions."
+    receipt:
+      result: pass
+      summary: "Issue form, handoff, triage doc, and README request actionable beta state while prohibiting private content and credentials."
+      evidence:
+        - "docs/goals/ios-v0.49-beta-feedback-intake-loop/notes/T003-judge-audit.md"
+      verification:
+        - "git diff --check"
+        - "ruby -e 'require \"yaml\"; YAML.load_file(\".github/ISSUE_TEMPLATE/ios_beta_feedback.yml\"); puts \"issue form yaml ok\"'"
+        - "privacy/unsafe-ask rg scans over changed intake artifacts"

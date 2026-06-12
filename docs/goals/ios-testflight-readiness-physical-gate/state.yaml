@@ -1,0 +1,512 @@
+version: 2
+
+goal:
+  title: "Foil iOS TestFlight Readiness With Physical Gate"
+  slug: "ios-testflight-readiness-physical-gate"
+  kind: existing_plan
+  tranche: "Run a fresh TestFlight/readiness pass using issue #39 physical proof as the release gate."
+  status: done
+  oracle:
+    signal: "Current main can regenerate, validate, optionally upload, and account for TestFlight build 0.1.0 (13), while physical route-first proof remains valid."
+    cadence: "before upload, after upload, after App Store Connect processing, and before any TestFlight-ready claim"
+    final_proof: "Sanitized receipts for physical gate, archive/export metadata, altool validation/upload or exact blocker, App Store Connect build state, internal group/tester state, and preview-phone smoke or exact blocker."
+  intake:
+    original_request: "setup a good follow-up conveyor: a fresh TestFlight/readiness pass using this physical proof as the release gate"
+    interpreted_outcome: "Create and run a measured TestFlight readiness conveyor that cannot claim release readiness unless the physical route-first onboarding proof remains valid."
+    input_shape: existing_plan
+    audience: "Foil owner preparing iOS build 0.1.0 (13) for internal TestFlight"
+    authority: approved
+    proof_type: artifact
+    completion_proof: "Final Judge receipt maps every TestFlight/readiness gate to fresh evidence or exact blocker."
+    likely_misfire: "Uploading or declaring TestFlight readiness from stale archive artifacts, stale App Store Connect state, or optimistic onboarding UI rather than physical proof."
+    blind_spots_considered:
+      - "The physical proof board could be local-only or stale relative to current main."
+      - "Archive/export can silently use old version/build metadata or missing icons."
+      - "App Store Connect API auth can fail or expose secrets if handled carelessly."
+      - "Validation can pass while upload, processing, export compliance, or group attachment remains incomplete."
+      - "Preview phone TestFlight install can require human App Store authentication."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  no_secret_printing: true
+  no_upload_without_validation: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: queued
+    url: "http://goalbuddy.localhost:41737/ios-testflight-readiness-physical-gate/"
+    command: "npx goalbuddy board docs/goals/ios-testflight-readiness-physical-gate"
+
+active_task: null
+
+source_context:
+  repo: "usefoil/foil-ios"
+  issue39:
+    url: "https://github.com/usefoil/foil-ios/issues/39"
+    state: "CLOSED"
+    closedAt: "2026-06-10T08:22:55Z"
+  route_onboarding_pr:
+    number: 40
+    mergedAt: "2026-06-09T23:09:35Z"
+    mergeCommit: "80bd6018323f4ef9659e94b3fb6a09e9e51bcacf"
+  harness_pr:
+    number: 43
+    mergedAt: "2026-06-10T01:02:14Z"
+    mergeCommit: "64ddb0f450986dd55d8cdb9a83c27efe5b4f61d3"
+  intended_build:
+    marketingVersion: "0.1.0"
+    buildNumber: "13"
+    appBundleId: "com.neonwatty.FoilIOS"
+    keyboardBundleId: "com.neonwatty.FoilIOS.Keyboard"
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: high
+    objective: "Validate entry gates before any archive, validation, upload, or TestFlight claim."
+    inputs:
+      - "https://github.com/usefoil/foil-ios/issues/39"
+      - "docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-provider-route-ready-receipt.json"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-keyboard-health-ready-receipt.json"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-after-element-click-receipt.json"
+      - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-app-group-after-element-click.json"
+      - "docs/ios-testflight-upload-runbook.md"
+      - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+    constraints:
+      - "Read-only except notes under this board."
+      - "Do not print secrets or raw WDA source."
+      - "Stop before archive work if issue #39 is not closed, physical proof does not validate, or version/build metadata is not build 13."
+    expected_output:
+      - "Entry-gate receipt with issue state, local board validation, intended metadata, and next task recommendation."
+    receipt:
+      result: done
+      outcome: entry_gates_passed
+      summary: "Entry gates passed before archive work: issue #39 is closed, the physical route-first proof board validates as done, required T019/T020 receipts are present, current HEAD is main commit 64ddb0f450986dd55d8cdb9a83c27efe5b4f61d3, and project metadata contains app/keyboard version 0.1.0 build 13 plus AppIcon configuration."
+      changed_files:
+        - "docs/goals/ios-testflight-readiness-physical-gate/state.yaml"
+      commands:
+        - "gh issue view 39 --repo usefoil/foil-ios --json number,state,closedAt,url"
+        - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-route-onboarding-physical-proof/state.yaml"
+        - "test -f docs/goals/ios-route-onboarding-physical-proof/notes/T019-provider-route-ready-receipt.json && test -f docs/goals/ios-route-onboarding-physical-proof/notes/T019-keyboard-health-ready-receipt.json && test -f docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-after-element-click-receipt.json && test -f docs/goals/ios-route-onboarding-physical-proof/notes/T020-app-group-after-element-click.json"
+        - "project.pbxproj metadata count inspection for CURRENT_PROJECT_VERSION, MARKETING_VERSION, PRODUCT_BUNDLE_IDENTIFIER, and ASSETCATALOG_COMPILER_APPICON_NAME"
+        - "find FoiliOS -path '*AppIcon.appiconset*' -maxdepth 8 -type f -print"
+      evidence:
+        - "Issue #39 state CLOSED, closedAt 2026-06-10T08:22:55Z"
+        - "docs/goals/ios-route-onboarding-physical-proof/state.yaml checker ok=true, goal_status=done"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-provider-route-ready-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T019-keyboard-health-ready-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-safari-after-element-click-receipt.json"
+        - "docs/goals/ios-route-onboarding-physical-proof/notes/T020-app-group-after-element-click.json"
+        - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj contains version/build/bundle/icon metadata for app and keyboard targets"
+        - "FoiliOS/FoilIOSApp/Assets.xcassets/AppIcon.appiconset contains required icon source files including 60@2x, 76@2x, and 1024"
+      gate_status:
+        issue39: "closed"
+        physical_proof_board: "done"
+        provider_route_receipt: "present"
+        keyboard_health_receipt: "present"
+        exact_once_receipt: "present"
+        app_group_after_insert_receipt: "present"
+        app_version: "0.1.0"
+        app_build: "13"
+        keyboard_version: "0.1.0"
+        keyboard_build: "13"
+        app_icon_sources: "present"
+      next_active_task: "T002"
+      privacy:
+        providerKeyPrinted: false
+        appStoreSecretsPrinted: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Regenerate Release archive/export artifacts from current main and prove IPA metadata."
+    allowed_files:
+      - "docs/goals/ios-testflight-readiness-physical-gate/**"
+      - "/tmp/FoilIOS-TestFlightReadiness*"
+    verify:
+      - "xcodebuild archive -project FoilIOS.xcodeproj -scheme FoilIOS -configuration Release -destination 'generic/platform=iOS' -archivePath /tmp/FoilIOS-TestFlightReadiness.xcarchive -allowProvisioningUpdates"
+      - "xcodebuild -exportArchive -archivePath /tmp/FoilIOS-TestFlightReadiness.xcarchive -exportPath /tmp/FoilIOS-TestFlightReadinessExport -exportOptionsPlist /tmp/FoilIOS-TestFlightReadiness-ExportOptions.plist -allowProvisioningUpdates"
+      - "Inspect app and keyboard Info.plist version/build values from exported IPA."
+      - "Inspect app icon plist/key assets required by prior App Store Connect errors."
+    stop_if:
+      - "Archive/export would require committing generated artifacts."
+      - "Signing/provisioning fails twice with the same unexplained error."
+      - "IPA metadata is not app and keyboard version 0.1.0 build 13."
+    expected_output:
+      - "Archive/export receipt with artifact paths, metadata, icon checks, and exact blocker or pass."
+    receipt:
+      result: done
+      outcome: archive_export_metadata_passed
+      summary: "Fresh Release archive and app-store-connect export were regenerated under /tmp for current main. Archive succeeded, export succeeded, IPA metadata proves app and keyboard extension version 0.1.0 build 13, app bundle id com.neonwatty.FoilIOS, keyboard bundle id com.neonwatty.FoilIOS.Keyboard, CFBundleIconName AppIcon, required prior-failure icon outputs present, and no archive/IPA artifacts were committed."
+      changed_files:
+        - "docs/goals/ios-testflight-readiness-physical-gate/state.yaml"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T002-export.log"
+      commands:
+        - cmd: "rm -rf /tmp/FoilIOS-TestFlightReadiness.xcarchive /tmp/FoilIOS-TestFlightReadinessExport /tmp/FoilIOS-TestFlightReadiness-ExportOptions.plist /tmp/FoilIOS-TestFlightReadinessIPA"
+          status: pass
+        - cmd: "/usr/libexec/PlistBuddy ... /tmp/FoilIOS-TestFlightReadiness-ExportOptions.plist"
+          status: pass
+        - cmd: "xcodebuild archive -project FoilIOS.xcodeproj -scheme FoilIOS -configuration Release -destination 'generic/platform=iOS' -archivePath /tmp/FoilIOS-TestFlightReadiness.xcarchive -allowProvisioningUpdates"
+          status: pass
+        - cmd: "xcodebuild -exportArchive -archivePath /tmp/FoilIOS-TestFlightReadiness.xcarchive -exportPath /tmp/FoilIOS-TestFlightReadinessExport -exportOptionsPlist /tmp/FoilIOS-TestFlightReadiness-ExportOptions.plist -allowProvisioningUpdates"
+          status: pass
+        - cmd: "unzip exported IPA to /tmp/FoilIOS-TestFlightReadinessIPA and inspect app/keyboard Info.plist metadata"
+          status: pass
+        - cmd: "inspect extracted app for AppIcon60x60@2x.png, AppIcon76x76@2x~ipad.png, and Assets.car"
+          status: pass
+      evidence:
+        - "/tmp/FoilIOS-TestFlightReadiness.xcarchive exists; Info.plist sha256 a7be7962360b9e307ff3b82c98a3fe883c897e016b022ba5267c4b0ac6fed62b"
+        - "/tmp/FoilIOS-TestFlightReadinessExport/Foil iOS.ipa exists; sha256 e2a64ba8dec8ab70019bc31cb34c69efa13d0c68e55340c021ff8126485ec346"
+        - "Archive ApplicationProperties: arm64, CFBundleIdentifier com.neonwatty.FoilIOS, CFBundleShortVersionString 0.1.0, CFBundleVersion 13, Team B3A6AN2HA4"
+        - "Export metadata: appVersion=0.1.0 appBuild=13 keyboardVersion=0.1.0 keyboardBuild=13 appBundleId=com.neonwatty.FoilIOS keyboardBundleId=com.neonwatty.FoilIOS.Keyboard iconName=AppIcon"
+        - "Icon outputs present: AppIcon60x60@2x.png, AppIcon76x76@2x~ipad.png, Assets.car"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T002-export.log"
+      gate_status:
+        archive: "succeeded"
+        export: "succeeded"
+        ipa_path: "/tmp/FoilIOS-TestFlightReadinessExport/Foil iOS.ipa"
+        app_version: "0.1.0"
+        app_build: "13"
+        keyboard_version: "0.1.0"
+        keyboard_build: "13"
+        app_bundle_id: "com.neonwatty.FoilIOS"
+        keyboard_bundle_id: "com.neonwatty.FoilIOS.Keyboard"
+        icon_name: "AppIcon"
+        prior_icon_failure_outputs: "present"
+      caveats:
+        - "The first archive command's tee target was relative to FoiliOS/ and failed to create T002-archive.log even though xcodebuild reported ARCHIVE SUCCEEDED; archive existence and Info.plist hash were inspected afterward."
+      next_active_task: "T003"
+      privacy:
+        appStoreSecretsPrinted: false
+        archiveArtifactsCommitted: false
+        ipaCommitted: false
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Validate the freshly exported IPA with App Store Connect without leaking API credentials."
+    allowed_files:
+      - "docs/goals/ios-testflight-readiness-physical-gate/**"
+      - "/tmp/FoilIOS-TestFlightReadiness*"
+    verify:
+      - "xcrun altool --validate-app -f '/tmp/FoilIOS-TestFlightReadinessExport/Foil iOS.ipa' --type ios --api-key <redacted> --api-issuer <redacted>"
+    stop_if:
+      - "API key id, issuer id, private key, JWT, or app-specific password would be printed."
+      - "IPA is missing or not from T002."
+      - "Validation fails with a blocker requiring code/signing changes."
+    expected_output:
+      - "Validation receipt with redacted command shape, altool status, and next task recommendation."
+    receipt:
+      result: done
+      outcome: validation_passed
+      summary: "App Store Connect validation passed after the issuer ID was restored into Keychain as APP_STORE_CONNECT_ISSUER_ID. The first restored value was rejected locally because it was not UUID-shaped; the corrected UUID-shaped issuer was saved without printing it. altool validation then reported VERIFY SUCCEEDED with no errors for the build 13 IPA."
+      changed_files:
+        - "docs/goals/ios-testflight-readiness-physical-gate/state.yaml"
+      commands:
+        - cmd: "env | rg '^(APP_STORE_CONNECT|ASC|API_PRIVATE_KEYS_DIR|ALTOOL)' with values redacted"
+          status: pass
+        - cmd: "find ~/.appstoreconnect/private_keys ~/.private_keys ~/private_keys ./private_keys -name 'AuthKey_*.p8' with filename redacted"
+          status: pass
+        - cmd: "security find-generic-password for APP_STORE_CONNECT_API_KEY, APP_STORE_CONNECT_ISSUER_ID, and altool service names without printing secrets"
+          status: pass
+        - cmd: "search prior local shell history for --api-issuer UUID pattern without printing the value"
+          status: pass
+        - cmd: "store corrected UUID-shaped APP_STORE_CONNECT_ISSUER_ID in Keychain via hidden-input macOS dialog"
+          status: pass
+        - cmd: "xcrun altool --validate-app -f '/tmp/FoilIOS-TestFlightReadinessExport/Foil iOS.ipa' --type ios --api-key <redacted> --api-issuer <redacted>"
+          status: pass
+      evidence:
+        - "Private key presence: AuthKey_<redacted>.p8 exists under ~/.appstoreconnect/private_keys"
+        - "No matching App Store Connect/altool environment variables were present."
+        - "No known keychain items for API key, issuer, or altool were found."
+        - "Shell-history issuer recovery reported issuer_missing."
+        - "IPA ready for validation remains at /tmp/FoilIOS-TestFlightReadinessExport/Foil iOS.ipa with sha256 e2a64ba8dec8ab70019bc31cb34c69efa13d0c68e55340c021ff8126485ec346."
+        - "Issuer Keychain value now has UUID shape; value was not printed."
+        - "altool validation output: VERIFY SUCCEEDED with no errors; no errors validating archive at /tmp/FoilIOS-TestFlightReadinessExport/Foil iOS.ipa."
+      gate_status:
+        ipa_ready_for_validation: true
+        api_private_key_file: "present_redacted"
+        api_key_id: "derivable_but_not_printed"
+        api_issuer_id: "present_uuid_not_printed"
+        validation: "passed"
+        upload: "not_attempted"
+      next_active_task: "T004"
+      privacy:
+        apiKeyIdPrinted: false
+        apiIssuerPrinted: false
+        privateKeyPrinted: false
+        jwtPrinted: false
+        appSpecificPasswordPrinted: false
+
+  - id: T004
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: high
+    objective: "Decide whether upload side effect is intended, then upload only if validation is green."
+    inputs:
+      - "T002 archive/export receipt"
+      - "T003 validation receipt"
+      - "docs/ios-testflight-upload-runbook.md"
+    constraints:
+      - "Do not upload unless T003 passed and the current run explicitly treats upload as intended."
+      - "Do not print API secrets, JWTs, or private key paths beyond existing runbook-safe references."
+      - "Record delivery UUID only if upload occurs."
+    expected_output:
+      - "Upload receipt with delivery UUID, or exact no-upload blocker."
+    receipt:
+      result: done
+      outcome: upload_succeeded
+      summary: "Operator approved the side effect with 'upload it'. The already-validated build 13 IPA was uploaded to App Store Connect/TestFlight. altool reported UPLOAD SUCCEEDED with no errors, package processing began, and the delivery UUID was captured for status polling."
+      changed_files:
+        - "docs/goals/ios-testflight-readiness-physical-gate/state.yaml"
+      commands:
+        - cmd: "test -f '/tmp/FoilIOS-TestFlightReadinessExport/Foil iOS.ipa' && shasum -a 256"
+          status: pass
+        - cmd: "xcrun altool --upload-app -f '/tmp/FoilIOS-TestFlightReadinessExport/Foil iOS.ipa' --type ios --api-key <redacted> --api-issuer <redacted> --show-progress"
+          status: pass
+      evidence:
+        - "IPA SHA-256 before upload: e2a64ba8dec8ab70019bc31cb34c69efa13d0c68e55340c021ff8126485ec346"
+        - "altool upload output: UPLOAD SUCCEEDED with no errors."
+        - "Delivery UUID: 484ec290-68c8-4611-bc8c-eb382da470e4"
+      app_store_connect:
+        delivery_id: "484ec290-68c8-4611-bc8c-eb382da470e4"
+      gate_status:
+        validation_before_upload: "passed"
+        upload: "passed"
+        package_processing_started: true
+      next_active_task: "T005"
+      privacy:
+        apiKeyIdPrinted: false
+        apiIssuerPrinted: false
+        privateKeyPrinted: false
+        jwtPrinted: false
+
+  - id: T005
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: high
+    objective: "Monitor App Store Connect/TestFlight processing and internal group readiness."
+    inputs:
+      - "Upload delivery UUID from T004 if upload occurred"
+      - "docs/ios-testflight-upload-runbook.md"
+    constraints:
+      - "Use API-key auth without printing token material."
+      - "Do not claim READY_FOR_BETA_TESTING from stale local notes."
+      - "If export compliance is missing, record the exact build id and required PATCH without printing JWT."
+    expected_output:
+      - "Build status receipt."
+      - "Export compliance state."
+      - "Internal group attachment/tester state or exact blocker."
+    receipt:
+      result: done
+      outcome: build_valid_beta_ready_attached
+      summary: "App Store Connect processing and internal group readiness passed for build 13. altool build-status reported VALID/VALID, on App Store Connect, App Store eligible, and non-exempt encryption false. App Store Connect REST initially reported MISSING_EXPORT_COMPLIANCE, the standard usesNonExemptEncryption=false PATCH returned HTTP 200, Foil Internal Testers attach returned HTTP 204, buildBetaDetails moved to IN_BETA_TESTING / READY_FOR_BETA_SUBMISSION, and group membership now contains build 13."
+      changed_files:
+        - "docs/goals/ios-testflight-readiness-physical-gate/state.yaml"
+      commands:
+        - cmd: "xcrun altool --build-status --delivery-id 484ec290-68c8-4611-bc8c-eb382da470e4 --api-key <redacted> --api-issuer <redacted> --output-format json"
+          status: pass
+        - cmd: "xcrun altool --generate-jwt --apiKey <redacted> --apiIssuer <redacted>; token used in shell variable only"
+          status: pass
+        - cmd: "GET /v1/builds/484ec290-68c8-4611-bc8c-eb382da470e4"
+          status: pass
+        - cmd: "GET /v1/buildBetaDetails?filter[build]=484ec290-68c8-4611-bc8c-eb382da470e4"
+          status: pass
+        - cmd: "PATCH /v1/builds/484ec290-68c8-4611-bc8c-eb382da470e4 usesNonExemptEncryption=false"
+          status: pass
+        - cmd: "POST /v1/betaGroups/bcca568d-167d-44cb-b952-a410e9c9e10f/relationships/builds attach build 13"
+          status: pass
+        - cmd: "GET /v1/betaGroups/bcca568d-167d-44cb-b952-a410e9c9e10f/relationships/builds?limit=200"
+          status: pass
+      evidence:
+        - "altool build-status: build-status VALID, import-status VALID, is-on-app-store-connect true, build-audience-type APP_STORE_ELIGIBLE, uses-non-exempt-encryption false, version 13, processingState VALID, minOsVersion 17.0."
+        - "Before compliance patch: buildBetaDetail internalBuildState MISSING_EXPORT_COMPLIANCE and externalBuildState MISSING_EXPORT_COMPLIANCE; Foil Internal Testers build count 12 and did not contain build 13."
+        - "PATCH /v1/builds/... returned HTTP 200."
+        - "After patch: buildBetaDetail internalBuildState READY_FOR_BETA_TESTING and externalBuildState READY_FOR_BETA_SUBMISSION."
+        - "POST internal group relationship returned HTTP 204."
+        - "After attach: buildBetaDetail internalBuildState IN_BETA_TESTING and externalBuildState READY_FOR_BETA_SUBMISSION; Foil Internal Testers build count 13 and contains build 13."
+      app_store_connect:
+        build_id: "484ec290-68c8-4611-bc8c-eb382da470e4"
+        beta_group_id: "bcca568d-167d-44cb-b952-a410e9c9e10f"
+        internal_state: "IN_BETA_TESTING"
+        external_state: "READY_FOR_BETA_SUBMISSION"
+        group_contains_build13: true
+      gate_status:
+        processing: "VALID"
+        import: "VALID"
+        export_compliance: "cleared"
+        internal_group_attachment: "passed"
+      next_active_task: "T006"
+      privacy:
+        apiKeyIdPrinted: false
+        apiIssuerPrinted: false
+        privateKeyPrinted: false
+        jwtPrinted: false
+
+  - id: T006
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "Run preview-phone TestFlight smoke or record the exact phone/auth blocker."
+    allowed_files:
+      - "docs/goals/ios-testflight-readiness-physical-gate/**"
+    verify:
+      - "Strict physical preflight before touching phone apps."
+      - "TestFlight-installed build identity proof, or exact App Store/TestFlight install/auth blocker."
+      - "Route-first onboarding readiness smoke references the T019/T020 physical gate or reruns a narrow physical proof if needed."
+    stop_if:
+      - "Phone opens to private content."
+      - "TestFlight/App Store requires human password entry."
+      - "WDA preflight is not healthy."
+    expected_output:
+      - "Preview-phone smoke receipt or exact blocker with next operator action."
+    receipt:
+      result: done
+      outcome: testflight_replace_and_physical_readiness_passed
+      summary: "Preview-phone TestFlight smoke passed after WDA recovered. Strict preflight against the direct WDA URL was healthy. CoreDevice found TestFlight installed and Foil iOS bundle 0.1.0 build 13 present. The first Foil readiness check failed because Foil Keyboard had not checked in recently, proving onboarding did not falsely claim setup complete. A sterile Safari normal field surfaced Foil Keyboard and refreshed health. The Foil-specific TestFlight detail then showed Install, required a replace confirmation, and changed to Open without account/password blockers. Tapping Open from that Foil detail launched com.neonwatty.FoilIOS. After the TestFlight replace, readiness again failed until the keyboard was refreshed; the final sterile keyboard refresh produced onboarding-ready present, onboarding-not-ready absent, Full Access ready text present by hash, stale/full-access-off warnings absent, and App Group idle/no transcript."
+      changed_files:
+        - "docs/goals/ios-testflight-readiness-physical-gate/state.yaml"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-healthy-preflight-after-retry.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-device-apps-sanitized.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-current-readiness-receipt.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-safari-focused-keyboard-receipt.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-after-keyboard-refresh-readiness-receipt.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-testflight-deeplink-markers.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-testflight-foil-install-poll.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-testflight-foil-replace-poll.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-testflight-foil-open-active-app.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-after-testflight-open-readiness-receipt.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-safari-refresh2-keyboard-receipt.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-final-readiness-after-testflight-refresh.json"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-final-app-group-after-testflight-refresh.json"
+      commands:
+        - cmd: "Review historical blocked preflight receipts T006-preflight.json and T006-preflight-rerun.json before rerun"
+          status: pass
+        - cmd: "python3 scripts/ios-physical-harness.py preflight --strict --wda-url http://192.168.1.40:8100 > docs/goals/ios-testflight-readiness-physical-gate/notes/T006-healthy-preflight-after-retry.json"
+          status: pass
+        - cmd: "xcrun devicectl device info apps --bundle-id com.apple.TestFlight/com.neonwatty.FoilIOS with sanitized JSON receipts"
+          status: pass
+        - cmd: "xcrun devicectl device process launch com.neonwatty.FoilIOS, then WDA active-app and readiness receipts"
+          status: pass
+        - cmd: "xcrun devicectl device process launch --payload-url http://192.168.1.34:8945/ com.apple.mobilesafari; WDA tap sterile normal field; keyboard receipt"
+          status: pass
+        - cmd: "xcrun devicectl device process launch --payload-url itms-beta://beta.itunes.apple.com/v1/app/6777069277 com.apple.TestFlight; WDA tap Foil Install and replace confirmation"
+          status: pass
+        - cmd: "WDA poll Foil-specific TestFlight detail for Open with no account/password markers"
+          status: pass
+        - cmd: "WDA tap Open from Foil-specific TestFlight detail; active app bundle com.neonwatty.FoilIOS"
+          status: pass
+        - cmd: "Repeat sterile Safari keyboard refresh after TestFlight replace; final Foil readiness receipt and App Group summary"
+          status: pass
+      evidence:
+        - "Earlier blockers retained: docs/goals/ios-testflight-readiness-physical-gate/notes/T006-preflight.json and T006-preflight-rerun.json classified WDA unreachable."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-healthy-preflight-after-retry.json: classification healthy, WDA ready true, safeToTouchHostApps true, iPhone-preview connected."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-device-apps-sanitized.json: TestFlight present; Foil iOS present with bundleVersion 13."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-current-readiness-receipt.json: initial readiness failed with onboarding-ready absent, onboarding-not-ready present, and stale keyboard warning present."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-safari-focused-keyboard-receipt.json: sterile Safari field surfaced Foil Keyboard and Insert latest disabled with no staged transcript."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-after-keyboard-refresh-readiness-receipt.json: pre-TestFlight-replace readiness passed after keyboard refresh."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-testflight-deeplink-markers.json: Foil-specific TestFlight deep link showed Foil Dictation and visible Install."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-testflight-foil-install-poll.json: replace confirmation visible with no Apple Account/password markers."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-testflight-foil-replace-poll.json: Foil detail changed to visible Open with no account/password blockers."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-testflight-foil-open-active-app.json: active app bundle com.neonwatty.FoilIOS after tapping Open from Foil detail."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-after-testflight-open-readiness-receipt.json: post-replace readiness initially failed because keyboard health was stale."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-safari-refresh2-keyboard-receipt.json: post-replace sterile keyboard refresh passed."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-final-readiness-after-testflight-refresh.json: final readiness passed with onboarding-ready present, onboarding-not-ready absent, Full Access ready text present by hash, and stale/off warnings absent."
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T006-final-app-group-after-testflight-refresh.json: App Group phase idle and hasTranscript false."
+      gate_status:
+        testflight_build13_uploaded: true
+        build13_internal_group: "attached"
+        physical_preflight: "healthy_after_retry"
+        testflight_foil_detail: "install_replace_open_passed"
+        active_app_after_testflight_open: "com.neonwatty.FoilIOS"
+        readiness_before_keyboard_refresh: "failed_stale_keyboard_as_expected"
+        final_readiness: "passed"
+        final_app_group: "idle_no_transcript"
+      next_active_task: "T007"
+      privacy:
+        openedHostApps: true
+        committedPrivateScreenshots: false
+        committedRawWdaSource: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
+
+  - id: T007
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Final TestFlight readiness audit."
+    inputs:
+      - "All task receipts"
+      - "docs/acceptance-evidence.md"
+      - "docs/ios-testflight-upload-runbook.md"
+    constraints:
+      - "Do not mark done if queued worker tasks remain unhandled."
+      - "Do not treat upload success as readiness unless processing/group/tester/phone gates are accounted for."
+      - "Name residual risks and owners."
+    expected_output:
+      - "ready | blocked | not_ready"
+      - "Gate-by-gate evidence table."
+      - "Next conveyor recommendation if not ready."
+    receipt:
+      result: done
+      outcome: ready
+      summary: "Final audit accepts internal TestFlight readiness for build 0.1.0 (13). The board preserves the earlier WDA blocker evidence, then proves recovery with a healthy direct-WDA preflight, regenerated archive/export metadata, App Store Connect validation/upload/processing/group attachment, Foil-specific TestFlight Install/Replace/Open flow, active-app Foil launch, failure-before-keyboard-refresh, final onboarding-ready receipt after guided keyboard health refresh, and App Group idle/no transcript."
+      changed_files:
+        - "docs/goals/ios-testflight-readiness-physical-gate/state.yaml"
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T007-final-audit.md"
+      commands:
+        - cmd: "Review T001-T006 receipts and docs/goals/ios-testflight-readiness-physical-gate/notes/T007-final-audit.md"
+          status: pass
+      evidence:
+        - "docs/goals/ios-testflight-readiness-physical-gate/notes/T007-final-audit.md"
+        - "T001 issue #39/physical proof gate passed."
+        - "T002 fresh archive/export metadata passed."
+        - "T003 validation passed."
+        - "T004 upload passed."
+        - "T005 App Store Connect processing/export compliance/internal group passed."
+        - "T006 physical TestFlight replace/open and final readiness passed."
+      verdict: "ready"
+      decision: "complete"
+      full_outcome_complete: true
+      residual_risks:
+        - "CoreDevice continued to report builtByDeveloper=true after TestFlight replace, so it is recorded as non-authoritative for install source; Foil-specific TestFlight Install/Replace/Open and active-app receipts are the install proof."
+        - "This pass does not expand beyond the sterile physical smoke and the already accepted issue #39 insertion proof."
+      privacy:
+        providerKeyPrinted: false
+        appStoreSecretsPrinted: false
+        privateKeyPrinted: false
+        jwtPrinted: false
+        committedRawWdaSource: false
+        committedPrivateScreenshots: false
+        archiveArtifactsCommitted: false
+        ipaCommitted: false

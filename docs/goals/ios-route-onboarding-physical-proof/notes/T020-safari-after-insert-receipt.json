@@ -1,0 +1,37 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "foil-keyboard-root",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "true"
+      ],
+      "passed": false
+    },
+    {
+      "actual": 0,
+      "expected": 1,
+      "kind": "expectValueTextCount",
+      "passed": false,
+      "textLength": 38,
+      "textSha256": "e6fa5904a341e996"
+    }
+  ],
+  "passed": false,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "T020-safari-after-insert-source.xml",
+    "nodeCount": 160,
+    "sha256": "744533610b420f39c75e91f71c0db976f3170b60d13b5dbd4a71039ee27bf176"
+  },
+  "target": "safari-normal-after-route-onboarding-insert"
+}

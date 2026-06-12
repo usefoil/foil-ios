@@ -100,6 +100,38 @@ struct FoilSetupChecklistItem: Equatable, Identifiable {
     var id: String { title }
 }
 
+struct FoilSetupRoutePresentation: Equatable, Identifiable {
+    var routeID: String
+    var title: String
+    var badge: String
+    var detail: String
+    var systemImage: String
+    var isRecommended: Bool
+    var isUsableNow: Bool
+
+    var id: String { routeID }
+}
+
+struct FoilMacPairingPreviewPresentation: Equatable {
+    var protocolFamily: String
+    var requestedRouteID: String
+    var receiptName: String
+    var supportedRouteIDs: [String]
+    var title: String
+    var detail: String
+    var contractDetail: String
+    var receiptDetail: String
+    var fallbackTitle: String
+}
+
+struct FoilOnboardingReadinessPresentation: Equatable {
+    var title: String
+    var detail: String
+    var systemImage: String
+    var isComplete: Bool
+    var blockers: [String]
+}
+
 struct FoilBetaGuidanceItem: Equatable, Identifiable {
     var title: String
     var detail: String
@@ -124,6 +156,18 @@ struct FoilSetupReadinessPresentation: Equatable {
 }
 
 enum FoilDictationLoopPresenter {
+    static let macRouteID = "use-my-mac"
+    static let iPhoneAPIKeyRouteID = "iphone-api-key"
+    static let advancedRouteID = "advanced"
+    static let localBridgeProtocolFamily = "foil.localBridge"
+    static let macSelectedRouteID = "mac-selected"
+    static let routeReceiptName = "RouteReceipt"
+    static let macSupportedRouteIDs = [
+        "local-whisper-cpp",
+        "openai-whisper",
+        "custom-openai-compatible"
+    ]
+
     static func setupReadinessPresentation(
         hasProviderKey: Bool,
         microphoneState: FoilMicrophoneSetupState,
@@ -230,16 +274,62 @@ enum FoilDictationLoopPresenter {
         )
     }
 
-    static func setupChecklistPresentation() -> [FoilSetupChecklistItem] {
+    static func routeChoicePresentation() -> [FoilSetupRoutePresentation] {
+        [
+            FoilSetupRoutePresentation(
+                routeID: macRouteID,
+                title: "Use my Mac",
+                badge: "Recommended next",
+                detail: "Mac pairing is coming soon. After pairing is available, this route can send iPhone audio to your paired Mac, use the Mac's selected route, and show a RouteReceipt only after the Mac handles the request.",
+                systemImage: "desktopcomputer",
+                isRecommended: true,
+                isUsableNow: false
+            ),
+            FoilSetupRoutePresentation(
+                routeID: iPhoneAPIKeyRouteID,
+                title: "Use an API key on this iPhone",
+                badge: "Works now",
+                detail: "This path is fully usable today: save a provider key here, record on this iPhone, then insert the transcript from Foil Keyboard.",
+                systemImage: "iphone.gen3",
+                isRecommended: false,
+                isUsableNow: true
+            ),
+            FoilSetupRoutePresentation(
+                routeID: advancedRouteID,
+                title: "Advanced, demo, and support",
+                badge: "Support",
+                detail: "Diagnostics, fake transcript tools, secure-field checks, and narrow beta target notes live here.",
+                systemImage: "wrench.and.screwdriver",
+                isRecommended: false,
+                isUsableNow: true
+            )
+        ]
+    }
+
+    static func macPairingPreviewPresentation() -> FoilMacPairingPreviewPresentation {
+        FoilMacPairingPreviewPresentation(
+            protocolFamily: localBridgeProtocolFamily,
+            requestedRouteID: macSelectedRouteID,
+            receiptName: routeReceiptName,
+            supportedRouteIDs: macSupportedRouteIDs,
+            title: "Mac pairing preview",
+            detail: "Mac pairing is not connected in this build. Foil will not call setup complete from this route until pairing, route receipt, keyboard health, and insertion are all proven.",
+            contractDetail: "Future bridge requests use \(localBridgeProtocolFamily) and default to \(macSelectedRouteID), so the Mac can resolve its selected transcription route.",
+            receiptDetail: "After a Mac handles the request, Foil will show a \(routeReceiptName) with the resolved route, such as \(macSupportedRouteIDs.joined(separator: ", ")).",
+            fallbackTitle: "Set up API key on iPhone"
+        )
+    }
+
+    static func iPhoneAPIKeySetupPresentation() -> [FoilSetupChecklistItem] {
         [
             FoilSetupChecklistItem(
-                title: "Provider key",
-                detail: "Save your Groq provider key once so Foil can create transcripts.",
+                title: "Save an API key",
+                detail: "Add a provider key on this iPhone so Foil can create transcripts without a paired Mac.",
                 systemImage: "key"
             ),
             FoilSetupChecklistItem(
-                title: "Microphone",
-                detail: "Allow microphone access when prompted before recording.",
+                title: "Allow microphone",
+                detail: "Foil asks for microphone access when you start recording.",
                 systemImage: "mic"
             ),
             FoilSetupChecklistItem(
@@ -249,25 +339,49 @@ enum FoilDictationLoopPresenter {
             ),
             FoilSetupChecklistItem(
                 title: "Allow Full Access",
-                detail: "Enable Allow Full Access so Foil Keyboard can read and clear shared dictation state.",
+                detail: "Foil uses Full Access to read and clear Foil's shared transcript state between this app and Foil Keyboard.",
                 systemImage: "checkmark.shield"
             ),
             FoilSetupChecklistItem(
-                title: "Record in Foil",
-                detail: "Record in Foil, finish recording, then Create transcript.",
-                systemImage: "record.circle"
+                title: "Verify keyboard health",
+                detail: "Open a safe text field, switch to Foil Keyboard, then return here and confirm Foil Keyboard checked in.",
+                systemImage: "stethoscope"
             ),
             FoilSetupChecklistItem(
-                title: "Return and insert",
-                detail: "Return to a safe text field and tap Insert latest once in Foil Keyboard.",
+                title: "Record and insert once",
+                detail: "Record here, create a transcript, then tap Insert latest once in Foil Keyboard.",
                 systemImage: "arrow.turn.down.left"
+            )
+        ]
+    }
+
+    static func advancedSupportPresentation() -> [FoilSetupChecklistItem] {
+        [
+            FoilSetupChecklistItem(
+                title: "Diagnostics",
+                detail: "Inspect App Group state and keyboard storage without exposing transcript text in receipts.",
+                systemImage: "externaldrive"
             ),
             FoilSetupChecklistItem(
-                title: "Reset when stale",
-                detail: "Use Reset shared state if the keyboard shows stale or incorrect text.",
+                title: "Demo fake transcript",
+                detail: "Stage a fake transcript only for support and demo checks.",
+                systemImage: "text.badge.checkmark"
+            ),
+            FoilSetupChecklistItem(
+                title: "Secure-field rejection",
+                detail: "Use the secure-field test to confirm Foil Keyboard is rejected where iOS blocks custom keyboards.",
+                systemImage: "lock"
+            ),
+            FoilSetupChecklistItem(
+                title: "Reset shared state",
+                detail: "Clear stale App Group state before starting another setup or insertion check.",
                 systemImage: "arrow.counterclockwise"
             )
         ]
+    }
+
+    static func setupChecklistPresentation() -> [FoilSetupChecklistItem] {
+        iPhoneAPIKeySetupPresentation()
     }
 
     static func betaGuidancePresentation() -> [FoilBetaGuidanceItem] {
@@ -360,6 +474,87 @@ enum FoilDictationLoopPresenter {
                 : "Full Access on, ready for dictation."
             return FoilKeyboardHealthPresentation(detail: detail, recoveryMessage: nil, recoverySteps: [])
         }
+    }
+
+    static func onboardingReadinessPresentation(
+        selectedRouteID: String,
+        hasConfiguredAPIKey: Bool,
+        microphoneAllowed: Bool,
+        keyboardHealth: FoilKeyboardHealthReport,
+        storageReport: FoilKeyboardStorageReport,
+        snapshot: FoilKeyboardSnapshot,
+        now: Date = Date(),
+        staleAfter: TimeInterval = 120
+    ) -> FoilOnboardingReadinessPresentation {
+        if selectedRouteID == macRouteID {
+            return FoilOnboardingReadinessPresentation(
+                title: "Mac pairing preview",
+                detail: "Mac pairing is not connected in this build. Use the iPhone API-key route for a complete setup today.",
+                systemImage: "desktopcomputer.trianglebadge.exclamationmark",
+                isComplete: false,
+                blockers: ["Use an API key on this iPhone until the Mac bridge is available."]
+            )
+        }
+
+        if selectedRouteID == advancedRouteID {
+            return FoilOnboardingReadinessPresentation(
+                title: "Support tools selected",
+                detail: "Advanced tools can test and recover the bridge, but they are not a complete first-run route.",
+                systemImage: "wrench.and.screwdriver",
+                isComplete: false,
+                blockers: ["Choose Use my Mac or Use an API key on this iPhone for setup."]
+            )
+        }
+
+        var blockers: [String] = []
+        if !hasConfiguredAPIKey {
+            blockers.append("Save an API key on this iPhone.")
+        }
+        if !microphoneAllowed {
+            blockers.append("Allow microphone access before recording.")
+        }
+
+        let healthPresentation = keyboardHealthPresentation(
+            report: keyboardHealth,
+            now: now,
+            staleAfter: staleAfter
+        )
+        if keyboardHealth.fullAccessState != .enabled || healthPresentation.recoveryMessage != nil {
+            blockers.append("Enable Allow Full Access and verify Foil Keyboard.")
+        }
+
+        if snapshot.insertableTranscript != nil {
+            blockers.append("Insert or reset the waiting transcript before calling setup complete.")
+        } else if snapshot.phase != .idle {
+            blockers.append("Reset shared state so setup starts from an idle keyboard bridge.")
+        }
+
+        let verifiedCleanSnapshot = storageReport.canonicalVerificationPhase == .idle &&
+            storageReport.canonicalVerificationHasTranscript == false
+        let bridgeWriteHealthy = storageReport.canonicalWriteSucceeded &&
+            storageReport.defaultsWriteAttempted &&
+            verifiedCleanSnapshot
+        if !bridgeWriteHealthy {
+            blockers.append("Reset shared state so the keyboard bridge can write a clean App Group snapshot.")
+        }
+
+        if blockers.isEmpty {
+            return FoilOnboardingReadinessPresentation(
+                title: "Ready to dictate and insert",
+                detail: "API key, microphone, Foil Keyboard health, Full Access, and App Group state are ready.",
+                systemImage: "checkmark.circle.fill",
+                isComplete: true,
+                blockers: []
+            )
+        }
+
+        return FoilOnboardingReadinessPresentation(
+            title: "Finish setup",
+            detail: "Foil will only call setup complete after the route, microphone, keyboard health, Full Access, and App Group state all check out.",
+            systemImage: "exclamationmark.circle.fill",
+            isComplete: false,
+            blockers: blockers
+        )
     }
 
     static func appPresentation(

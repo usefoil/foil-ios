@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.50-simulator-sanity-regression"
   kind: specific
   tranche: "Fast simulator regression coverage for closed-beta polish."
-  status: active
+  status: done
   oracle:
     signal: "Simulator sanity catches regressions without overclaiming physical keyboard behavior."
     cadence: "before physical boards and before release rehearsal"
@@ -20,26 +20,45 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map current simulator build/test coverage and keyboard-state fixtures."
     acceptance_criteria:
       - "Receipt names commands, missing fixture states, and physical-proof boundaries."
+    receipt:
+      result: done
+      summary: "Mapped existing presentation, bridge, provider, transcription, and compile coverage plus the missing reusable lane/proof boundary."
+      evidence:
+        - "docs/goals/ios-v0.50-simulator-sanity-regression/notes/T001-scout-receipt.md"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Add or run simulator sanity coverage."
     acceptance_criteria:
       - "Coverage includes onboarding/provider/keyboard-state fixture paths and compile health."
+    receipt:
+      result: done
+      summary: "Added simulator sanity script and runbook, then ran the lane successfully."
+      evidence:
+        - "scripts/ios-simulator-sanity.sh"
+        - "docs/ios-simulator-sanity-runbook.md"
+        - "docs/goals/ios-v0.50-simulator-sanity-regression/notes/T002-worker-receipt.md"
+      verification:
+        - "scripts/ios-simulator-sanity.sh"
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Verify simulator evidence is useful and scoped."
     acceptance_criteria:
       - "Receipts are labeled non-physical and do not replace physical host-app proof."
+    receipt:
+      result: pass
+      summary: "Simulator lane and runbook are clearly labeled non-physical and point physical host-app claims to physical preflight/matrix proof."
+      evidence:
+        - "docs/goals/ios-v0.50-simulator-sanity-regression/notes/T003-judge-audit.md"

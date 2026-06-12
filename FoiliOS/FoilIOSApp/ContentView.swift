@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var providerCredentialMessage = ""
     @State private var showDiagnostics = false
     @State private var lastHandledCommandID: String?
+    @AppStorage("foil.onboarding.selectedRoute.v1") private var selectedRouteID = FoilDictationLoopPresenter.macRouteID
     private let refreshTimer = Timer.publish(every: 0.75, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -35,8 +36,7 @@ struct ContentView: View {
                         transcriptReviewPanel(transcriptReviewPresentation)
                     }
 
-                    setupChecklistPanel
-                    betaGuidancePanel
+                    routeFirstOnboardingPanel
 
                     if let handoffGuidance {
                         VStack(alignment: .leading, spacing: 10) {
@@ -81,8 +81,23 @@ struct ContentView: View {
                         }
                     }
 
-                    DisclosureGroup("Diagnostics", isExpanded: $showDiagnostics) {
+                    DisclosureGroup("Advanced / Support", isExpanded: $showDiagnostics) {
                         VStack(alignment: .leading, spacing: 12) {
+                            ForEach(FoilDictationLoopPresenter.advancedSupportPresentation()) { item in
+                                setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
+                            }
+
+                            Divider()
+
+                            Text("Safe test targets")
+                                .font(.callout.weight(.semibold))
+
+                            ForEach(FoilDictationLoopPresenter.betaGuidancePresentation()) { item in
+                                setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
+                            }
+
+                            Divider()
+
                             statusRow(storageReportSummary, systemImage: "externaldrive")
                                 .accessibilityIdentifier("keyboard-storage-report-summary")
                             if transcriptReviewPresentation != nil {
@@ -110,6 +125,7 @@ struct ContentView: View {
                         }
                         .padding(.top, 8)
                     }
+                    .accessibilityIdentifier("advanced-support-disclosure")
 
                     Spacer(minLength: 0)
                 }
@@ -333,61 +349,25 @@ struct ContentView: View {
         .accessibilityElement(children: .contain)
     }
 
-    private var setupChecklistPanel: some View {
+    private var routeFirstOnboardingPanel: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Closed beta setup")
+                Text("Choose your setup route")
                     .font(.headline)
-                Text("Complete these once, then use Foil from the keyboard in a safe text field.")
+                Text("Start with the Mac path when it is available, or finish setup today with an API key on this iPhone.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
 
-            setupReadinessPanel
-
-            VStack(alignment: .leading, spacing: 10) {
-                ForEach(FoilDictationLoopPresenter.setupChecklistPresentation()) { item in
-                    setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(FoilDictationLoopPresenter.routeChoicePresentation()) { route in
+                    routeChoiceButton(route)
                 }
             }
 
             Divider()
 
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Current status")
-                    .font(.callout.weight(.semibold))
-
-                setupRow(
-                    title: "Microphone",
-                    detail: microphonePermissionSummary,
-                    systemImage: "mic"
-                )
-                setupRow(
-                    title: "Provider",
-                    detail: transcription.credentialSummary,
-                    systemImage: transcription.hasConfiguredAPIKey ? "key.fill" : "key"
-                )
-                providerCredentialEditor
-                setupRow(
-                    title: "Keyboard health",
-                    detail: keyboardHealthSummary,
-                    systemImage: keyboardHealth.fullAccessState == .enabled ? "checkmark.circle" : "exclamationmark.circle"
-                )
-                setupRow(
-                    title: "Shared state",
-                    detail: storageHealthSummary,
-                    systemImage: "externaldrive"
-                )
-
-                Button {
-                    bridge.reset()
-                    refresh()
-                } label: {
-                    Label("Reset shared state", systemImage: "arrow.counterclockwise")
-                }
-                .buttonStyle(.bordered)
-                .accessibilityIdentifier("setup-reset-shared-state-button")
-            }
+            selectedRouteDetails
         }
         .font(.callout)
         .padding(14)
@@ -397,7 +377,139 @@ struct ContentView: View {
                 .strokeBorder(.secondary.opacity(0.18))
         )
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("closed-beta-setup-checklist")
+        .accessibilityIdentifier("route-first-onboarding")
+    }
+
+    private func routeChoiceButton(_ route: FoilSetupRoutePresentation) -> some View {
+        Button {
+            selectedRouteID = route.routeID
+        } label: {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: selectedRouteID == route.routeID ? "checkmark.circle.fill" : route.systemImage)
+                    .foregroundStyle(selectedRouteID == route.routeID ? Color.accentColor : Color.secondary)
+                    .frame(width: 22)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(route.title)
+                            .font(.callout.weight(.semibold))
+                        Text(route.badge)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(route.isUsableNow ? .green : .orange)
+                    }
+                    Text(route.detail)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                }
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(.plain)
+        .padding(10)
+        .background(.background.opacity(0.6), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(selectedRouteID == route.routeID ? Color.accentColor.opacity(0.5) : Color.secondary.opacity(0.18))
+        )
+        .accessibilityIdentifier("route-choice-\(route.routeID)")
+    }
+
+    @ViewBuilder
+    private var selectedRouteDetails: some View {
+        switch selectedRouteID {
+        case FoilDictationLoopPresenter.macRouteID:
+            macRouteDetails
+        case FoilDictationLoopPresenter.advancedRouteID:
+            advancedRouteDetails
+        default:
+            iPhoneAPIKeyRouteDetails
+        }
+    }
+
+    private var macRouteDetails: some View {
+        let preview = FoilDictationLoopPresenter.macPairingPreviewPresentation()
+
+        return VStack(alignment: .leading, spacing: 12) {
+            setupRow(
+                title: preview.title,
+                detail: preview.detail,
+                systemImage: "desktopcomputer"
+            )
+            setupRow(
+                title: "Bridge contract",
+                detail: preview.contractDetail,
+                systemImage: "point.3.connected.trianglepath.dotted"
+            )
+            setupRow(
+                title: preview.receiptName,
+                detail: preview.receiptDetail,
+                systemImage: "doc.text.magnifyingglass"
+            )
+            readinessPanel
+            Button {
+                selectedRouteID = FoilDictationLoopPresenter.iPhoneAPIKeyRouteID
+            } label: {
+                Label(preview.fallbackTitle, systemImage: "iphone.gen3")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .buttonBorderShape(.roundedRectangle(radius: 8))
+            .accessibilityIdentifier("select-iphone-api-route-button")
+        }
+    }
+
+    private var iPhoneAPIKeyRouteDetails: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(FoilDictationLoopPresenter.iPhoneAPIKeySetupPresentation()) { item in
+                    setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
+                }
+            }
+
+            Divider()
+
+            Text("Current status")
+                .font(.callout.weight(.semibold))
+
+            setupReadinessPanel
+
+            setupRow(
+                title: "Microphone",
+                detail: microphonePermissionSummary,
+                systemImage: "mic"
+            )
+            setupRow(
+                title: "Provider route",
+                detail: transcription.credentialSummary,
+                systemImage: transcription.hasConfiguredAPIKey ? "key.fill" : "key"
+            )
+            providerCredentialEditor
+            setupRow(
+                title: "Keyboard health",
+                detail: keyboardHealthSummary,
+                systemImage: keyboardHealth.fullAccessState == .enabled ? "checkmark.circle" : "exclamationmark.circle"
+            )
+            keyboardRecoveryChecklist
+            setupRow(
+                title: "Shared state",
+                detail: storageHealthSummary,
+                systemImage: "externaldrive"
+            )
+
+            readinessPanel
+
+            Button {
+                bridge.reset()
+                refresh()
+            } label: {
+                Label("Reset shared state", systemImage: "arrow.counterclockwise")
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("setup-reset-shared-state-button")
+        }
     }
 
     private var setupReadinessPanel: some View {
@@ -435,24 +547,36 @@ struct ContentView: View {
         .accessibilityIdentifier("setup-readiness-summary")
     }
 
-    private var betaGuidancePanel: some View {
+    private var advancedRouteDetails: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Where to test")
-                .font(.headline)
-
-            ForEach(FoilDictationLoopPresenter.betaGuidancePresentation()) { item in
+            ForEach(FoilDictationLoopPresenter.advancedSupportPresentation()) { item in
                 setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
             }
+            setupRow(
+                title: "Support tools",
+                detail: "Open Advanced / Support below for diagnostics, fake transcript staging, secure-field checks, and safe target notes.",
+                systemImage: "chevron.down.circle"
+            )
+            readinessPanel
         }
-        .font(.callout)
-        .padding(14)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(.secondary.opacity(0.18))
-        )
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("closed-beta-target-guidance")
+    }
+
+    private var readinessPanel: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            statusRow(onboardingReadiness.detail, systemImage: onboardingReadiness.systemImage)
+                .foregroundStyle(onboardingReadiness.isComplete ? .green : .primary)
+
+            if !onboardingReadiness.blockers.isEmpty {
+                ForEach(onboardingReadiness.blockers, id: \.self) { blocker in
+                    Label(blocker, systemImage: "circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(10)
+        .background(.background.opacity(0.55), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .accessibilityIdentifier(onboardingReadiness.isComplete ? "onboarding-ready" : "onboarding-not-ready")
     }
 
     @ViewBuilder
@@ -624,6 +748,10 @@ struct ContentView: View {
         }
     }
 
+    private var microphoneAllowed: Bool {
+        AVAudioApplication.shared.recordPermission == .granted
+    }
+
     private var microphoneSetupState: FoilMicrophoneSetupState {
         switch AVAudioApplication.shared.recordPermission {
         case .granted:
@@ -662,6 +790,17 @@ struct ContentView: View {
             return "Ready, no transcript"
         }
         return snapshot.phase.displayName
+    }
+
+    private var onboardingReadiness: FoilOnboardingReadinessPresentation {
+        FoilDictationLoopPresenter.onboardingReadinessPresentation(
+            selectedRouteID: selectedRouteID,
+            hasConfiguredAPIKey: transcription.hasConfiguredAPIKey,
+            microphoneAllowed: microphoneAllowed,
+            keyboardHealth: keyboardHealth,
+            storageReport: storageReport,
+            snapshot: snapshot
+        )
     }
 
     private var dictationStage: FoilAppLoopPresentation {

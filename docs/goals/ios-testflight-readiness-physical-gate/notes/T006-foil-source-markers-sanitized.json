@@ -1,0 +1,26 @@
+{
+  "baseUrl": "http://192.168.1.40:8100",
+  "buttonCountApprox": 33,
+  "foilBundleIdPresent": true,
+  "httpOk": true,
+  "markers": {
+    "advanced": true,
+    "apiKeyRoute": true,
+    "foilTitle": true,
+    "fullAccess": true,
+    "keyboardHealth": true,
+    "onboardingNotReady": false,
+    "onboardingNotReadyIdentifier": true,
+    "onboardingReadyIdentifier": false,
+    "setupComplete": false,
+    "useMyMac": true
+  },
+  "privacy": {
+    "rawSourcePersisted": false,
+    "rawSourcePrinted": false,
+    "screenshotsTaken": false
+  },
+  "schema": "foil.testflightReadiness.foilSourceMarkers.v1",
+  "sourceBytes": 41215,
+  "sourceSha256Prefix": "423a55c3acff123c"
+}

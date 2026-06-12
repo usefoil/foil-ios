@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.52-testflight-beta-launch-rehearsal"
   kind: specific
   tranche: "Closed-beta candidate TestFlight release proof."
-  status: active
+  status: blocked
   oracle:
     signal: "Candidate build is available, installed, and minimally smoked or exactly blocked."
     cadence: "before upload, after upload, after install, after smoke"
@@ -20,33 +20,57 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Preflight signing, build metadata, release notes, and TestFlight state."
     acceptance_criteria:
       - "Receipt proves upload is safe to attempt or names exact Apple/signing blocker."
+    receipt:
+      result: upload_blocker_identified
+      summary: "Local build/signing tooling is present and build 13 prep is safe, but App Store Connect validation/upload requires API key/issuer or Apple ID app-password/provider inputs not safely discoverable from repo/env."
+      evidence:
+        - "docs/goals/ios-v0.52-testflight-beta-launch-rehearsal/notes/T001-preflight-receipt.md"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     objective: "Archive/upload candidate build and attach internal beta state."
     acceptance_criteria:
       - "Upload, processing, export compliance, and internal group state are verified or exactly blocked."
+    receipt:
+      result: archive_export_done_upload_blocked
+      summary: "Build 0.1.0 (13) archives/exports locally with app and keyboard metadata verified, but upload is blocked on App Store Connect authentication command inputs."
+      evidence:
+        - "docs/goals/ios-v0.52-testflight-beta-launch-rehearsal/notes/T002-candidate-build-receipt.md"
+      next_owner: "operator"
+      next_action: "Provide App Store Connect API key ID plus issuer ID, or Apple ID app-password/provider details, through a safe channel."
   - id: T003
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     objective: "Install/update candidate build and run minimal physical smoke."
     acceptance_criteria:
       - "Preview iPhone runs candidate build and proves onboarding plus one safe insertion path."
+    receipt:
+      result: blocked
+      summary: "Build 13 is not uploaded to TestFlight and physical WDA preflight is not healthy, so install/update and post-update smoke were not attempted."
+      evidence:
+        - "docs/goals/ios-v0.52-testflight-beta-launch-rehearsal/notes/T003-install-smoke-blocker.md"
+      next_owner: "operator"
+      next_action: "After upload succeeds, make preview iPhone available/unlocked and restore WDA for minimal post-update smoke."
   - id: T004
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     objective: "Verify release proof and scoped claims."
     acceptance_criteria:
       - "Release notes and docs claim only the behaviors proven by the candidate build."
+    receipt:
+      result: blocked_before_upload
+      summary: "Final audit limits the claim to local build-13 archive/export readiness and explicitly rejects uploaded/available/installed/smoked claims."
+      evidence:
+        - "docs/goals/ios-v0.52-testflight-beta-launch-rehearsal/notes/T004-final-audit.md"

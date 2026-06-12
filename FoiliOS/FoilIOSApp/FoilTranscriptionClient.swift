@@ -1,12 +1,16 @@
 import Foundation
 
+protocol FoilTranscriptionProviding {
+    func transcribe(audioFileURL: URL, apiKey: String) async throws -> String
+}
+
 protocol FoilTranscriptionUploading {
     func upload(for request: URLRequest, from body: Data) async throws -> (Data, URLResponse)
 }
 
 extension URLSession: FoilTranscriptionUploading {}
 
-struct FoilTranscriptionClient {
+struct FoilTranscriptionClient: FoilTranscriptionProviding {
     private let endpoint = URL(string: "https://api.groq.com/openai/v1/audio/transcriptions")!
     private let model = "whisper-large-v3-turbo"
     private let transport: FoilTranscriptionUploading
