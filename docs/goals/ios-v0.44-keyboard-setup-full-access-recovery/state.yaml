@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.44-keyboard-setup-full-access-recovery"
   kind: specific
   tranche: "Keyboard setup and recovery polish."
-  status: blocked
+  status: done
   oracle:
     signal: "Physical iPhone setup and recovery paths work or name exact external blockers."
     cadence: "after each Settings/keyboard state"
@@ -95,23 +95,44 @@ tasks:
       next_action: "Approve or perform WDA/TestFlight/device actions required to make physical UI automation reachable, then rerun setup and recovery proof."
   - id: T004
     type: judge
-    assignee: PM
-    status: blocked
+    assignee: Judge
+    status: done
     objective: "Collect physical keyboard setup/recovery receipts after WDA recovery."
     acceptance_criteria:
       - "Receipts prove recovery guidance and disabled keyboard behavior while Full Access is unavailable."
       - "If Full Access is still unavailable, receipts name the blocker without private content."
     receipt:
-      result: external_blocker
-      summary: "Physical iPhone receipts prove #29 recovery guidance is present in the app and Foil Keyboard keeps Insert Latest disabled with a Full Access/refocus/cycle message. The enabled Full Access path remains physically blocked because the keyboard reports Full Access unavailable."
+      result: done
+      decision: approved
+      summary: "Physical iPhone receipts proved #29 recovery guidance is present in the app and Foil Keyboard keeps Insert Latest disabled with a Full Access/refocus/cycle message while Full Access is unavailable. Follow-up T005 cleared the enabled-path blocker."
       evidence:
         - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/T004-physical-receipt.md"
         - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T004-app-recovery-copy.json"
         - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T004-keyboard-disabled.json"
         - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T004-keyboard-full-access-disabled.json"
         - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T004-app-group-after-keyboard.json"
-      missing:
-        - "Physical receipt for enabled Full Access after cycling/refocusing Foil Keyboard."
-        - "Physical receipt for stale-state reset success once Full Access is enabled."
-      next_owner: "operator"
-      next_action: "Enable Allow Full Access for Foil Keyboard in iOS Settings, refocus a safe host field, cycle back to Foil Keyboard, then rerun the enabled-path receipts."
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/T005-enabled-path-receipt.md"
+  - id: T005
+    type: pm
+    assignee: PM
+    status: done
+    objective: "Retry enabled Full Access physical proof after operator permission changes."
+    acceptance_criteria:
+      - "Strict preflight is green before any host app is touched."
+      - "If automation remains unavailable, receipts name the blocker without private content."
+    receipt:
+      result: done
+      decision: complete
+      summary: "WDA/preflight recovered and physical receipts now prove Foil Keyboard Full Access enabled behavior in the sterile Safari fixture: idle/no-transcript state disables Insert Latest/Clear, a sterile staged transcript enables both controls, and keyboard Clear returns App Group state to idle."
+      evidence:
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/T005-enabled-path-receipt.md"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T005-preflight-healthy.json"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T005-safari-fixture-keyboard-visible.json"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T005-reset-enabled-path.json"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T005-app-group-after-reset.json"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T005-keyboard-enabled-reset-idle.json"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T005-stage-enabled-transcript.json"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T005-app-group-after-stage.json"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T005-keyboard-enabled-transcript-waiting.json"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T005-app-group-after-keyboard-clear.json"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T005-keyboard-clear-reset-idle.json"

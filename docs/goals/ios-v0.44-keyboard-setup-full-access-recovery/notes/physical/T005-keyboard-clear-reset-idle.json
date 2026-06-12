@@ -1,0 +1,65 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "foil-keyboard-root",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "foil-keyboard-clear-latest",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "foil-keyboard-clear-latest",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 24,
+      "textSha256": "27b5f75960524657"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 30,
+      "textSha256": "d82d622ddd06cdb6"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-pr29-after-clear-source.json",
+    "nodeCount": 163,
+    "sha256": "154197ef34b20e91512f5a5dae0a8382449ba12c0953d84704abbb3ebb7e55f5"
+  },
+  "target": "pr29-keyboard-clear-reset-idle"
+}
