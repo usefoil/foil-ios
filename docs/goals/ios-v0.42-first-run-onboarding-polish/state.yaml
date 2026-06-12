@@ -99,3 +99,25 @@ tasks:
         - "Physical iPhone onboarding receipts for first-run, returning-user, blocked-keyboard, and setup-complete states."
       next_owner: "operator"
       next_action: "Make iPhone-preview available/unlocked, approve installing the PR #27 development build, and restore WDA/equivalent physical UI automation."
+  - id: T004
+    type: judge
+    assignee: PM
+    status: blocked
+    objective: "Collect physical route-choice onboarding receipts after WDA recovery."
+    acceptance_criteria:
+      - "Receipts prove route choices are visible and setup-complete is not claimed while physical gates are unmet."
+      - "If setup-complete is still unavailable, receipts name the exact physical blockers without private content."
+    receipt:
+      result: external_blocker
+      summary: "Physical iPhone receipts prove route-first onboarding is visible, API-key setup remains usable, Advanced / Support hides diagnostics, and onboarding does not overclaim ready. The device still blocks setup-complete on microphone permission, keyboard Full Access/health verification, and app-visible shared-state reset."
+      evidence:
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T004-physical-receipt.md"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T004-first-run-mac-default.json"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T004-api-route-not-ready.json"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T004-advanced-collapsed.json"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T004-after-keyboard-health-not-ready.json"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T004-after-app-reset-not-ready.json"
+      missing:
+        - "Physical receipt for `onboarding-ready` after microphone, keyboard Full Access/health, and app-visible App Group reset all pass."
+      next_owner: "operator"
+      next_action: "Grant microphone permission if prompted, verify Foil Keyboard Full Access from Settings and a safe host field, reset shared state from the app UI, then rerun the setup-complete receipt."

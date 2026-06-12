@@ -1,0 +1,49 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "route-first-onboarding",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-iphone-api-key",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "provider-key-field",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "keyboard-recovery-checklist",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "setup-readiness-summary",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-not-ready",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "pr27-api-route.json",
+    "nodeCount": 140,
+    "sha256": "9f580918e9771cd9ec90b9a3b01ea1286997ca58a7989154196d903c34471a83"
+  },
+  "target": "pr27-api-route-selected"
+}
