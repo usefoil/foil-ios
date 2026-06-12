@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.46-insert-latest-usage-ux"
   kind: specific
   tranche: "Keyboard insertion predictability and state polish."
-  status: blocked
+  status: done
   oracle:
     signal: "Insert Latest inserts once when valid and clearly refuses unsafe/empty/stale states."
     cadence: "after each insertion-state scenario"
@@ -86,3 +86,34 @@ tasks:
         - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/T003-physical-blocker.md"
       next_owner: "operator"
       next_action: "Restore WDA or equivalent physical UI automation, then rerun exactly-once/stale/reset proof in a sterile field."
+  - id: T004
+    type: judge
+    assignee: PM
+    status: done
+    objective: "Collect physical Insert Latest receipts after WDA recovery."
+    acceptance_criteria:
+      - "Receipts rule out double insert, stale insert, non-complete insert, no-transcript insert, and App Group reset failures."
+      - "Committed receipts contain only sanitized hashes, counts, booleans, and pass/fail assertions."
+    receipt:
+      result: done
+      summary: "Physical iPhone Safari fixture receipts prove fresh complete transcript inserts once, disables after insertion, clears App Group state, and refuses no-transcript, stale complete, and processing-with-transcript snapshots."
+      evidence:
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/T004-physical-receipt.md"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/physical/T004-preflight.json"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/physical/T004-safari-after-insert.json"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/physical/T004-safari-after-second-click.json"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/physical/T004-no-transcript-disabled.json"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/physical/T004-stale-disabled.json"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/physical/T004-processing-disabled.json"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/notes/physical/T004-app-group-final.json"
+      commands:
+        - cmd: "scripts/ios-physical-harness.py preflight --strict --wda-url http://192.168.1.40:8100"
+          status: pass
+        - cmd: "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -configuration Debug -destination 'id=00008030-001A0C980A33C02E' -derivedDataPath /tmp/foil-ios-pr31-dd DEVELOPMENT_TEAM=B3A6AN2HA4 CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates"
+          status: pass
+        - cmd: "xcrun devicectl device install app --device 5320F5AD-2A71-50AC-94FE-207B544B6247 /tmp/foil-ios-pr31-dd/Build/Products/Debug-iphoneos/Foil iOS.app"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py receipt --source /tmp/pr31-after-second-click.json --target pr31-safari-after-second-click --require-identifier foil-keyboard-root --require-identifier foil-keyboard-insert-latest --expect-identifier-state foil-keyboard-insert-latest.enabled=false --expect-value-count '<sterile transcript>=1'"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py receipt --source /tmp/pr31-stale-visible.json --target pr31-stale-disabled --require-identifier foil-keyboard-root --require-identifier foil-keyboard-insert-latest --expect-identifier-state foil-keyboard-insert-latest.enabled=false --expect-value-count '<sterile stale transcript>=0'"
+          status: pass
