@@ -1,0 +1,52 @@
+{
+  "automationProcesses": {
+    "count": 0,
+    "lineHashes": [],
+    "printedCommandLines": false,
+    "returncode": 1
+  },
+  "classification": "wda_unreachable",
+  "device": {
+    "devicectlReturncode": 0,
+    "identifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+    "name": "iPhone-preview",
+    "summary": {
+      "looksAvailable": true,
+      "present": true,
+      "rawLineSha256": "0628112e1234a5a0",
+      "state": "available (paired)"
+    }
+  },
+  "nextAction": "Start or repair WDA, then rerun preflight before touching host apps.",
+  "privacy": {
+    "openedHostApps": false,
+    "printedRawWdaSource": false,
+    "printedScreenshots": false,
+    "printedTranscriptBodies": false
+  },
+  "redaction": {
+    "selfTest": {
+      "returncode": 0,
+      "stderrBytes": 0,
+      "stderrSha256": null,
+      "stdoutBytes": 1349,
+      "stdoutSha256": "6c82f1cdd22beeb6"
+    },
+    "selfTestPassed": true
+  },
+  "safeToTouchHostApps": false,
+  "schema": "foil.iosPhysicalHarness.preflight.v1",
+  "tooling": {
+    "iproxyPath": "/opt/homebrew/bin/iproxy",
+    "iproxyPresent": true,
+    "wdaCommandAvailable": true,
+    "wdaProjectPresent": true
+  },
+  "wda": {
+    "ready": false,
+    "status": {
+      "error": "URLError"
+    },
+    "url": "http://192.168.1.40:8100"
+  }
+}

@@ -1,7 +1,8 @@
 # T002 Copy And Claim Boundary Scan
 
-Date: 2026-06-09
-Result: `pass_after_companion_public_copy_fix`
+Date: 2026-06-12T02:26Z
+Result: `done`
+Decision: `pass_after_companion_public_copy_fix`
 
 ## iOS Repo
 
@@ -16,16 +17,16 @@ Scanned:
 
 Findings:
 
-- `README.md` separates current source version `0.1.0 (13)` from the safe released TestFlight claim for build `0.1.0 (12)`.
-- `docs/ios-closed-beta-tester-handoff.md` says build `0.1.0 (12)` is a narrow internal beta, names Safari normal insertion and Safari secure-field rejection as current build 12 proof, and explicitly rejects broad iPhone compatibility, Mail support, Messages delivery, private-thread behavior, secure-field insertion, and public App Store availability.
+- `README.md` keeps the broad claim boundary narrow: sterile Safari normal-field proof, secure-field rejection, no arbitrary app support, no Messages delivery/private-thread claim, and Mail deferred.
+- `docs/ios-closed-beta-tester-handoff.md` now targets build `0.1.0 (13)` and says the build is uploaded/processed/attached/installed only because the later TestFlight physical-gate receipts prove those states. It still explicitly rejects broad iPhone compatibility, Mail support, Messages delivery, private-thread behavior, secure-field insertion, and public App Store availability.
 - `docs/ios-keyboard-host-app-matrix.md` keeps build 12 Notes and Messages rows privacy-blocked and keeps v0.47 current-build rows blocked/not-rerun.
-- `docs/ios-testflight-upload-runbook.md` describes source candidate build 13 as upload-blocked until App Store Connect auth inputs are supplied; it does not claim build 13 is uploaded, installed, or smoked.
+- `docs/ios-testflight-upload-runbook.md` records the later successful App Store Connect/TestFlight path, including the residual need for human TestFlight/App Store authentication where applicable.
 - The beta issue template asks for safe target-app context and includes private-content guardrails.
-- A scoped current-copy overclaim scan returned only anti-claim lines for Messages delivery, Mail support, broad iPhone compatibility, and unsupported private-thread behavior.
+- A scoped current-copy overclaim scan returned build-13 TestFlight claims in the handoff/runbook that are backed by `docs/goals/ios-testflight-readiness-physical-gate/state.yaml`, plus anti-claim lines for Messages delivery, Mail support, broad iPhone compatibility, and unsupported private-thread behavior.
 
 ## Public Foil Repo
 
-Initial scan found stale phrasing in the public `mean-weasel/foil` repo that could be read as more general iOS verification than the evidence supports. Companion PR [mean-weasel/foil#288](https://github.com/mean-weasel/foil/pull/288) changed the wording to build-scoped host-app proof and merged at `2026-06-09T13:34:45Z` with merge commit `927e4289a1044f2f6848134256a603fd5952c9c4`.
+Initial scan found stale phrasing in the public `usefoil/foil` repo that could be read as more general iOS verification than the evidence supports. Companion PR [usefoil/foil#288](https://github.com/usefoil/foil/pull/288) changed the wording to build-scoped host-app proof and merged at `2026-06-09T13:34:45Z` with merge commit `927e4289a1044f2f6848134256a603fd5952c9c4`.
 
 Post-merge public scan confirmed:
 
@@ -37,4 +38,4 @@ Post-merge public scan confirmed:
 
 ## Decision
 
-Tester-facing and public-facing copy is aligned with proven behavior after the companion public-copy merge. No remaining scanned copy should invite a reader to infer Mail support, Messages delivery, existing private-thread safety, secure-field support, broad iPhone compatibility, or public App Store availability.
+Tester-facing and public-facing copy is aligned with proven behavior after the companion public-copy merge and later TestFlight physical-gate receipts. No remaining scanned copy should invite a reader to infer Mail support, Messages delivery, existing private-thread safety, secure-field support, broad iPhone compatibility, or public App Store availability.

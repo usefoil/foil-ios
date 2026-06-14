@@ -1,0 +1,61 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "process",
+      "launch",
+      "--device",
+      "5320F5AD-2A71-50AC-94FE-207B544B6247",
+      "com.apple.mobilesafari",
+      "--payload-url",
+      "http://192.168.1.34:8945/index.html",
+      "--terminate-existing",
+      "--json-output",
+      "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T009-open-safari-fixture-corrected.json"
+    ],
+    "commandType" : "devicectl.device.process.launch",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 3,
+    "outcome" : "success",
+    "version" : "518.31"
+  },
+  "result" : {
+    "deviceIdentifier" : "5320F5AD-2A71-50AC-94FE-207B544B6247",
+    "launchOptions" : {
+      "activatedWhenStarted" : true,
+      "arguments" : [
+        "--payload-url",
+        "http://192.168.1.34:8945/index.html",
+        "--terminate-existing"
+      ],
+      "environmentVariables" : {
+        "TERM" : "dumb"
+      },
+      "platformSpecificOptions" : {
+
+      },
+      "startStopped" : false,
+      "terminateExistingInstances" : false,
+      "user" : {
+        "active" : true
+      }
+    },
+    "process" : {
+      "auditToken" : [
+        4294967295,
+        501,
+        501,
+        501,
+        501,
+        44105,
+        0,
+        130382
+      ],
+      "executable" : "file:///private/var/containers/Bundle/Application/62414D32-E0AE-45C5-BC96-A4BD5C157D87/MobileSafari.app/MobileSafari",
+      "processIdentifier" : 44105
+    }
+  }
+}

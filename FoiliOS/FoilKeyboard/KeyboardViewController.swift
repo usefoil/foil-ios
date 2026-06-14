@@ -144,7 +144,7 @@ final class KeyboardViewController: UIInputViewController {
         statusLabel.text = presentation.status
         messageLabel.text = presentation.message
         let hasTranscript = snapshot.transcript?.isEmpty == false
-        let hasInsertableTranscript = snapshot.insertableTranscript != nil
+        let hasInsertableTranscript = snapshot.insertableTranscript() != nil
         let hasRecoverableState = snapshot.phase != .idle || hasTranscript
         insertButton.isEnabled = hasInsertableTranscript && fullAccessEnabled
         resetButton.isEnabled = hasRecoverableState && fullAccessEnabled
