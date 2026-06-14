@@ -1,0 +1,46 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "foil-keyboard-root",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 20,
+      "textSha256": "b0bf37841873e746"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 12,
+      "textSha256": "e258f2a316e31465"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 24,
+      "textSha256": "27b5f75960524657"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-pr29-safari-source.json",
+    "nodeCount": 162,
+    "sha256": "21db74e92fcbe1a7f815c75d29a14e948684049fc3b8221083828dafb7c7a4b3"
+  },
+  "target": "pr29-safari-fixture-keyboard-visible"
+}

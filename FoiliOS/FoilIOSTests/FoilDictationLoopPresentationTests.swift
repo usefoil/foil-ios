@@ -423,6 +423,7 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         XCTAssertEqual(presentation.status, "Open Foil")
         XCTAssertEqual(presentation.insertTitle, "Insert unavailable")
         XCTAssertTrue(presentation.message.contains("Allow Full Access"))
+        XCTAssertTrue(presentation.message.contains("refocus the field"))
         XCTAssertTrue(presentation.message.contains("cycle back"))
     }
 
@@ -433,9 +434,11 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         )
 
         XCTAssertTrue(presentation.detail.contains("Open Foil Keyboard"))
+        XCTAssertTrue(presentation.detail.contains("safe text field"))
         XCTAssertEqual(presentation.recoveryMessage, presentation.detail)
         XCTAssertEqual(presentation.recoverySteps.count, 3)
-        XCTAssertTrue(presentation.recoverySteps[1].contains("Switch to Foil Keyboard"))
+        XCTAssertTrue(presentation.recoverySteps[0].contains("tap inside it"))
+        XCTAssertTrue(presentation.recoverySteps[1].contains("globe/Next Keyboard"))
     }
 
     func testKeyboardHealthPresentationPrioritizesFullAccessOff() {
@@ -453,10 +456,11 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         )
 
         XCTAssertTrue(presentation.detail.contains("Allow Full Access is off"))
-        XCTAssertTrue(presentation.detail.contains("reopen Foil Keyboard"))
+        XCTAssertTrue(presentation.detail.contains("refocus the field"))
         XCTAssertEqual(presentation.recoveryMessage, presentation.detail)
         XCTAssertEqual(presentation.recoverySteps.count, 3)
         XCTAssertTrue(presentation.recoverySteps[1].contains("enable Allow Full Access"))
+        XCTAssertTrue(presentation.recoverySteps[2].contains("globe/Next Keyboard"))
     }
 
     func testKeyboardHealthPresentationDetectsStaleEnabledKeyboard() {
@@ -475,10 +479,10 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         )
 
         XCTAssertTrue(presentation.detail.contains("not checked in recently"))
-        XCTAssertTrue(presentation.detail.contains("cycle back"))
+        XCTAssertTrue(presentation.detail.contains("globe/Next Keyboard"))
         XCTAssertEqual(presentation.recoveryMessage, presentation.detail)
         XCTAssertEqual(presentation.recoverySteps.count, 3)
-        XCTAssertTrue(presentation.recoverySteps[1].contains("Switch away"))
+        XCTAssertTrue(presentation.recoverySteps[1].contains("select another keyboard"))
     }
 
     func testKeyboardHealthPresentationKeepsFreshEnabledStateQuiet() {

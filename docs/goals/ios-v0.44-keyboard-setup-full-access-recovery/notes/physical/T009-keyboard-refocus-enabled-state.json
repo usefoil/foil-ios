@@ -1,0 +1,42 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "foil-keyboard-root",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 26,
+      "textSha256": "9f3a0b52676c5553"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-ios-pr29-t009-after-focus-source.json",
+    "nodeCount": 149,
+    "sha256": "86b99d3ca606d7739ef3ad6cb9113d8d39933316a1e66e7a4dd1ab3c71d0a459"
+  },
+  "target": "pr29-keyboard-refocus-enabled-state"
+}
