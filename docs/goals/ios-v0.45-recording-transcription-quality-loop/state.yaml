@@ -152,3 +152,38 @@ tasks:
         - "Three consecutive sterile safe-phrase record -> transcribe -> Insert Latest cycles."
       next_owner: "operator"
       next_action: "Repair WDA/UI automation mode on iPhone-preview, rerun strict preflight, then use the sterile phrase `Foil safe test phrase June twelve` for live recording/cancel/transcription/insert-cycle proof."
+  - id: T006
+    type: judge
+    assignee: PM
+    status: blocked
+    objective: "Collect physical recording/cancel receipts after WDA recovered."
+    acceptance_criteria:
+      - "Receipts prove current-build setup-ready recording controls and cancel behavior, or exactly block before claiming live transcription."
+      - "Receipts keep raw WDA source, audio, transcript bodies, screenshots, provider keys, and private phone content out of commits."
+    receipt:
+      result: external_blocker
+      note: "notes/T006-physical-recording-cancel-receipt.md"
+      summary: "WDA recovered and current PR #30 physical receipts now prove sterile Safari/keyboard refresh, onboarding-ready recording controls, active recording Cancel availability, Cancel returning to idle/no transcript, and stopped-recording Transcribe availability. Two sterile Mac TTS live transcription attempts reached Transcribe but failed with no detected speech, leaving App Group phase failed and no transcript."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T006-physical-recording-cancel-receipt.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-install-current-build.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-current-recording-surface.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-onboarding-ready-recording-surface.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-recording-active-cancel-available.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-recording-cancel-returned-idle.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-live-recording-stopped-transcribe-ready.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-live-transcription-retry-result.json"
+      proven:
+        - "Current PR #30 build installed and launched on iPhone-preview."
+        - "WDA direct-device preflight is healthy."
+        - "Keyboard health refreshed through a sterile Safari field with Full Access warning absent."
+        - "Onboarding-ready is present before recording."
+        - "Physical Cancel is available during recording and returns app/App Group to idle."
+        - "A stopped live recording enables Transcribe."
+      missing:
+        - "Successful live transcription of the sterile phrase."
+        - "Retry/reset receipt after successful transcription."
+        - "Three consecutive sterile safe-phrase record -> transcribe -> Insert Latest cycles."
+      next_owner: "operator"
+      next_action: "Speak `Foil safe test phrase June twelve` near iPhone-preview during the next recording window, then rerun transcription and sterile Safari insertion receipts."

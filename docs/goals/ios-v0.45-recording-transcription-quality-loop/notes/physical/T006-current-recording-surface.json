@@ -1,0 +1,95 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "dictation-console",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "start-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "stop-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "cancel-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "transcribe-latest-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-ready",
+      "kind": "requireIdentifier",
+      "passed": false,
+      "present": false
+    },
+    {
+      "identifier": "onboarding-not-ready",
+      "kind": "forbidIdentifier",
+      "passed": false,
+      "present": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "true",
+      "identifier": "start-recording-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "true"
+      ],
+      "passed": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "stop-recording-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "cancel-recording-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "transcribe-latest-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    }
+  ],
+  "passed": false,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-app-source.json",
+    "nodeCount": 131,
+    "sha256": "8a7d3a2b23204def6bfb9ad4a67088c99c842e94766c10c4fe84c358a95b670e"
+  },
+  "target": "pr30-current-recording-surface"
+}

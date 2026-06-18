@@ -1,0 +1,78 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "dictation-console",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "stop-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "cancel-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "start-recording-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "true",
+      "identifier": "stop-recording-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "true"
+      ],
+      "passed": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "true",
+      "identifier": "cancel-recording-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "true"
+      ],
+      "passed": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "transcribe-latest-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 29,
+      "textSha256": "641125d6dda33ddb"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-recording-active-source.json",
+    "nodeCount": 126,
+    "sha256": "80dff81ae30419057a10b52680432203a6177c4e4a8111488df387349ab81545"
+  },
+  "target": "pr30-recording-active-cancel-available"
+}

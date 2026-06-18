@@ -1,0 +1,34 @@
+{
+  "appGroup": {
+    "snapshot": {
+      "file": "T006-app-group-after-transcribe-retry.json",
+      "hasTranscript": false,
+      "phase": null,
+      "sha256": "99003bb5eb41c30120721db3d657e35c707916e2bc2de92a2462c9700a7a058e"
+    }
+  },
+  "checks": [
+    {
+      "identifier": "dictation-console",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "actual": 0,
+      "expected": 1,
+      "kind": "expectValueTextCount",
+      "passed": false,
+      "textLength": 33,
+      "textSha256": "7b58d3c7937e2382"
+    }
+  ],
+  "passed": false,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-after-transcribe2-source.json",
+    "nodeCount": 126,
+    "sha256": "032996aae8248450a626f9dd5a2f3fdbd19791b68efecbc1c358eac2ccf59963"
+  },
+  "target": "pr30-live-transcription-retry-result"
+}
