@@ -125,3 +125,30 @@ tasks:
         - "Three consecutive safe real-audio insert cycles."
       next_owner: "operator"
       next_action: "Approve a sterile safe-phrase microphone run, grant microphone if prompted, ensure provider/keyboard/App Group gates are ready, then rerun live cancel/transcription/insert-cycle receipts."
+  - id: T005
+    type: judge
+    assignee: PM
+    status: blocked
+    objective: "Resolve PR #30's main-branch conflict and re-check the physical proof gate."
+    acceptance_criteria:
+      - "PR #30 no longer has merge conflicts."
+      - "Focused recording/onboarding presentation tests pass after the merge."
+      - "If physical proof is blocked, the receipt names the exact blocker without private audio, transcript, WDA tree, screenshot, or device-path content."
+    receipt:
+      result: external_blocker
+      note: "notes/T005-conflict-resolution-and-wda-blocker.md"
+      summary: "Merged current main into PR #30, resolved the handoff-doc conflict by preserving both Full Access recovery and recording Cancel recovery guidance, and revalidated the focused presentation tests. Physical live-audio proof remains blocked because WDA launches but XCTest times out while enabling automation mode, so strict preflight refuses host-app touches."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T005-conflict-resolution-and-wda-blocker.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T005-conflict-resolution-summary.json"
+      proven:
+        - "The merge conflict is resolved."
+        - "Recording cancel and route/setup presentation tests still pass."
+        - "Merged physical receipts were privacy-scanned and the raw Safari executable path was redacted."
+      missing:
+        - "Strict physical preflight with WDA ready."
+        - "Physical cancel-during-active-recording receipt."
+        - "Physical live transcription/retry/reset receipts."
+        - "Three consecutive sterile safe-phrase record -> transcribe -> Insert Latest cycles."
+      next_owner: "operator"
+      next_action: "Repair WDA/UI automation mode on iPhone-preview, rerun strict preflight, then use the sterile phrase `Foil safe test phrase June twelve` for live recording/cancel/transcription/insert-cycle proof."

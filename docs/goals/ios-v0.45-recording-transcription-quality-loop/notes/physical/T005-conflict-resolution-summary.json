@@ -1,0 +1,50 @@
+{
+  "schema": "foil.physicalReceipt.v1",
+  "task": "T005",
+  "createdAt": "2026-06-18T22:26:42Z",
+  "claim": "PR #30 merge conflict is resolved, but physical recording proof remains blocked on WDA automation mode.",
+  "merge": {
+    "branch": "codex/ios-v0.45-recording-quality-loop",
+    "mergedBase": "origin/main",
+    "conflictingFiles": [
+      "docs/ios-closed-beta-tester-handoff.md"
+    ],
+    "resolution": "Kept Full Access refocus/cycle recovery guidance and recording Cancel recovery guidance."
+  },
+  "verification": {
+    "focusedPresentationTests": {
+      "command": "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests",
+      "status": "pass",
+      "executedTests": 23,
+      "failures": 0
+    },
+    "diffCheck": "pass",
+    "yamlParse": "pass",
+    "jsonParse": "pass",
+    "privacyScan": "pass"
+  },
+  "sanitization": {
+    "sanitizedMergedReceipt": "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/notes/physical/T009-open-safari-fixture-corrected.json",
+    "redactedRawExecutablePath": true,
+    "redactedAuditToken": true,
+    "redactedProcessIdentifier": true
+  },
+  "wda": {
+    "device": "iPhone-preview",
+    "url": "http://192.168.1.40:8100",
+    "ready": false,
+    "latestFailure": "Timed out while enabling automation mode.",
+    "strictPreflightClassification": "wda_unreachable",
+    "safeToTouchHostApps": false
+  },
+  "privacy": {
+    "committedRawWdaLogs": false,
+    "committedXcresult": false,
+    "committedScreenshots": false,
+    "committedAudio": false,
+    "committedTranscriptBodies": false,
+    "committedPrivatePhoneContent": false
+  },
+  "result": "blocked",
+  "nextAction": "Repair WDA/UI automation mode, rerun strict preflight, then collect live cancel/transcription/insert-cycle receipts with the sterile safe phrase."
+}
