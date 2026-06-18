@@ -1,0 +1,91 @@
+{
+  "appGroup": {
+    "snapshot": {
+      "file": "T006-app-group-after-app-reset.json",
+      "hasTranscript": false,
+      "phase": null,
+      "sha256": "abeeb5d8144d4616e4c0fd20a6457b79b511323113d801c6d098e7b894f5e89f"
+    }
+  },
+  "checks": [
+    {
+      "identifier": "route-first-onboarding",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-use-my-mac",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-iphone-api-key",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-advanced",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-ready",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-not-ready",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 24,
+      "textSha256": "4c73a67cb1c5711c"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 36,
+      "textSha256": "3efd8cd7c0661f36"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 41,
+      "textSha256": "da49ffdff0f67e2a"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 18,
+      "textSha256": "8cb63be8f1fd5d05"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 79,
+      "textSha256": "0afc46090988bcd8"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-after-app-reset-source.json",
+    "nodeCount": 119,
+    "sha256": "3667bfa4743a9b1622ecde383413475d772569228c3bcd56671400735ff81601"
+  },
+  "target": "pr27-current-onboarding-ready-after-app-reset"
+}

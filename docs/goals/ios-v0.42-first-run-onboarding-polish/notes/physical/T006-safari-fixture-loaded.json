@@ -1,0 +1,35 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 24,
+      "textSha256": "9094659807f52c60"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 17,
+      "textSha256": "30f6a2703489bbad"
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "kind": "expectValueTextCount",
+      "passed": true,
+      "textLength": 33,
+      "textSha256": "7b58d3c7937e2382"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "safari-fixture-source-2.json",
+    "nodeCount": 183,
+    "sha256": "374282d090e208dd68e2e95ae59dbe50b6ab37a0d3398e6b05234a81ef7dd9e5"
+  },
+  "target": "pr27-safari-fixture-loaded"
+}

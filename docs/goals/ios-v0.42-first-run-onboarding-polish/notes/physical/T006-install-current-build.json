@@ -1,0 +1,14 @@
+{
+  "appExists": true,
+  "appPathSha256": "67dcad40a6da68d5f0dd32017ddc1b044516cda92e850b2e5c3a82a85619140c",
+  "bundleIdentifier": "com.neonwatty.FoilIOS",
+  "bundleVersion": "13",
+  "device": "iPhone-preview",
+  "installCommandReturncode": 0,
+  "launchCommandReturncode": 0,
+  "rawDeviceContainerPathCommitted": false,
+  "rawInstallUrlCommitted": false,
+  "schema": "foil.physicalReceipt.installSummary.v1",
+  "shortVersion": "0.1.0",
+  "target": "pr27-onboarding-polish"
+}

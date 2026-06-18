@@ -1,0 +1,84 @@
+{
+  "appGroup": {
+    "snapshot": {
+      "file": "T006-app-group-ready.json",
+      "hasTranscript": false,
+      "phase": null,
+      "sha256": "b678fd6096b785585d26457d24caed5aa5d06738389967eb147995959001dc08"
+    }
+  },
+  "checks": [
+    {
+      "identifier": "route-first-onboarding",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-use-my-mac",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-iphone-api-key",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-advanced",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-ready",
+      "kind": "requireIdentifier",
+      "passed": false,
+      "present": false
+    },
+    {
+      "identifier": "onboarding-not-ready",
+      "kind": "forbidIdentifier",
+      "passed": false,
+      "present": true
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 24,
+      "textSha256": "4c73a67cb1c5711c"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 36,
+      "textSha256": "3efd8cd7c0661f36"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 41,
+      "textSha256": "da49ffdff0f67e2a"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 18,
+      "textSha256": "8cb63be8f1fd5d05"
+    }
+  ],
+  "passed": false,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-after-keyboard-source.json",
+    "nodeCount": 121,
+    "sha256": "dd3e870a6adc5a7e9924e397cb7bef649a278b9670958f1ef83a78b9deae97c5"
+  },
+  "target": "pr27-current-onboarding-ready-after-keyboard-refresh"
+}

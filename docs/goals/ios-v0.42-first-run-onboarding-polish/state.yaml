@@ -100,7 +100,7 @@ tasks:
       next_owner: "operator"
       next_action: "Make iPhone-preview available/unlocked, approve installing the PR #27 development build, and restore WDA/equivalent physical UI automation."
   - id: T004
-    type: judge
+    type: pm
     assignee: PM
     status: blocked
     objective: "Collect physical route-choice onboarding receipts after WDA recovery."
@@ -122,7 +122,7 @@ tasks:
       next_owner: "operator"
       next_action: "Grant microphone permission if prompted, verify Foil Keyboard Full Access from Settings and a safe host field, reset shared state from the app UI, then rerun the setup-complete receipt."
   - id: T005
-    type: judge
+    type: pm
     assignee: PM
     status: blocked
     objective: "Rerun physical onboarding-ready proof after the preview phone was unlocked."
@@ -145,3 +145,34 @@ tasks:
         - "Final onboarding-ready receipt after provider route, microphone, keyboard health, Full Access, App Group, and insertion gates pass."
       next_owner: "operator"
       next_action: "Approve any iOS UI automation / WebDriverAgent / Trust prompt during WDA launch; if no prompt appears, reconnect, re-pair, reboot, or use USB, then rerun strict preflight."
+  - id: T006
+    type: pm
+    assignee: PM
+    status: done
+    objective: "Collect onboarding-ready physical proof after WDA recovered."
+    acceptance_criteria:
+      - "Receipts prove route choices remain visible and onboarding-ready appears only after all physical gates pass."
+      - "Receipts keep raw WDA source, screenshots, provider keys, private phone content, and transcript bodies out of commits."
+    receipt:
+      result: done
+      note: "notes/T006-onboarding-ready-physical-receipt.md"
+      summary: "WDA recovered and current PR #27 physical receipts now prove the route-first onboarding no-overclaim boundary and final onboarding-ready state. Initial install stayed not-ready while keyboard health was stale; sterile Safari/keyboard cycling refreshed Foil Keyboard with Full Access warning absent; app-owned Reset shared state cleared the final App Group gate; final receipt has route choices visible, onboarding-ready present, onboarding-not-ready absent, keyboard checked in, Full Access ready, and App Group idle/no transcript."
+      evidence:
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T006-onboarding-ready-physical-receipt.md"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T006-summary.json"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T006-onboarding-ready-initial.json"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T006-safari-normal-focused-keyboard.json"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T006-safari-foil-keyboard-after-cycle.json"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T006-onboarding-ready-after-app-reset.json"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T006-app-group-after-app-reset.json"
+      proven:
+        - "Current PR #27 build installed and launched on iPhone-preview."
+        - "WDA direct-device preflight is healthy."
+        - "Route choices for Mac, iPhone API key, and Advanced remain visible."
+        - "Onboarding does not overclaim ready while keyboard health or App Group reset is stale."
+        - "After keyboard refresh and app-owned reset, onboarding-ready is present and onboarding-not-ready is absent."
+        - "App Group is idle/no transcript in the final ready receipt."
+      missing:
+        - "No PR #27 onboarding-ready blocker remains."
+      next_owner: "pm"
+      next_action: "Monitor fresh CI and merge PR #27 only if checks are green and mergeability remains clean."
