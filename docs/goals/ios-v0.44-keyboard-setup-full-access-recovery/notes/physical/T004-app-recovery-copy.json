@@ -1,0 +1,58 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "route-first-onboarding",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "dictation-stage-detail",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "keyboard-recovery-checklist",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-ready",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 41,
+      "textSha256": "b715b819af7942fe"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 48,
+      "textSha256": "3fd8e4bbb11a990e"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 47,
+      "textSha256": "2687d02b0f9d9d50"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "pr29-app-recovery.json",
+    "nodeCount": 132,
+    "sha256": "587f1075514c8f3240207b53537c61ce741e8d39881294d6b8a7c8eb8597269b"
+  },
+  "target": "pr29-app-recovery-copy"
+}

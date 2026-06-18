@@ -1,0 +1,9 @@
+{
+  "deleted": true,
+  "response": {
+    "sessionId": null,
+    "value": null
+  },
+  "schema": "foil.iosPhysicalHarness.deleteSession.v1",
+  "sessionId": "E2352343-ABA0-46B9-90D5-C04BC1AB1E43"
+}

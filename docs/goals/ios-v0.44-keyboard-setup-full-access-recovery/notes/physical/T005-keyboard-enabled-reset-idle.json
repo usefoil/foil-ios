@@ -1,0 +1,39 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "foil-keyboard-root",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 24,
+      "textSha256": "27b5f75960524657"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 30,
+      "textSha256": "d82d622ddd06cdb6"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-pr29-after-reset-source.json",
+    "nodeCount": 162,
+    "sha256": "24417820309d9db4d71bf04b69c870eb0e809d4410858fa03573dedbeaac1b1c"
+  },
+  "target": "pr29-keyboard-enabled-reset-idle"
+}

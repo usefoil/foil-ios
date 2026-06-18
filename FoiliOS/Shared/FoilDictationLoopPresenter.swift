@@ -239,12 +239,12 @@ enum FoilDictationLoopPresenter {
             ),
             FoilSetupChecklistItem(
                 title: "Add Foil Keyboard",
-                detail: "Settings > General > Keyboard > Keyboards > Add New Keyboard.",
+                detail: "Settings > General > Keyboard > Keyboards > Add New Keyboard, then choose Foil Keyboard.",
                 systemImage: "keyboard"
             ),
             FoilSetupChecklistItem(
                 title: "Allow Full Access",
-                detail: "Foil uses Full Access to read and clear Foil's shared transcript state between this app and Foil Keyboard.",
+                detail: "Open Foil Keyboard in that list and enable Allow Full Access so it can read and clear Foil's shared transcript state.",
                 systemImage: "checkmark.shield"
             ),
             FoilSetupChecklistItem(
@@ -339,36 +339,36 @@ enum FoilDictationLoopPresenter {
     ) -> FoilKeyboardHealthPresentation {
         switch report.fullAccessState {
         case .disabled:
-            let message = "Allow Full Access is off. Enable it in Keyboard settings, then reopen Foil Keyboard."
+            let message = "Allow Full Access is off. Enable it in Keyboard settings, then refocus the field and cycle back to Foil Keyboard."
             return FoilKeyboardHealthPresentation(
                 detail: message,
                 recoveryMessage: message,
                 recoverySteps: [
                     "Open Settings > General > Keyboard > Keyboards.",
                     "Select Foil Keyboard and enable Allow Full Access.",
-                    "Return to the target field and cycle back to Foil Keyboard."
+                    "Return to the target field, tap it again, then use globe/Next Keyboard to select Foil Keyboard."
                 ]
             )
         case .unverified:
-            let message = "Open Foil Keyboard in a text field to verify Full Access."
+            let message = "Open Foil Keyboard in a safe text field to verify Full Access."
             return FoilKeyboardHealthPresentation(
                 detail: message,
                 recoveryMessage: message,
                 recoverySteps: [
-                    "Open a safe text field.",
-                    "Switch to Foil Keyboard.",
+                    "Open a safe text field and tap inside it.",
+                    "Use globe/Next Keyboard to select Foil Keyboard.",
                     "Return to Foil and check Keyboard health again."
                 ]
             )
         case .enabled:
             if now.timeIntervalSince(report.updatedAt) > staleAfter {
-                let message = "Foil Keyboard has not checked in recently. Tap the target field and cycle back to Foil Keyboard."
+                let message = "Foil Keyboard has not checked in recently. Tap the target field again, then use globe/Next Keyboard to cycle back."
                 return FoilKeyboardHealthPresentation(
                     detail: message,
                     recoveryMessage: message,
                     recoverySteps: [
-                        "Tap the target text field.",
-                        "Switch away from Foil Keyboard, then back.",
+                        "Tap the target text field again.",
+                        "Use globe/Next Keyboard to select another keyboard, then Foil Keyboard.",
                         "Return here if Insert latest still looks stale."
                     ]
                 )
@@ -544,7 +544,7 @@ enum FoilDictationLoopPresenter {
         guard fullAccessEnabled else {
             return FoilKeyboardLoopPresentation(
                 status: "Open Foil",
-                message: "Allow Full Access in Settings, then cycle back to Foil Keyboard.",
+                message: "Allow Full Access in Settings, then refocus the field and cycle back to Foil Keyboard.",
                 insertTitle: "Insert unavailable",
                 clearTitle: "Clear unavailable",
                 startTitle: "Open Foil"

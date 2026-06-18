@@ -122,13 +122,13 @@ private history visible.
 
 ## Recovery
 
-- If Foil Keyboard does not appear, cycle keyboards and tap the target field
-  again.
+- If Foil Keyboard does not appear, tap the target field again and use
+  globe/Next Keyboard to cycle back to Foil Keyboard.
 - If Insert latest is disabled, open Foil and check Keyboard health. If it says
   the keyboard has not checked in recently, tap a safe target field, cycle back
   to Foil Keyboard, then return to Foil.
-- If Full Access is off, enable it in Keyboard settings, then reopen the target
-  field.
+- If Full Access is off, enable it in Keyboard settings, then refocus the target
+  field and cycle back to Foil Keyboard.
 - If you start recording the wrong phrase or background noise, tap **Cancel**
   before creating a transcript and record again.
 - If the transcript is stale or wrong, use **Reset shared state** in Foil and
