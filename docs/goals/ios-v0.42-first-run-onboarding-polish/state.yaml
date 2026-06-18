@@ -121,3 +121,27 @@ tasks:
         - "Physical receipt for `onboarding-ready` after microphone, keyboard Full Access/health, and app-visible App Group reset all pass."
       next_owner: "operator"
       next_action: "Grant microphone permission if prompted, verify Foil Keyboard Full Access from Settings and a safe host field, reset shared state from the app UI, then rerun the setup-complete receipt."
+  - id: T005
+    type: judge
+    assignee: PM
+    status: blocked
+    objective: "Rerun physical onboarding-ready proof after the preview phone was unlocked."
+    acceptance_criteria:
+      - "Strict preflight passes before any host-app touch."
+      - "If preflight fails, receipt names the exact blocker without raw WDA logs or private phone content."
+    receipt:
+      result: external_blocker
+      note: "notes/T005-wda-automation-mode-blocker.md"
+      summary: "iPhone-preview is paired and available, but WebDriverAgent repeatedly fails before serving because XCTest times out while enabling automation mode. Strict preflight after the unlocked retry classified WDA as unreachable, reported zero automation processes, and refused host-app touches."
+      evidence:
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T005-wda-automation-mode-blocker.md"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T005-wda-automation-mode-summary.json"
+      proven:
+        - "The physical device is visible and paired."
+        - "The harness did not touch host apps after WDA failed."
+        - "Raw WDA logs, screenshots, transcripts, and xcresult diagnostics were not committed."
+      missing:
+        - "Strict preflight with WDA ready."
+        - "Final onboarding-ready receipt after provider route, microphone, keyboard health, Full Access, App Group, and insertion gates pass."
+      next_owner: "operator"
+      next_action: "Approve any iOS UI automation / WebDriverAgent / Trust prompt during WDA launch; if no prompt appears, reconnect, re-pair, reboot, or use USB, then rerun strict preflight."
