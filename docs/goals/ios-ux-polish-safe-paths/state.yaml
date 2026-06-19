@@ -47,7 +47,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-ux-polish-safe-paths/"
     command: "npx goalbuddy board docs/goals/ios-ux-polish-safe-paths"
 
-active_task: T001
+active_task: T005
 
 source_context:
   iOS_repo: "https://github.com/usefoil/foil-ios"
@@ -66,7 +66,7 @@ tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Inventory current iOS UX surfaces, existing proof, and likely friction before touching code."
     inputs:
@@ -86,12 +86,29 @@ tasks:
       - "A list of top friction points with evidence and risk."
       - "Candidate physical walkthrough script using sterile surfaces only."
       - "Recommended next Judge task inputs."
-    receipt: null
+    receipt:
+      result: done
+      note: "docs/goals/ios-ux-polish-safe-paths/notes/T001-ux-surface-map.md"
+      summary: "Mapped current Foil app, Foil Keyboard, presenter/test coverage, tester docs, host-app matrix, and prior physical receipts. Main UX risk is not missing copy but physical flow ambiguity: first-run setup sits below the dictation console, action surfaces are duplicated, keyboard labels are terse in host-app context, and Notes/Messages need fresh sterile gating before current-build claims."
+      evidence:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/FoilKeyboard/KeyboardViewController.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "docs/ios-closed-beta-tester-handoff.md"
+        - "docs/ios-keyboard-host-app-matrix.md"
+        - "docs/goals/ios-testflight-readiness-physical-gate/state.yaml"
+      next_active_task: "T002"
+      privacy:
+        secretsPrinted: false
+        privatePhoneContentPrinted: false
+        rawWdaSourceCommitted: false
+        screenshotsCommitted: false
 
   - id: T002
     type: scout
     assignee: Scout
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Run or prepare the physical safe-host-app UX walkthrough and record sanitized receipts."
     inputs:
@@ -107,12 +124,26 @@ tasks:
     expected_output:
       - "Sanitized pass/fail receipts for app setup, keyboard health, provider route, App Group idle/reset, Safari insertion, Notes blank editor if safe, Messages fake/dedicated draft if safe, secure-field rejection, stale-state recovery, and exact-once behavior."
       - "Exact blocker receipts for any host app that cannot be safely touched."
-    receipt: null
+    receipt:
+      result: external_blocker
+      summary: "Strict preflight against direct WDA URL did not allow safe host-app walkthrough. iPhone-preview is present but unavailable, WDA is unreachable, and safeToTouchHostApps is false, so no Safari/Notes/Messages/private surfaces were touched."
+      evidence:
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T002-preflight.json"
+      commands:
+        - cmd: "python3 scripts/ios-physical-harness.py preflight --strict --wda-url http://192.168.1.40:8100"
+          status: fail
+      next_owner: "operator"
+      next_action: "Unlock/connect iPhone-preview, confirm Xcode device preparation is healthy, and rerun strict preflight before touching host apps."
+      privacy:
+        openedHostApps: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
 
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Prioritize the first safe UX polish implementation slice."
     inputs:
@@ -129,36 +160,88 @@ tasks:
       - "Verification commands."
       - "Stop conditions."
       - "Whether the slice should become one PR or be split."
-    receipt: null
+    receipt:
+      result: done
+      decision: "approved_first_worker_slice"
+      note: "docs/goals/ios-ux-polish-safe-paths/notes/T003-first-slice-decision.md"
+      summary: "Approved a bounded first UX polish slice: make route/setup readiness lead the app only when setup is not ready and no dictation/transcript flow is active. T002 physical walkthrough is blocked by device_unavailable/WDA unreachable, but source/test evidence is enough for this conservative layout improvement."
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+          status: pass_after_sequential_rerun
+      evidence:
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T001-ux-surface-map.md"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T002-preflight.json"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      next_active_task: "T004"
 
   - id: T004
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     reasoning_hint: high
-    objective: "Implement the first safe UX polish slice selected by T003."
+    objective: "Make setup lead the app when setup is not ready and no dictation/transcript flow is active."
     allowed_files:
-      - "FoiliOS/**"
-      - "docs/ios-closed-beta-tester-handoff.md"
-      - "docs/ios-keyboard-host-app-matrix.md"
-      - "docs/ios-beta-feedback-triage.md"
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
       - "docs/goals/ios-ux-polish-safe-paths/**"
     verify:
-      - "Run focused tests selected by T003."
-      - "Run the strongest realistic proof from docs/acceptance-evidence.md for changed behavior."
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+      - "git diff --check"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-ux-polish-safe-paths/state.yaml"
       - "Run no-overclaim and privacy scans over changed docs/receipts."
       - "Open a PR, monitor CI, and merge only when fresh checks are green and mergeability is clean."
     stop_if:
       - "Need files outside allowed_files."
       - "Need private phone content, raw WDA source, screenshots of private apps, provider keys, App Store Connect keys, JWTs, archives, or IPAs."
       - "The fix would imply Mac bridge support, Mail support, arbitrary-app support, Messages delivery, secure-field insertion, or unsupported private-thread behavior."
+      - "The fix hides active recording, transcription, transcript review, or recovery behind setup."
       - "Focused verification fails twice without a clear small fix."
-    receipt: null
+    receipt:
+      result: done
+      summary: "Implemented the first UX polish slice. ContentView now leads with route/setup readiness when setup is not ready and no dictation/transcript flow is active, while preserving dictation-first ordering for setup-ready, recording, saved-recording, transcribing, processing, and transcript-ready states. Added presenter tests for the layout decision and left keyboard insertion/consume/reset logic untouched."
+      changed_files:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "docs/goals/ios-ux-polish-safe-paths/state.yaml"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T001-ux-surface-map.md"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T002-preflight.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T003-first-slice-decision.md"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+          status: pass
+        - cmd: "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "privacy/no-overclaim scan over changed files"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-ux-polish-safe-paths/state.yaml"
+          status: pass
+      evidence:
+        - "New tests prove setup leads only when setup is incomplete and idle."
+        - "Full simulator suite executed 56 tests with 0 failures."
+        - "Bridge tests still prove exact-once insertion, stale transcript rejection, non-complete leftover transcript rejection, and shared-state clearing."
+        - "Privacy/no-overclaim scan hits were limited to existing negative guardrails and tests asserting unsafe claims are absent."
+        - "T002 preflight remains blocked, so no host apps or private surfaces were touched."
+      privacy:
+        openedHostApps: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
 
   - id: T005
     type: judge
     assignee: Judge
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Review the merged first polish slice and decide whether another safe polish slice is required."
     inputs:

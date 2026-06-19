@@ -30,13 +30,7 @@ struct ContentView: View {
                             .font(.title.weight(.semibold))
                     }
 
-                    dictationConsole
-
-                    if let transcriptReviewPresentation {
-                        transcriptReviewPanel(transcriptReviewPresentation)
-                    }
-
-                    routeFirstOnboardingPanel
+                    primaryFlowSections
 
                     if let handoffGuidance {
                         VStack(alignment: .leading, spacing: 10) {
@@ -161,6 +155,23 @@ struct ContentView: View {
         }
         .onAppear(perform: handlePendingCommand)
         .onReceive(refreshTimer) { _ in handlePendingCommand() }
+    }
+
+    @ViewBuilder
+    private var primaryFlowSections: some View {
+        if shouldPrioritizeSetup {
+            routeFirstOnboardingPanel
+            dictationConsole
+            if let transcriptReviewPresentation {
+                transcriptReviewPanel(transcriptReviewPresentation)
+            }
+        } else {
+            dictationConsole
+            if let transcriptReviewPresentation {
+                transcriptReviewPanel(transcriptReviewPresentation)
+            }
+            routeFirstOnboardingPanel
+        }
     }
 
     private var dictationConsole: some View {
@@ -833,6 +844,16 @@ struct ContentView: View {
             hasSavedRecording: audioCapture.lastRecordingURL != nil,
             isTranscribing: transcription.status == "Transcribing",
             recoveryMessage: recoveryMessage
+        )
+    }
+
+    private var shouldPrioritizeSetup: Bool {
+        FoilDictationLoopPresenter.shouldPrioritizeSetup(
+            onboardingReadiness: onboardingReadiness,
+            snapshot: snapshot,
+            isRecording: audioCapture.isRecording,
+            hasSavedRecording: audioCapture.lastRecordingURL != nil,
+            isTranscribing: transcription.status == "Transcribing"
         )
     }
 

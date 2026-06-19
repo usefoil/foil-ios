@@ -656,6 +656,20 @@ enum FoilDictationLoopPresenter {
         )
     }
 
+    static func shouldPrioritizeSetup(
+        onboardingReadiness: FoilOnboardingReadinessPresentation,
+        snapshot: FoilKeyboardSnapshot,
+        isRecording: Bool,
+        hasSavedRecording: Bool,
+        isTranscribing: Bool
+    ) -> Bool {
+        guard !onboardingReadiness.isComplete else { return false }
+        guard !isRecording, !hasSavedRecording, !isTranscribing else { return false }
+        guard snapshot.phase == .idle else { return false }
+        let transcript = snapshot.transcript?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return transcript?.isEmpty != false
+    }
+
     static func keyboardPresentation(
         snapshot: FoilKeyboardSnapshot,
         fullAccessEnabled: Bool,
