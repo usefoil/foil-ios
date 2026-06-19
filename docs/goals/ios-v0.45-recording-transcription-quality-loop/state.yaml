@@ -239,14 +239,14 @@ tasks:
   - id: T008
     type: pm
     assignee: PM
-    status: blocked
+    status: done
     objective: "Collect post-timeout-fix live transcription and sterile insertion receipts."
     acceptance_criteria:
       - "Receipts prove either successful sterile transcription plus Insert Latest, or a bounded timeout/failure with recovery instead of stale processing."
       - "Receipts keep provider keys, raw transcripts, raw WDA source, screenshots, audio, and private phone content out of commits."
     receipt:
-      result: external_blocker
-      summary: "The exact current PR head is installed and idle on iPhone-preview. Fresh post-push WDA proof is healthy and Foil is reachable, but App Group remains idle with no transcript and the Foil surface shows Start enabled while Stop, Cancel, and Transcribe are disabled. The post-fix watcher did not observe a phone-side Record/Stop transition."
+      result: done
+      summary: "The exact current PR head is installed on iPhone-preview. After the operator spoke the sterile phrase, the app moved from recorded/Transcribe-ready to provider complete, exposed a non-empty hashed transcript review, inserted exactly one copy into a sterile Safari normal field via Foil Keyboard, disabled Insert Latest afterward, and returned App Group to idle/no transcript."
       evidence:
         - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-summary.json"
         - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-timeout-fix-idle-ui.json"
@@ -257,12 +257,21 @@ tasks:
         - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-current-head-reset.json"
         - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-current-head-app-group-idle.json"
         - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-current-head-idle-controls.json"
-      missing:
-        - "Post-timeout-fix phone-side Record/Stop pass."
-        - "Post-timeout-fix Transcribe result receipt."
-        - "Sterile Insert Latest receipt."
-      next_owner: "operator"
-      next_action: "On the installed timeout-fix build, tap Record, speak `Foil safe test phrase June twelve`, tap Stop, then rerun Transcribe and sterile insertion receipts."
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-preflight-after-user-record.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-app-group-after-record-stop.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-processing-controls.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-transcribe-complete.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-transcript-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-transcript-review-nonempty.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-fixture-loaded.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-before-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert-app-group.json"
+      proven:
+        - "One real-audio sterile record -> transcribe -> Insert Latest cycle succeeded on the current PR head."
+        - "The inserted Safari value count moved from 0 to exactly 1 for the transcript hash."
+        - "Insert Latest disabled after insertion."
+        - "App Group returned to idle with no transcript after insertion."
   - id: T009
     type: worker
     assignee: Worker
@@ -304,3 +313,23 @@ tasks:
       evidence:
         - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
         - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+  - id: T010
+    type: pm
+    assignee: PM
+    status: blocked
+    objective: "Collect the remaining repeated live insert cycles and post-success recovery receipts for the v0.45 release gate."
+    acceptance_criteria:
+      - "Two additional sterile real-audio record -> transcribe -> Insert Latest cycles pass on the current PR head."
+      - "Receipts prove retry/reset behavior after a successful transcription without exposing raw transcripts, audio, screenshots, raw WDA trees, provider keys, or private host-app content."
+    receipt:
+      result: external_blocker
+      summary: "One current-head live cycle is now proven. The stricter v0.45 gate still asks for three repeated real-audio insert cycles and retry/reset-after-success evidence; two more operator-spoken cycles remain."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert-app-group.json"
+      missing:
+        - "Second sterile real-audio record -> transcribe -> Insert Latest cycle."
+        - "Third sterile real-audio record -> transcribe -> Insert Latest cycle."
+        - "Post-success retry/reset receipt."
+      next_owner: "operator"
+      next_action: "Repeat the sterile phrase recording flow two more times on iPhone-preview, then let PM collect the repeat-cycle and recovery receipts."
