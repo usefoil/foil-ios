@@ -1,0 +1,45 @@
+{
+  "appGroup": {
+    "snapshot": {
+      "file": "T007-app-group-poll-30.json",
+      "hasTranscript": false,
+      "phase": null,
+      "sha256": "305fe879eb159fa54ee9d67a25230c998fd6fc81668ab80b3456a2ae57558cd4"
+    }
+  },
+  "checks": [
+    {
+      "identifier": "start-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "stop-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "transcript-review-retry-recording-button",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 33,
+      "textSha256": "7b58d3c7937e2382"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "T007-foil-processing-source.json",
+    "nodeCount": 136,
+    "sha256": "ed7709374ef62afc1031787e0babb8f7404406111fbb0f792ef003f18f81fba3"
+  },
+  "target": "pr30-spoken-processing-ui"
+}

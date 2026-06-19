@@ -1,0 +1,72 @@
+{
+  "schema": "foil.physicalReceipt.v1",
+  "task": "T007",
+  "createdAt": "2026-06-19T12:43:00Z",
+  "claim": "Manual safe-phrase follow-up exposed stale processing; PR #30 now bounds Groq upload timeout and needs a post-fix live proof retry.",
+  "device": {
+    "name": "iPhone-preview",
+    "identifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+    "wdaUrl": "http://192.168.1.40:8100"
+  },
+  "proof": {
+    "preflightHealthy": true,
+    "manualPassMovedAppGroupToProcessing": true,
+    "processingPollReachedTerminalState": false,
+    "finalProcessingPhase": "processing",
+    "finalProcessingHasTranscript": false,
+    "sterilePhraseVisibleInFoilUi": false,
+    "retryUiVisibleBeforeFix": false,
+    "timeoutFixImplemented": true,
+    "timeoutFixFocusedTestsPassed": true,
+    "timeoutFixBuildInstalled": true,
+    "appGroupResetAfterFix": {
+      "phase": "idle",
+      "hasTranscript": false
+    },
+    "postFixIdleUiVerified": true,
+    "postFixRecordStopObserved": false
+  },
+  "evidence": [
+    "T007-preflight-healthy.json",
+    "T007-app-group-before-transcribe.json",
+    "T007-app-group-final-processing.json",
+    "T007-processing-stuck-ui.json",
+    "T007-install-timeout-fix.json",
+    "T007-app-group-reset-after-timeout-fix.json",
+    "T007-timeout-fix-idle-ui.json",
+    "FoiliOS/FoilIOSApp/FoilTranscriptionClient.swift",
+    "FoiliOS/FoilIOSTests/FoilTranscriptionClientTests.swift"
+  ],
+  "commands": [
+    {
+      "cmd": "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilTranscriptionClientTests",
+      "status": "pass"
+    },
+    {
+      "cmd": "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilProviderFailurePresentationTests",
+      "status": "pass"
+    },
+    {
+      "cmd": "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -configuration Debug -destination 'id=00008030-001A0C980A33C02E' -derivedDataPath /tmp/foil-ios-pr30-timeout-fix DEVELOPMENT_TEAM=B3A6AN2HA4 CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates",
+      "status": "pass"
+    },
+    {
+      "cmd": "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'",
+      "status": "pass"
+    },
+    {
+      "cmd": "git diff --check",
+      "status": "pass"
+    }
+  ],
+  "privacy": {
+    "committedRawWdaSource": false,
+    "committedScreenshots": false,
+    "committedAudio": false,
+    "committedTranscriptBodies": false,
+    "committedProviderKeys": false,
+    "committedPrivatePhoneContent": false
+  },
+  "result": "blocked",
+  "nextAction": "Run a fresh phone-side Record, speak the sterile phrase, Stop, then collect post-fix Transcribe and Insert Latest receipts."
+}

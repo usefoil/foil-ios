@@ -1,0 +1,49 @@
+{
+  "appGroup": {
+    "snapshot": {
+      "file": "T007-app-group-reset-after-timeout-fix.json",
+      "hasTranscript": false,
+      "phase": null,
+      "sha256": "4ac701457d4508bac2def172287cab858fc64107b7577c390fb4bbaf2b7e815c"
+    }
+  },
+  "checks": [
+    {
+      "identifier": "start-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "stop-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "stop-recording-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 33,
+      "textSha256": "7b58d3c7937e2382"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "T007-timeout-fix-idle-source.json",
+    "nodeCount": 133,
+    "sha256": "a9071045a4b72d87ef5f18d89a60700a0fa82db1721393d89400d6ded17d9576"
+  },
+  "target": "pr30-timeout-fix-idle-ui"
+}

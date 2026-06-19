@@ -104,7 +104,7 @@ tasks:
       next_owner: "operator"
       next_action: "Restore WDA or equivalent physical automation and approve safe-phrase physical audio proof."
   - id: T004
-    type: judge
+    type: pm
     assignee: PM
     status: blocked
     objective: "Collect physical recording/cancel surface receipts after WDA recovery."
@@ -126,7 +126,7 @@ tasks:
       next_owner: "operator"
       next_action: "Approve a sterile safe-phrase microphone run, grant microphone if prompted, ensure provider/keyboard/App Group gates are ready, then rerun live cancel/transcription/insert-cycle receipts."
   - id: T005
-    type: judge
+    type: pm
     assignee: PM
     status: blocked
     objective: "Resolve PR #30's main-branch conflict and re-check the physical proof gate."
@@ -153,7 +153,7 @@ tasks:
       next_owner: "operator"
       next_action: "Repair WDA/UI automation mode on iPhone-preview, rerun strict preflight, then use the sterile phrase `Foil safe test phrase June twelve` for live recording/cancel/transcription/insert-cycle proof."
   - id: T006
-    type: judge
+    type: pm
     assignee: PM
     status: blocked
     objective: "Collect physical recording/cancel receipts after WDA recovered."
@@ -187,3 +187,72 @@ tasks:
         - "Three consecutive sterile safe-phrase record -> transcribe -> Insert Latest cycles."
       next_owner: "operator"
       next_action: "Speak `Foil safe test phrase June twelve` near iPhone-preview during the next recording window, then rerun transcription and sterile Safari insertion receipts."
+  - id: T007
+    type: worker
+    assignee: Worker
+    status: done
+    objective: "Bound provider upload hangs and record the physical stale-processing blocker."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/FoilTranscriptionClient.swift"
+      - "FoiliOS/FoilIOSTests/FoilTranscriptionClientTests.swift"
+      - "docs/goals/ios-v0.45-recording-transcription-quality-loop/**"
+    verify:
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilTranscriptionClientTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilProviderFailurePresentationTests"
+      - "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -configuration Debug -destination 'id=00008030-001A0C980A33C02E' -derivedDataPath /tmp/foil-ios-pr30-timeout-fix DEVELOPMENT_TEAM=B3A6AN2HA4 CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+      - "git diff --check"
+    stop_if:
+      - "The fix requires storing provider keys, raw transcripts, raw WDA source, audio, screenshots, or private phone content."
+      - "Post-fix physical proof still requires operator phone-side recording."
+    acceptance_criteria:
+      - "Provider upload requests have an explicit timeout."
+      - "Focused tests prove the timeout is applied."
+      - "Physical receipts prove the stale processing blocker and post-fix idle recovery without private content."
+    receipt:
+      result: done
+      note: "notes/T007-timeout-and-processing-blocker.md"
+      summary: "Manual safe-phrase follow-up moved App Group to processing but it never reached complete/failed. Added an explicit 45-second Groq upload timeout, covered default and injected timeout tests, installed the timeout-fix build, reset the stale App Group state to idle, and verified the post-fix idle recording surface. Live post-fix success proof still needs another phone-side Record/Stop pass."
+      changed_files:
+        - "FoiliOS/FoilIOSApp/FoilTranscriptionClient.swift"
+        - "FoiliOS/FoilIOSTests/FoilTranscriptionClientTests.swift"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T007-timeout-and-processing-blocker.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-summary.json"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilTranscriptionClientTests"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilProviderFailurePresentationTests"
+          status: pass
+        - cmd: "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -configuration Debug -destination 'id=00008030-001A0C980A33C02E' -derivedDataPath /tmp/foil-ios-pr30-timeout-fix DEVELOPMENT_TEAM=B3A6AN2HA4 CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T007-timeout-and-processing-blocker.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-app-group-final-processing.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-processing-stuck-ui.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-timeout-fix-idle-ui.json"
+  - id: T008
+    type: pm
+    assignee: PM
+    status: blocked
+    objective: "Collect post-timeout-fix live transcription and sterile insertion receipts."
+    acceptance_criteria:
+      - "Receipts prove either successful sterile transcription plus Insert Latest, or a bounded timeout/failure with recovery instead of stale processing."
+      - "Receipts keep provider keys, raw transcripts, raw WDA source, screenshots, audio, and private phone content out of commits."
+    receipt:
+      result: external_blocker
+      summary: "The timeout-fix build is installed and idle, but the post-fix watcher did not observe a phone-side Record/Stop transition. Start remained enabled, Stop and Cancel remained disabled, and no Transcribe control appeared through the bounded watch window."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-timeout-fix-idle-ui.json"
+      missing:
+        - "Post-timeout-fix phone-side Record/Stop pass."
+        - "Post-timeout-fix Transcribe result receipt."
+        - "Sterile Insert Latest receipt."
+      next_owner: "operator"
+      next_action: "On the installed timeout-fix build, tap Record, speak `Foil safe test phrase June twelve`, tap Stop, then rerun Transcribe and sterile insertion receipts."
