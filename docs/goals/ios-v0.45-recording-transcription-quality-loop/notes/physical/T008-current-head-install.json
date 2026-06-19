@@ -1,0 +1,11 @@
+{
+  "appPathCommitted": false,
+  "bundleId": "com.neonwatty.FoilIOS",
+  "device": "iPhone-preview",
+  "gitHead": "80dccf78189095b3b309c4de9f9db5b31782ae50",
+  "installed": true,
+  "rawOutputCommitted": false,
+  "schema": "foil.iosPhysicalInstallReceipt.v1",
+  "stdoutBytes": 449,
+  "stdoutSha256": "59036b97fa998cfcc1c699787f4c76848b4344be23279e6e61a0d8ae60c089d4"
+}
