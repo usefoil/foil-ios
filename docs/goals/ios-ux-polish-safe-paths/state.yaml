@@ -5,7 +5,7 @@ goal:
   slug: "ios-ux-polish-safe-paths"
   kind: open_ended
   tranche: "Audit then polish the current iOS beta UX before starting the Mac bridge conveyor."
-  status: active
+  status: blocked
   oracle:
     signal: "Current iOS beta UX claims are intuitive, narrow, physically checked, and backed by tests/receipts/merged PRs."
     cadence: "after UX audit, after each implementation slice, after physical walkthrough, and before final merge/readiness claims"
@@ -47,7 +47,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-ux-polish-safe-paths/"
     command: "npx goalbuddy board docs/goals/ios-ux-polish-safe-paths"
 
-active_task: T005
+active_task: null
 
 source_context:
   iOS_repo: "https://github.com/usefoil/foil-ios"
@@ -242,7 +242,7 @@ tasks:
   - id: T005
     type: judge
     assignee: Judge
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Review the merged first polish slice and decide whether another safe polish slice is required."
     inputs:
@@ -251,12 +251,24 @@ tasks:
     expected_output:
       - "Decision: continue with another Worker slice, collect more physical proof, or proceed to final audit."
       - "If continuing, exact next Worker objective, allowed files, verification, and stop conditions."
-    receipt: null
+    receipt:
+      result: done
+      decision: "no_second_source_only_slice"
+      note: "docs/goals/ios-ux-polish-safe-paths/notes/T005-post-merge-judge.md"
+      summary: "PR #50 merged cleanly after fresh CodeQL checks. The first UX slice is accepted, but no second source-only polish slice is approved because the remaining UX uncertainty is physical host-app behavior and preview-device/WDA availability is still blocked."
+      evidence:
+        - "https://github.com/usefoil/foil-ios/pull/50"
+        - "Merge commit ad46d1f13b56f44798b57eac0e261d764c147164"
+        - "Analyze (python): pass"
+        - "Analyze (swift): pass"
+        - "CodeQL: pass"
+        - "Strict preflight rerun classification: device_unavailable, safeToTouchHostApps false"
+      next_active_task: "T999"
 
   - id: T006
     type: worker
     assignee: Worker
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Implement a second safe UX polish slice if T005 approves one."
     allowed_files: []
@@ -265,12 +277,16 @@ tasks:
       - "T005 did not approve this slice."
       - "Need private phone content, raw WDA source, screenshots of private apps, provider keys, App Store Connect keys, JWTs, archives, or IPAs."
       - "The change expands unsupported host-app or Mac bridge claims."
-    receipt: null
+    receipt:
+      result: not_approved
+      summary: "T005 did not approve a second source-only UX slice. The next useful work is physical common-app walkthrough proof after preview-device/WDA recovery."
+      next_owner: "operator"
+      next_action: "Restore iPhone-preview/WDA availability, then rerun strict preflight and host-app UX receipts."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: blocked
     reasoning_hint: high
     objective: "Final audit: decide whether the iOS UX polish tranche is complete before the Mac bridge conveyor."
     inputs:
@@ -283,4 +299,28 @@ tasks:
       - "full_outcome_complete: true | false"
       - "Evidence that the app does not claim setup is complete when Full Access, keyboard health, provider route, App Group state, insertion, or host-app targeting still fails."
       - "Remaining blockers or next board if not complete."
-    receipt: null
+    receipt:
+      result: external_blocker
+      decision: "not_complete"
+      full_outcome_complete: false
+      note: "docs/goals/ios-ux-polish-safe-paths/notes/T999-final-audit.md"
+      summary: "The iOS UX polish tranche has one merged improvement, but the full common-app UX review is blocked. Strict preflight still reports iPhone-preview present but unavailable, WDA unreachable, and safeToTouchHostApps false, so Safari/Notes/Messages/secure-field physical receipts cannot be collected safely."
+      completed:
+        - "Current UX surfaces audited."
+        - "PR #50 merged after fresh green checks."
+        - "Setup now leads incomplete idle first-run states without hiding active dictation or transcript flows."
+        - "Presenter and bridge tests passed before merge."
+      missing_evidence:
+        - "Current-build physical route/setup walkthrough after PR #50."
+        - "Current-build Foil Keyboard health and Full Access confirmation in a sterile host app."
+        - "Current-build Safari exact-once insertion after the UX ordering change."
+        - "Current-build blank Notes editor walkthrough."
+        - "Current-build fake/dedicated Messages draft walkthrough."
+        - "Secure-field rejection after the UX ordering change."
+      next_owner: "operator"
+      next_action: "Unlock/connect iPhone-preview, confirm Xcode reports it available, restore WDA at http://192.168.1.40:8100, then rerun strict preflight."
+      privacy:
+        openedHostApps: false
+        printedRawWdaSource: false
+        printedScreenshots: false
+        printedTranscriptBodies: false
