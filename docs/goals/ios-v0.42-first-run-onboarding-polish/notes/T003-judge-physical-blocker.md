@@ -1,5 +1,9 @@
 # T003 Judge Physical Blocker
 
+Superseded: this was the original physical blocker. It was later resolved by
+T006 onboarding-ready physical receipts, and PR #27 merged into
+`usefoil/foil-ios` on 2026-06-19.
+
 Result: `external_blocker`
 
 ## Decision

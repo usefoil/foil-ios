@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.42-first-run-onboarding-polish"
   kind: specific
   tranche: "Closed-beta onboarding and setup surface polish."
-  status: blocked
+  status: done
   oracle:
     signal: "A tester can complete or recover setup from the app UI, with physical iPhone proof."
     cadence: "after implementation and before PR merge"
@@ -83,33 +83,37 @@ tasks:
   - id: T003
     type: judge
     assignee: Judge
-    status: blocked
+    status: done
     objective: "Verify onboarding proof and overclaim boundaries."
     acceptance_criteria:
       - "Simulator and physical receipts rule out confusing first-run or unsafe beta claims."
     receipt:
-      result: external_blocker
+      result: done
+      previous_result: external_blocker
+      decision: superseded_by_T006
       note: "notes/T003-judge-physical-blocker.md"
-      summary: "Local and simulator proof are green, but v0.42 cannot be approved or merged as complete because iPhone-preview is unavailable, WDA is not reachable, and installing the branch requires operator approval."
+      summary: "Historical blocker superseded by T006 and T999. Local/simulator proof stayed green, WDA later recovered, physical onboarding-ready receipts were collected, and PR #27 merged on 2026-06-19."
       proven:
         - "Simulator tests and semantic UI snapshots cover first-run, partial keyboard-not-verified, and ready-to-insert states."
         - "Copy scan found only existing disclaimers/tests for unsafe beta claims."
       missing:
-        - "Physical iPhone install of PR #27 branch."
-        - "Physical iPhone onboarding receipts for first-run, returning-user, blocked-keyboard, and setup-complete states."
-      next_owner: "operator"
-      next_action: "Make iPhone-preview available/unlocked, approve installing the PR #27 development build, and restore WDA/equivalent physical UI automation."
+        - "None for v0.42 onboarding readiness after T006."
+      superseded_by:
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T006-onboarding-ready-physical-receipt.md"
+        - "https://github.com/usefoil/foil-ios/pull/27"
   - id: T004
     type: pm
     assignee: PM
-    status: blocked
+    status: done
     objective: "Collect physical route-choice onboarding receipts after WDA recovery."
     acceptance_criteria:
       - "Receipts prove route choices are visible and setup-complete is not claimed while physical gates are unmet."
       - "If setup-complete is still unavailable, receipts name the exact physical blockers without private content."
     receipt:
-      result: external_blocker
-      summary: "Physical iPhone receipts prove route-first onboarding is visible, API-key setup remains usable, Advanced / Support hides diagnostics, and onboarding does not overclaim ready. The device still blocks setup-complete on microphone permission, keyboard Full Access/health verification, and app-visible shared-state reset."
+      result: done
+      previous_result: external_blocker
+      decision: superseded_by_T006
+      summary: "Historical partial physical receipt superseded by T006. The T004 run correctly proved route-first visibility and no-overclaim boundaries while setup-complete gates were still missing; T006 later proved final onboarding-ready after microphone, keyboard health, Full Access, and App Group reset gates passed."
       evidence:
         - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T004-physical-receipt.md"
         - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T004-first-run-mac-default.json"
@@ -118,21 +122,23 @@ tasks:
         - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T004-after-keyboard-health-not-ready.json"
         - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T004-after-app-reset-not-ready.json"
       missing:
-        - "Physical receipt for `onboarding-ready` after microphone, keyboard Full Access/health, and app-visible App Group reset all pass."
-      next_owner: "operator"
-      next_action: "Grant microphone permission if prompted, verify Foil Keyboard Full Access from Settings and a safe host field, reset shared state from the app UI, then rerun the setup-complete receipt."
+        - "None for v0.42 onboarding readiness after T006."
+      superseded_by:
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T006-onboarding-ready-physical-receipt.md"
   - id: T005
     type: pm
     assignee: PM
-    status: blocked
+    status: done
     objective: "Rerun physical onboarding-ready proof after the preview phone was unlocked."
     acceptance_criteria:
       - "Strict preflight passes before any host-app touch."
       - "If preflight fails, receipt names the exact blocker without raw WDA logs or private phone content."
     receipt:
-      result: external_blocker
+      result: done
+      previous_result: external_blocker
+      decision: superseded_by_T006
       note: "notes/T005-wda-automation-mode-blocker.md"
-      summary: "iPhone-preview is paired and available, but WebDriverAgent repeatedly fails before serving because XCTest times out while enabling automation mode. Strict preflight after the unlocked retry classified WDA as unreachable, reported zero automation processes, and refused host-app touches."
+      summary: "Historical WDA blocker superseded by T006. WDA later recovered on the direct device URL, strict preflight passed, and final onboarding-ready physical receipts were collected before PR #27 merged."
       evidence:
         - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T005-wda-automation-mode-blocker.md"
         - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T005-wda-automation-mode-summary.json"
@@ -141,10 +147,9 @@ tasks:
         - "The harness did not touch host apps after WDA failed."
         - "Raw WDA logs, screenshots, transcripts, and xcresult diagnostics were not committed."
       missing:
-        - "Strict preflight with WDA ready."
-        - "Final onboarding-ready receipt after provider route, microphone, keyboard health, Full Access, App Group, and insertion gates pass."
-      next_owner: "operator"
-      next_action: "Approve any iOS UI automation / WebDriverAgent / Trust prompt during WDA launch; if no prompt appears, reconnect, re-pair, reboot, or use USB, then rerun strict preflight."
+        - "None for v0.42 onboarding readiness after T006."
+      superseded_by:
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T006-onboarding-ready-physical-receipt.md"
   - id: T006
     type: pm
     assignee: PM
@@ -176,3 +181,22 @@ tasks:
         - "No PR #27 onboarding-ready blocker remains."
       next_owner: "pm"
       next_action: "Monitor fresh CI and merge PR #27 only if checks are green and mergeability remains clean."
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    objective: "Audit v0.42 onboarding readiness after PR #27 merge."
+    acceptance_criteria:
+      - "Audit confirms the prior physical blocker is superseded by T006 receipts."
+      - "Audit confirms PR #27 merged with fresh green checks."
+      - "Audit keeps broader recording/transcription and arbitrary host-app behavior out of scope."
+    receipt:
+      result: done
+      task_id: T999
+      decision: complete
+      full_outcome_complete: true
+      summary: "Final audit accepts v0.42 as complete after PR #27 merged on 2026-06-19. T006 physical receipts prove route-first onboarding reaches ready only after route, microphone, keyboard health, Full Access, and App Group gates pass; broader recording/transcription and host-app claims remain delegated to later boards."
+      evidence:
+        - "https://github.com/usefoil/foil-ios/pull/27"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T006-onboarding-ready-physical-receipt.md"
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/physical/T006-summary.json"

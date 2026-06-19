@@ -1,5 +1,8 @@
 # T004 Physical Receipt
 
+Superseded: this partial no-overclaim receipt remains useful history, but the
+missing setup-complete receipt was later collected in T006 before PR #27 merged.
+
 Claim: First-run route choice is visible and does not call setup complete until the route, microphone, keyboard health, Full Access, and App Group gates are all satisfied.
 
 Strongest realistic failure mode: the onboarding UI says setup is complete because one route/provider path looks configured, while physical keyboard health, Full Access, microphone permission, or App Group state still blocks insertion.
