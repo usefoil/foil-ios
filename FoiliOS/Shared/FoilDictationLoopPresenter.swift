@@ -185,6 +185,7 @@ enum FoilDictationLoopPresenter {
     static let macRouteID = "use-my-mac"
     static let iPhoneAPIKeyRouteID = "iphone-api-key"
     static let advancedRouteID = "advanced"
+    static let defaultBetaRouteID = iPhoneAPIKeyRouteID
     static let localBridgeProtocolFamily = "foil.localBridge"
     static let macSelectedRouteID = "mac-selected"
     static let routeReceiptName = "RouteReceipt"
@@ -305,8 +306,8 @@ enum FoilDictationLoopPresenter {
             FoilSetupRoutePresentation(
                 routeID: macRouteID,
                 title: "Use my Mac",
-                badge: "Recommended next",
-                detail: "Mac pairing is coming soon. After pairing is available, this route can send iPhone audio to your paired Mac, use the Mac's selected route, and show a RouteReceipt only after the Mac handles the request.",
+                badge: "Future path",
+                detail: "Mac pairing is coming soon. This is the future product path, but it is not the current beta setup route. After pairing is available, Foil will show a RouteReceipt only after the Mac handles the request.",
                 systemImage: "desktopcomputer",
                 isRecommended: true,
                 isUsableNow: false
@@ -314,8 +315,8 @@ enum FoilDictationLoopPresenter {
             FoilSetupRoutePresentation(
                 routeID: iPhoneAPIKeyRouteID,
                 title: "Use an API key on this iPhone",
-                badge: "Works now",
-                detail: "This path is fully usable today: save a provider key here, record on this iPhone, then insert the transcript from Foil Keyboard.",
+                badge: "Current beta path",
+                detail: "This path is fully usable for this beta: save a provider key here, record on this iPhone, then insert the transcript from Foil Keyboard.",
                 systemImage: "iphone.gen3",
                 isRecommended: false,
                 isUsableNow: true
@@ -365,7 +366,7 @@ enum FoilDictationLoopPresenter {
             ),
             FoilSetupChecklistItem(
                 title: "Allow Full Access",
-                detail: "Open Foil Keyboard in that list and enable Allow Full Access so it can read and clear Foil's shared transcript state.",
+                detail: "Open Foil Keyboard in that list and enable Allow Full Access. iOS shows a broad keyboard warning; Foil uses Full Access only to read and clear Foil's shared transcript state.",
                 systemImage: "checkmark.shield"
             ),
             FoilSetupChecklistItem(
@@ -413,7 +414,7 @@ enum FoilDictationLoopPresenter {
     static func betaGuidancePresentation() -> [FoilBetaGuidanceItem] {
         [
             FoilBetaGuidanceItem(
-                title: "Safe targets",
+                title: "Tested targets",
                 detail: "Use blank Notes, Safari normal text fields, or a Messages draft with safe test text.",
                 systemImage: "checkmark.circle"
             ),
@@ -606,7 +607,7 @@ enum FoilDictationLoopPresenter {
             return FoilAppLoopPresentation(
                 title: "Ready for keyboard",
                 badge: "Return",
-                detail: "Return to the text field and tap Insert latest in Foil Keyboard.",
+                detail: "Return to your target field, switch to Foil Keyboard, then tap Insert latest once. Tested targets: Safari, blank Notes, or a Messages draft.",
                 systemImage: "keyboard.badge.ellipsis",
                 tone: .success,
                 primaryAction: nil
@@ -649,7 +650,7 @@ enum FoilDictationLoopPresenter {
         return FoilAppLoopPresentation(
             title: "Record in Foil",
             badge: "Start",
-            detail: "Record here. Return to your keyboard when the transcript is ready.",
+            detail: "Record here. When the transcript is ready, return to the target field, switch to Foil Keyboard, and insert once.",
             systemImage: "mic.circle.fill",
             tone: .ready,
             primaryAction: .record

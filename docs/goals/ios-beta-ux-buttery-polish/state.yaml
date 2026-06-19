@@ -1,0 +1,262 @@
+version: 2
+
+goal:
+  title: "Foil iOS Beta UX Buttery Polish"
+  slug: "ios-beta-ux-buttery-polish"
+  kind: existing_plan
+  tranche: "Turn the three-agent UX critique into scoped iOS beta polish PRs with tests and sanitized proof."
+  status: active
+  oracle:
+    signal: "A first-time beta tester can complete the current iPhone API-key path and understand the record-return-keyboard-insert loop without docs-only guidance or false-ready states."
+    cadence: "after each implementation slice, after focused tests, after simulator/physical proof, and before PR merge"
+    final_proof: "Final PM/Judge audit maps each critique risk to merged code/docs, focused tests, privacy/no-overclaim scans, and strongest realistic simulator or physical receipts."
+  intake:
+    original_request: "Make a detailed goal to achieve the three-agent iOS UX critique."
+    interpreted_outcome: "Prepare an executable GoalBuddy conveyor that improves the iOS beta UX until the current tester path is smooth, clear, and proof-backed."
+    input_shape: existing_plan
+    audience: "Foil iOS internal beta testers"
+    authority: approved
+    proof_type: demo
+    completion_proof: "Merged scoped PRs plus focused tests and sanitized receipts proving no false ready/setup states and a clearer happy path."
+    likely_misfire: "Polishing copy while accidentally implying Mac bridge, broad host-app support, provider verification, or setup completion that has not been proven."
+    blind_spots_considered:
+      - "Mac route is future-facing but the current beta path is iPhone API key."
+      - "Apple Full Access warning is broad and can scare testers unless Foil explains its narrow use."
+      - "Keyboard handoff can feel broken because iOS cannot automatically return to the prior app and field."
+      - "Saved provider key is not the same thing as live provider verification."
+      - "Safe target guidance can become invisible if left only in Advanced / Support."
+      - "Docs drift can create operator-driven confusion even when the app is correct."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  no_secret_printing: true
+  no_private_phone_content: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: queued
+    url: "http://goalbuddy.localhost:41737/ios-beta-ux-buttery-polish/"
+    command: "npx goalbuddy board docs/goals/ios-beta-ux-buttery-polish"
+
+active_task: T002
+
+source_context:
+  iOS_repo: "https://github.com/usefoil/foil-ios"
+  current_ux_proof_pr: "https://github.com/usefoil/foil-ios/pull/52"
+  setup_source:
+    - "FoiliOS/FoilIOSApp/ContentView.swift"
+    - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+  keyboard_source:
+    - "FoiliOS/FoilKeyboard/KeyboardViewController.swift"
+    - "FoiliOS/Shared/FoilKeyboardBridge.swift"
+  focused_tests:
+    - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+    - "FoiliOS/FoilIOSTests/FoilKeyboardBridgeTests.swift"
+    - "FoiliOS/FoilIOSTests/FoilProviderFailurePresentationTests.swift"
+  critique_receipt: "docs/goals/ios-beta-ux-buttery-polish/notes/T000-subagent-critique-summary.md"
+
+tasks:
+  - id: T001
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: high
+    objective: "First PR: make the current beta route and handoff loop unmistakable without expanding unsupported claims."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      - "docs/goals/ios-beta-ux-buttery-polish/**"
+    verify:
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+      - "git diff --check"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+      - "Privacy/no-overclaim scan over changed files."
+    stop_if:
+      - "The change implies Mac pairing is usable today."
+      - "The change removes the Mac route from the product direction instead of clearly marking it future-facing."
+      - "The change hides API-key setup or makes it less usable."
+      - "The change weakens any setup-complete gate."
+      - "Need private phone content, raw WDA source, screenshots of private apps, provider keys, App Store Connect keys, JWTs, archives, or IPAs."
+    expected_output:
+      - "Current beta path is visibly foregrounded or default-selected."
+      - "Mac route remains visible as future-facing and cannot complete setup."
+      - "Ready-to-insert copy includes the three-step handoff: return to field, switch to Foil Keyboard, tap Insert latest once."
+      - "Safe/tested target guidance is visible near ready/recovery states without opening Advanced."
+      - "Focused presentation tests assert the above."
+    receipt:
+      result: done
+      note: "docs/goals/ios-beta-ux-buttery-polish/notes/T001-worker-receipt.md"
+      summary: "Current beta route and handoff loop are clearer: the iPhone API-key route is the default/current beta path, Mac remains a future path, ready/recording copy names return/switch/insert once, Full Access copy is narrower, and tested targets are visible outside Advanced."
+      changed_files:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "docs/goals/ios-beta-ux-buttery-polish/goal.md"
+        - "docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+        - "docs/goals/ios-beta-ux-buttery-polish/notes/T000-subagent-critique-summary.md"
+        - "docs/goals/ios-beta-ux-buttery-polish/notes/T001-worker-receipt.md"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+          status: pass
+        - cmd: "privacy/no-overclaim scan over changed files"
+          status: pass
+      evidence:
+        - "FoilDictationLoopPresenter.defaultBetaRouteID == iphone-api-key"
+        - "Route choice tests assert Mac is future-facing and not current beta setup."
+        - "Presentation tests assert the ready state says return to target field, switch to Foil Keyboard, and Insert latest once."
+        - "Presentation tests assert Full Access copy mentions Apple's broad warning while narrowing Foil's use."
+      next_active_task: "T002"
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: active
+    reasoning_hint: high
+    objective: "Second PR: make keyboard disabled, stale, inserted, and recovery states self-explaining."
+    allowed_files:
+      - "FoiliOS/FoilKeyboard/KeyboardViewController.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/Shared/FoilKeyboardBridge.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilKeyboardBridgeTests.swift"
+      - "docs/goals/ios-beta-ux-buttery-polish/**"
+    verify:
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+      - "git diff --check"
+      - "GoalBuddy state checker and privacy/no-overclaim scan."
+    stop_if:
+      - "The change weakens consume-once insertion or stale transcript rejection."
+      - "The change makes Insert latest enabled in non-complete, stale, Full Access off, failed, processing, or idle states."
+    expected_output:
+      - "Keyboard button/message copy names why insertion is unavailable."
+      - "Stale state distinguishes clear/re-record guidance from no-transcript guidance."
+      - "Post-insert state says inserted once and suggests switching keyboards to continue typing."
+      - "Tests cover the state matrix."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Third PR: improve provider/key recovery and avoid key-saved equals provider-verified overclaim."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/FoilIOSApp/TranscriptionController.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilProviderFailurePresentationTests.swift"
+      - "docs/goals/ios-beta-ux-buttery-polish/**"
+    verify:
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilProviderFailurePresentationTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+      - "git diff --check"
+      - "Secret/key leakage scan over changed files and test output receipts."
+    stop_if:
+      - "Provider key material would be printed, logged, committed, or included in receipts."
+      - "The app claims live provider verification without a real verification proof."
+    expected_output:
+      - "Copy distinguishes key saved from provider verified."
+      - "Rejected/missing key recovery surfaces Update provider key as the primary repair."
+      - "Retry is not visually dominant when the key must change first."
+      - "Tests assert no key/header/body leakage."
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Fourth PR: add aged processing and App Group recovery UX that feels like a path, not a dead end."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/Shared/FoilKeyboardBridge.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilKeyboardBridgeTests.swift"
+      - "docs/goals/ios-beta-ux-buttery-polish/**"
+    verify:
+      - "Focused presentation and bridge tests for aged processing, failed App Group write, reset, and non-insertable states."
+      - "git diff --check"
+      - "GoalBuddy state checker and privacy/no-overclaim scan."
+    stop_if:
+      - "Non-complete processing becomes insertable."
+      - "Recovery destroys an insertable transcript without explicit user action."
+    expected_output:
+      - "Aged processing offers retry/reset recovery."
+      - "Keyboard storage/App Group failure is named distinctly from stale transcript."
+      - "A single primary recovery action is visible with one verification step."
+
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: medium
+    objective: "Fifth PR: align beta docs and feedback templates with the current tester build and app boundaries."
+    allowed_files:
+      - "README.md"
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - ".github/ISSUE_TEMPLATE/ios_beta_feedback.yml"
+      - "docs/goals/ios-beta-ux-buttery-polish/**"
+    verify:
+      - "rg -n \"0\\.1\\.0 \\(12\\)|build 12|Build 12\" README.md docs .github/ISSUE_TEMPLATE/ios_beta_feedback.yml"
+      - "git diff --check"
+      - "GoalBuddy state checker and privacy/no-overclaim scan."
+    stop_if:
+      - "Docs claim a TestFlight build is released without release evidence."
+      - "Docs broaden host-app support beyond proven beta targets."
+    expected_output:
+      - "Current tester docs and feedback template no longer contradict build 13 handoff."
+      - "Historical build claims are marked historical if retained."
+
+  - id: T006
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Decide whether simulator proof is enough or physical iPhone proof is required for the polished UX."
+    inputs:
+      - "Receipts from T001-T005."
+      - "docs/acceptance-evidence.md"
+      - "Physical device availability."
+    expected_output:
+      - "Decision: simulator-only acceptable, physical proof required, or blocked."
+      - "If physical proof is required, exact sterile walkthrough script and receipt list."
+
+  - id: T007
+    type: scout
+    assignee: Scout
+    status: queued
+    reasoning_hint: high
+    objective: "Collect the strongest realistic UX proof after polish."
+    constraints:
+      - "Use only sterile host surfaces."
+      - "Do not commit raw WDA trees, screenshots, transcripts, provider keys, recordings, private phone content, archives, IPAs, App Store Connect keys, or JWTs."
+    expected_output:
+      - "Simulator receipts and, if approved/available, physical receipts showing the revised first-run path and record-return-keyboard-insert loop."
+      - "Sanitized pass/fail evidence for route no-overclaim, provider copy, safe target guidance, keyboard disabled states, exact-once insertion, secure-field rejection, and App Group idle recovery."
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Final audit: prove the iOS beta UX polish goal is complete or exactly blocked."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Evidence map from each original critique risk to merged PRs, tests, receipts, and remaining limitations."
+      - "Explicit no-overclaim and privacy audit."

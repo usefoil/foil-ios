@@ -18,7 +18,7 @@ struct ContentView: View {
     @State private var providerCredentialMessage = ""
     @State private var showDiagnostics = false
     @State private var lastHandledCommandID: String?
-    @AppStorage("foil.onboarding.selectedRoute.v1") private var selectedRouteID = FoilDictationLoopPresenter.macRouteID
+    @AppStorage("foil.onboarding.selectedRoute.v1") private var selectedRouteID = FoilDictationLoopPresenter.defaultBetaRouteID
     private let refreshTimer = Timer.publish(every: 0.75, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -48,6 +48,7 @@ struct ContentView: View {
                             statusRow(recoveryMessage, systemImage: "exclamationmark.arrow.triangle.2.circlepath")
                                 .font(.callout)
                             keyboardRecoveryChecklist
+                            testedTargetsPanel
 
                             LazyVGrid(columns: actionColumns, alignment: .leading, spacing: 10) {
                                 if canRetryTranscription {
@@ -388,7 +389,7 @@ struct ContentView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Choose your setup route")
                     .font(.headline)
-                Text("Start with the Mac path when it is available, or finish setup today with an API key on this iPhone.")
+                Text("For this beta, finish setup with an API key on this iPhone. The Mac path stays visible as the future route.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -509,6 +510,7 @@ struct ContentView: View {
                 .font(.callout.weight(.semibold))
 
             setupReadinessPanel
+            testedTargetsPanel
 
             setupRow(
                 title: "Microphone",
@@ -611,6 +613,19 @@ struct ContentView: View {
         .padding(10)
         .background(.background.opacity(0.55), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .accessibilityIdentifier(onboardingReadiness.isComplete ? "onboarding-ready" : "onboarding-not-ready")
+    }
+
+    private var testedTargetsPanel: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Where to test")
+                .font(.callout.weight(.semibold))
+            ForEach(FoilDictationLoopPresenter.betaGuidancePresentation()) { item in
+                setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
+            }
+        }
+        .padding(10)
+        .background(.background.opacity(0.55), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .accessibilityIdentifier("tested-target-guidance")
     }
 
     @ViewBuilder
