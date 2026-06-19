@@ -1,0 +1,71 @@
+{
+  "schema": "foil.physicalReceipt.v1",
+  "task": "T006",
+  "createdAt": "2026-06-18T22:53:12Z",
+  "claim": "Current PR #30 physical setup-ready controls and cancel path are proven; live transcription is blocked by no detected speech.",
+  "device": {
+    "name": "iPhone-preview",
+    "identifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+    "wdaUrl": "http://192.168.1.40:8100"
+  },
+  "proof": {
+    "preflightHealthy": true,
+    "currentDebugBuildInstalled": true,
+    "sterileSafariFixtureLoaded": true,
+    "foilKeyboardVisibleInSterileField": true,
+    "keyboardFullAccessWarningAbsent": true,
+    "appGroupBeforeRecording": {
+      "phase": "idle",
+      "hasTranscript": false
+    },
+    "onboardingReadyAfterKeyboardRefresh": true,
+    "recordingControlsIdleState": true,
+    "recordingActiveCancelAvailable": true,
+    "cancelReturnedIdle": true,
+    "appGroupAfterCancel": {
+      "phase": "idle",
+      "hasTranscript": false
+    },
+    "liveRecordingStoppedTranscribeReady": true,
+    "liveTranscriptionAttempts": [
+      {
+        "input": "macOS text-to-speech sterile phrase",
+        "result": "no_speech_detected",
+        "appGroupPhase": "failed",
+        "hasTranscript": false
+      },
+      {
+        "input": "slower repeated macOS text-to-speech sterile phrase",
+        "result": "no_speech_detected",
+        "appGroupPhase": "failed",
+        "hasTranscript": false
+      }
+    ]
+  },
+  "evidence": [
+    "T006-preflight-healthy.json",
+    "T006-install-current-build.json",
+    "T006-current-recording-surface.json",
+    "T006-safari-fixture-loaded.json",
+    "T006-safari-normal-focused-keyboard.json",
+    "T006-onboarding-ready-recording-surface.json",
+    "T006-recording-active-cancel-available.json",
+    "T006-recording-cancel-returned-idle.json",
+    "T006-app-group-after-cancel.json",
+    "T006-live-recording-stopped-transcribe-ready.json",
+    "T006-live-transcription-result.json",
+    "T006-app-group-after-transcribe.json",
+    "T006-live-transcription-retry-result.json",
+    "T006-app-group-after-transcribe-retry.json"
+  ],
+  "privacy": {
+    "committedRawWdaSource": false,
+    "committedScreenshots": false,
+    "committedAudio": false,
+    "committedTranscriptBodies": false,
+    "committedProviderKeys": false,
+    "committedPrivatePhoneContent": false
+  },
+  "result": "blocked",
+  "nextAction": "Have the operator speak the sterile phrase near iPhone-preview during recording, then rerun transcription and sterile Safari Insert Latest receipts."
+}

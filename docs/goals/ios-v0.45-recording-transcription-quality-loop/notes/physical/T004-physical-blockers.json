@@ -1,0 +1,34 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 41,
+      "textSha256": "03059eccef411ebd"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 50,
+      "textSha256": "a9c18acc940b846a"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 79,
+      "textSha256": "0afc46090988bcd8"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "pr30-initial-app.json",
+    "nodeCount": 138,
+    "sha256": "c27bff9196db0e0c94a31a74842d27ea2086c453a7790624c239e87559e0c989"
+  },
+  "target": "pr30-microphone-keyboard-blockers"
+}

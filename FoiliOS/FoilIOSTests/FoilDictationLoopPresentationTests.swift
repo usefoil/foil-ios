@@ -375,6 +375,19 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         XCTAssertTrue(presentation.detail.contains("Return to your keyboard"))
     }
 
+    func testRecordingStateOffersFinishAndCancelActions() {
+        let presentation = FoilDictationLoopPresenter.appPresentation(
+            snapshot: .initial,
+            isRecording: true,
+            hasSavedRecording: false,
+            isTranscribing: false,
+            recoveryMessage: nil
+        )
+
+        XCTAssertEqual(presentation.primaryAction, .stopRecording)
+        XCTAssertEqual(presentation.secondaryAction, .cancelRecording)
+    }
+
     func testAppCompleteStatePointsBackToTargetAppAndKeyboardInsert() {
         let presentation = FoilDictationLoopPresenter.appPresentation(
             snapshot: FoilKeyboardSnapshot(

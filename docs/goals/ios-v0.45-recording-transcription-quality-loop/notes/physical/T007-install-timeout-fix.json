@@ -1,0 +1,10 @@
+{
+  "schema": "foil.physicalInstallSummary.v1",
+  "device": "iPhone-preview",
+  "bundleId": "com.neonwatty.FoilIOS",
+  "configuration": "Debug",
+  "installed": true,
+  "rawOutputBytes": 449,
+  "rawOutputSha256": "d2b1ada04a1c7f0f1cdea8265a15933577a6528c2aeed18648025cbc7e274a44",
+  "rawOutputCommitted": false
+}

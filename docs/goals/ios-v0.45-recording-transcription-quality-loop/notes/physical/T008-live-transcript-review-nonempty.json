@@ -1,0 +1,32 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "transcript-review-panel",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "transcript-review-body",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 3,
+      "textSha256": "449b11820b0f6526"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "T008-live-complete-source.xml",
+    "nodeCount": 150,
+    "sha256": "b7ffab39ecddd096d2cef4a69175c3d3e882e934c6ccc1fad9c1d9273234cbbc"
+  },
+  "target": "foil-pr30-live-complete"
+}

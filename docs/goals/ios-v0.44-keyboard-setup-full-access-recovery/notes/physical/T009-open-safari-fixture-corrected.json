@@ -44,18 +44,10 @@
       }
     },
     "process" : {
-      "auditToken" : [
-        4294967295,
-        501,
-        501,
-        501,
-        501,
-        44105,
-        0,
-        130382
-      ],
-      "executable" : "file:///private/var/containers/Bundle/Application/62414D32-E0AE-45C5-BC96-A4BD5C157D87/MobileSafari.app/MobileSafari",
-      "processIdentifier" : 44105
+      "appBundle" : "MobileSafari",
+      "auditTokenRedacted" : true,
+      "executablePathRedacted" : true,
+      "processIdentifierRedacted" : true
     }
   }
 }

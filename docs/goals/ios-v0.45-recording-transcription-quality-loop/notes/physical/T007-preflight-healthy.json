@@ -1,0 +1,64 @@
+{
+  "automationProcesses": {
+    "count": 2,
+    "lineHashes": [
+      "da1894dc476852a8",
+      "5b47cdeb353c37f6"
+    ],
+    "printedCommandLines": false,
+    "returncode": 0
+  },
+  "classification": "healthy",
+  "device": {
+    "devicectlReturncode": 0,
+    "identifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+    "name": "iPhone-preview",
+    "summary": {
+      "looksAvailable": true,
+      "present": true,
+      "rawLineSha256": "0074c34291b545a9",
+      "state": "connected"
+    }
+  },
+  "nextAction": "Proceed only with sterile host-app fixtures and sanitized receipts.",
+  "privacy": {
+    "openedHostApps": false,
+    "printedRawWdaSource": false,
+    "printedScreenshots": false,
+    "printedTranscriptBodies": false
+  },
+  "redaction": {
+    "selfTest": {
+      "returncode": 0,
+      "stderrBytes": 0,
+      "stderrSha256": null,
+      "stdoutBytes": 1349,
+      "stdoutSha256": "cff6fb36eb05550b"
+    },
+    "selfTestPassed": true
+  },
+  "safeToTouchHostApps": true,
+  "schema": "foil.iosPhysicalHarness.preflight.v1",
+  "tooling": {
+    "iproxyPath": "/opt/homebrew/bin/iproxy",
+    "iproxyPresent": true,
+    "wdaCommandAvailable": true,
+    "wdaProjectPresent": true
+  },
+  "wda": {
+    "ready": true,
+    "status": {
+      "state": null,
+      "valueKeys": [
+        "build",
+        "device",
+        "ios",
+        "message",
+        "os",
+        "ready",
+        "state"
+      ]
+    },
+    "url": "http://192.168.1.40:8100"
+  }
+}

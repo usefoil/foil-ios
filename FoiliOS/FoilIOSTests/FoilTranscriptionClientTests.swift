@@ -29,6 +29,7 @@ final class FoilTranscriptionClientTests: XCTestCase {
         let request = try XCTUnwrap(capturedRequest)
         XCTAssertEqual(request.url?.absoluteString, "https://api.groq.com/openai/v1/audio/transcriptions")
         XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.timeoutInterval, 45)
         XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer test-groq-key")
         XCTAssertEqual(
             request.value(forHTTPHeaderField: "Content-Type"),
@@ -66,6 +67,30 @@ final class FoilTranscriptionClientTests: XCTestCase {
             XCTAssertEqual(error as? TranscriptionError, .httpStatus(401))
             XCTAssertFalse(error.localizedDescription.contains("provider-body-sentinel"))
         }
+    }
+
+    func testTranscribeUsesExplicitUploadTimeout() async throws {
+        let audioURL = try writeTemporaryAudioFile(bytes: Data("voice".utf8))
+        var capturedTimeout: TimeInterval?
+        let transport = StubUploadTransport { request, _ in
+            capturedTimeout = request.timeoutInterval
+            let response = HTTPURLResponse(
+                url: try XCTUnwrap(request.url),
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+            return (Data(#"{"text":"foil timeout bounded"}"#.utf8), response)
+        }
+        let client = FoilTranscriptionClient(
+            requestTimeout: 7,
+            transport: transport,
+            boundaryProvider: { "TestBoundary" }
+        )
+
+        _ = try await client.transcribe(audioFileURL: audioURL, apiKey: "test-groq-key")
+
+        XCTAssertEqual(capturedTimeout, 7)
     }
 
     private func writeTemporaryAudioFile(bytes: Data) throws -> URL {

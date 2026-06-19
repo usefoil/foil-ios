@@ -1,0 +1,32 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "transcript-review-panel",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "transcript-review-body",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 3,
+      "textSha256": "449b11820b0f6526"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-complete-source.xml",
+    "nodeCount": 142,
+    "sha256": "56f5e15b348ba61d0fd3c5b264bd70fbe50125b03578eb61e612fa7e909a9483"
+  },
+  "target": "pr30-tts-cycle3-complete"
+}

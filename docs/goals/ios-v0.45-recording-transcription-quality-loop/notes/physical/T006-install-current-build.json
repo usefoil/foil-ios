@@ -1,0 +1,14 @@
+{
+  "appExists": true,
+  "appPathSha256": "888c09539b7fd573c691c2012cfd0623dea09dac4ecdd56bc90f25d27e839699",
+  "bundleIdentifier": "com.neonwatty.FoilIOS",
+  "bundleVersion": "13",
+  "device": "iPhone-preview",
+  "installCommandReturncode": 0,
+  "launchCommandReturncode": 0,
+  "rawDeviceContainerPathCommitted": false,
+  "rawInstallUrlCommitted": false,
+  "schema": "foil.physicalReceipt.installSummary.v1",
+  "shortVersion": "0.1.0",
+  "target": "pr30-current-recording-quality-loop"
+}

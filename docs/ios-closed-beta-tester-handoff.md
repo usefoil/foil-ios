@@ -92,9 +92,11 @@ that is not safe to edit.
 5. If Foil says keyboard health is stale, cycle away from and back to Foil
    Keyboard before recording.
 6. Record a short safe phrase.
-7. Create the transcript.
-8. Return to Notes and tap **Insert latest** once.
-9. Confirm the text appears once.
+7. If you started with the wrong phrase or noisy audio, tap **Cancel** and
+   record again.
+8. Create the transcript.
+9. Return to Notes and tap **Insert latest** once.
+10. Confirm the text appears once.
 
 ### Safari
 
@@ -127,6 +129,8 @@ private history visible.
   to Foil Keyboard, then return to Foil.
 - If Full Access is off, enable it in Keyboard settings, then refocus the target
   field and cycle back to Foil Keyboard.
+- If you start recording the wrong phrase or background noise, tap **Cancel**
+  before creating a transcript and record again.
 - If the transcript is stale or wrong, use **Reset shared state** in Foil and
   record again.
 - If recording or transcription fails, retry with a shorter phrase.

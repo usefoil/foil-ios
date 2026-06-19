@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.45-recording-transcription-quality-loop"
   kind: specific
   tranche: "Recording, transcription, retry, and reset polish."
-  status: active
+  status: done
   oracle:
     signal: "Safe audio loop succeeds and realistic failure states are recoverable."
     cadence: "after each recording/transcription scenario"
@@ -20,26 +20,362 @@ agents:
   scout: installed
   worker: installed
   judge: installed
-active_task: T001
+active_task: null
 tasks:
   - id: T001
     type: scout
     assignee: Scout
-    status: active
+    status: done
     objective: "Map recording/transcription states and test hooks."
     acceptance_criteria:
       - "Receipt identifies success/failure scenarios and safe audio fixture strategy."
+    receipt:
+      result: done
+      summary: "Recording/transcription states are mostly present, but v0.45 names cancel and the app lacks a first-class cancel-recording path. Real-audio and insert-cycle proof remains physical/device/provider gated."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T001-scout-receipt.md"
+        - "FoiliOS/FoilIOSApp/AudioCaptureController.swift"
+        - "FoiliOS/FoilIOSApp/TranscriptionController.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
   - id: T002
     type: worker
     assignee: Worker
-    status: queued
+    status: done
     objective: "Polish recording/transcription status and recovery."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/AudioCaptureController.swift"
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilTranscriptQualityTests.swift"
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "docs/goals/ios-v0.45-recording-transcription-quality-loop/**"
+      - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/state.yaml"
+      - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T003-v0.44-blocker.md"
+    verify:
+      - "Watch new recording cancel presentation test fail before implementation."
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+      - "git diff --check"
+      - "scripts/ios-physical-harness.py status"
+    stop_if:
+      - "Live microphone, provider key, TestFlight install/update, WDA, or physical Insert Latest proof is required."
+      - "A receipt would include private audio, transcript text outside sterile fixtures, provider secrets, or host-app private content."
     acceptance_criteria:
       - "Core audio loop states are clear, recoverable, reflected in keyboard-ready state, and proven over three consecutive safe real-audio cycles."
+    receipt:
+      result: done
+      summary: "Added first-class cancel-recording presentation/UI/controller behavior with a red-green focused test. The local app now lets testers cancel an active recording without using broader reset."
+      changed_files:
+        - "FoiliOS/FoilIOSApp/AudioCaptureController.swift"
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "docs/ios-closed-beta-tester-handoff.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+          status: pass
+        - cmd: "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T002-worker-receipt.md"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSApp/AudioCaptureController.swift"
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
   - id: T003
     type: judge
     assignee: Judge
-    status: queued
+    status: blocked
     objective: "Verify audio loop proof and privacy."
     acceptance_criteria:
       - "Receipts rule out private audio/transcript leakage and weak happy-path-only proof."
+    receipt:
+      result: external_blocker
+      summary: "Physical/live audio proof is blocked on WDA/physical automation readiness and explicit safe-phrase microphone/provider/host-app insertion approval."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T003-physical-blocker.md"
+        - "scripts/ios-physical-harness.py status"
+      next_owner: "operator"
+      next_action: "Restore WDA or equivalent physical automation and approve safe-phrase physical audio proof."
+  - id: T004
+    type: pm
+    assignee: PM
+    status: blocked
+    objective: "Collect physical recording/cancel surface receipts after WDA recovery."
+    acceptance_criteria:
+      - "Receipts prove the cancel control exists with sane pre-recording state on the physical app."
+      - "If live audio proof is not run, receipts name the exact microphone/provider/keyboard/App Group blockers."
+    receipt:
+      result: external_blocker
+      summary: "Physical iPhone receipts prove the #30 build exposes the recording/cancel/transcribe controls with safe initial enabled states, and identify the remaining physical blockers. Live microphone/cancel/transcription proof was intentionally not run without explicit safe-phrase approval."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T004-physical-receipt.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T004-recording-surface.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T004-physical-blockers.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T004-app-group-initial.json"
+      missing:
+        - "Physical cancel-during-active-recording receipt with explicit safe-phrase microphone approval."
+        - "Physical transcription retry/failure/reset receipt with provider route ready."
+        - "Three consecutive safe real-audio insert cycles."
+      next_owner: "operator"
+      next_action: "Approve a sterile safe-phrase microphone run, grant microphone if prompted, ensure provider/keyboard/App Group gates are ready, then rerun live cancel/transcription/insert-cycle receipts."
+  - id: T005
+    type: pm
+    assignee: PM
+    status: blocked
+    objective: "Resolve PR #30's main-branch conflict and re-check the physical proof gate."
+    acceptance_criteria:
+      - "PR #30 no longer has merge conflicts."
+      - "Focused recording/onboarding presentation tests pass after the merge."
+      - "If physical proof is blocked, the receipt names the exact blocker without private audio, transcript, WDA tree, screenshot, or device-path content."
+    receipt:
+      result: external_blocker
+      note: "notes/T005-conflict-resolution-and-wda-blocker.md"
+      summary: "Merged current main into PR #30, resolved the handoff-doc conflict by preserving both Full Access recovery and recording Cancel recovery guidance, and revalidated the focused presentation tests. Physical live-audio proof remains blocked because WDA launches but XCTest times out while enabling automation mode, so strict preflight refuses host-app touches."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T005-conflict-resolution-and-wda-blocker.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T005-conflict-resolution-summary.json"
+      proven:
+        - "The merge conflict is resolved."
+        - "Recording cancel and route/setup presentation tests still pass."
+        - "Merged physical receipts were privacy-scanned and the raw Safari executable path was redacted."
+      missing:
+        - "Strict physical preflight with WDA ready."
+        - "Physical cancel-during-active-recording receipt."
+        - "Physical live transcription/retry/reset receipts."
+        - "Three consecutive sterile safe-phrase record -> transcribe -> Insert Latest cycles."
+      next_owner: "operator"
+      next_action: "Repair WDA/UI automation mode on iPhone-preview, rerun strict preflight, then use the sterile phrase `Foil safe test phrase June twelve` for live recording/cancel/transcription/insert-cycle proof."
+  - id: T006
+    type: pm
+    assignee: PM
+    status: blocked
+    objective: "Collect physical recording/cancel receipts after WDA recovered."
+    acceptance_criteria:
+      - "Receipts prove current-build setup-ready recording controls and cancel behavior, or exactly block before claiming live transcription."
+      - "Receipts keep raw WDA source, audio, transcript bodies, screenshots, provider keys, and private phone content out of commits."
+    receipt:
+      result: external_blocker
+      note: "notes/T006-physical-recording-cancel-receipt.md"
+      summary: "WDA recovered and current PR #30 physical receipts now prove sterile Safari/keyboard refresh, onboarding-ready recording controls, active recording Cancel availability, Cancel returning to idle/no transcript, and stopped-recording Transcribe availability. Two sterile Mac TTS live transcription attempts reached Transcribe but failed with no detected speech, leaving App Group phase failed and no transcript."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T006-physical-recording-cancel-receipt.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-install-current-build.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-current-recording-surface.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-onboarding-ready-recording-surface.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-recording-active-cancel-available.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-recording-cancel-returned-idle.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-live-recording-stopped-transcribe-ready.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T006-live-transcription-retry-result.json"
+      proven:
+        - "Current PR #30 build installed and launched on iPhone-preview."
+        - "WDA direct-device preflight is healthy."
+        - "Keyboard health refreshed through a sterile Safari field with Full Access warning absent."
+        - "Onboarding-ready is present before recording."
+        - "Physical Cancel is available during recording and returns app/App Group to idle."
+        - "A stopped live recording enables Transcribe."
+      missing:
+        - "Successful live transcription of the sterile phrase."
+        - "Retry/reset receipt after successful transcription."
+        - "Three consecutive sterile safe-phrase record -> transcribe -> Insert Latest cycles."
+      next_owner: "operator"
+      next_action: "Speak `Foil safe test phrase June twelve` near iPhone-preview during the next recording window, then rerun transcription and sterile Safari insertion receipts."
+  - id: T007
+    type: worker
+    assignee: Worker
+    status: done
+    objective: "Bound provider upload hangs and record the physical stale-processing blocker."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/FoilTranscriptionClient.swift"
+      - "FoiliOS/FoilIOSTests/FoilTranscriptionClientTests.swift"
+      - "docs/goals/ios-v0.45-recording-transcription-quality-loop/**"
+    verify:
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilTranscriptionClientTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilProviderFailurePresentationTests"
+      - "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -configuration Debug -destination 'id=00008030-001A0C980A33C02E' -derivedDataPath /tmp/foil-ios-pr30-timeout-fix DEVELOPMENT_TEAM=B3A6AN2HA4 CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+      - "git diff --check"
+    stop_if:
+      - "The fix requires storing provider keys, raw transcripts, raw WDA source, audio, screenshots, or private phone content."
+      - "Post-fix physical proof still requires operator phone-side recording."
+    acceptance_criteria:
+      - "Provider upload requests have an explicit timeout."
+      - "Focused tests prove the timeout is applied."
+      - "Physical receipts prove the stale processing blocker and post-fix idle recovery without private content."
+    receipt:
+      result: done
+      note: "notes/T007-timeout-and-processing-blocker.md"
+      summary: "Manual safe-phrase follow-up moved App Group to processing but it never reached complete/failed. Added an explicit 45-second Groq upload timeout, covered default and injected timeout tests, installed the timeout-fix build, reset the stale App Group state to idle, and verified the post-fix idle recording surface. Live post-fix success proof still needs another phone-side Record/Stop pass."
+      changed_files:
+        - "FoiliOS/FoilIOSApp/FoilTranscriptionClient.swift"
+        - "FoiliOS/FoilIOSTests/FoilTranscriptionClientTests.swift"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T007-timeout-and-processing-blocker.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-summary.json"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilTranscriptionClientTests"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilProviderFailurePresentationTests"
+          status: pass
+        - cmd: "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -configuration Debug -destination 'id=00008030-001A0C980A33C02E' -derivedDataPath /tmp/foil-ios-pr30-timeout-fix DEVELOPMENT_TEAM=B3A6AN2HA4 CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T007-timeout-and-processing-blocker.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-app-group-final-processing.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-processing-stuck-ui.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-timeout-fix-idle-ui.json"
+  - id: T008
+    type: pm
+    assignee: PM
+    status: done
+    objective: "Collect post-timeout-fix live transcription and sterile insertion receipts."
+    acceptance_criteria:
+      - "Receipts prove either successful sterile transcription plus Insert Latest, or a bounded timeout/failure with recovery instead of stale processing."
+      - "Receipts keep provider keys, raw transcripts, raw WDA source, screenshots, audio, and private phone content out of commits."
+    receipt:
+      result: done
+      summary: "The exact current PR head is installed on iPhone-preview. After the operator spoke the sterile phrase, the app moved from recorded/Transcribe-ready to provider complete, exposed a non-empty hashed transcript review, inserted exactly one copy into a sterile Safari normal field via Foil Keyboard, disabled Insert Latest afterward, and returned App Group to idle/no transcript."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-timeout-fix-idle-ui.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-postpush-preflight.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-postpush-app-group-idle.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-postpush-idle-controls.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-current-head-install.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-current-head-reset.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-current-head-app-group-idle.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-current-head-idle-controls.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-preflight-after-user-record.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-app-group-after-record-stop.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-processing-controls.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-transcribe-complete.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-transcript-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-live-transcript-review-nonempty.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-fixture-loaded.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-before-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert-app-group.json"
+      proven:
+        - "One real-audio sterile record -> transcribe -> Insert Latest cycle succeeded on the current PR head."
+        - "The inserted Safari value count moved from 0 to exactly 1 for the transcript hash."
+        - "Insert Latest disabled after insertion."
+        - "App Group returned to idle with no transcript after insertion."
+  - id: T009
+    type: worker
+    assignee: Worker
+    status: done
+    objective: "Repair the setup-readiness merge regression after bringing PR #27 into PR #30."
+    allowed_files:
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "docs/goals/ios-v0.45-recording-transcription-quality-loop/**"
+    verify:
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests/testSetupReadinessCompleteStateKeepsClosedBetaScopeNarrow"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml"
+      - "git diff --check"
+    stop_if:
+      - "The regression fix requires changing route, provider, keyboard, App Group, or insertion semantics beyond the stale transcript readiness check."
+      - "Verification fails twice."
+    acceptance_criteria:
+      - "Idle setup-ready state is no longer misclassified as a waiting transcript."
+      - "Focused and full simulator tests pass after the main merge."
+    receipt:
+      result: done
+      summary: "Fixed the post-main-merge readiness regression by calling the insertable transcript predicate instead of treating the method reference as truthy. This restores idle setup-ready presentation and removes the Swift warning."
+      changed_files:
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests/testSetupReadinessCompleteStateKeepsClosedBetaScopeNarrow"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(\"docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml\"); puts \"yaml ok\"'"
+          status: pass
+        - cmd: "targeted privacy scan over changed code and v0.45 GoalBuddy receipts"
+          status: pass
+      evidence:
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+  - id: T010
+    type: pm
+    assignee: PM
+    status: done
+    objective: "Collect the remaining repeated live insert cycles and post-success recovery receipts for the v0.45 release gate."
+    acceptance_criteria:
+      - "Two additional sterile real-audio record -> transcribe -> Insert Latest cycles pass on the current PR head."
+      - "Receipts prove retry/reset behavior after a successful transcription without exposing raw transcripts, audio, screenshots, raw WDA trees, provider keys, or private host-app content."
+    receipt:
+      result: done
+      summary: "The stricter v0.45 physical gate is now satisfied on iPhone-preview. In addition to the existing operator-spoken current-head cycle, two Apple-voice sterile cycles produced provider-complete transcripts, proved Insert Latest enabled before insertion, inserted exactly one copy into the sterile Safari normal field, disabled Insert Latest afterward, and returned App Group state to idle/no transcript. A stale third transcript was correctly blocked before insertion after WDA recovery, then rerun fresh as cycle 3b. Post-success reset proof shows the transcript review reset control clears App Group state and returns to the idle recording surface without leaving a waiting transcript."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert-app-group.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-transcribe-complete.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-transcript-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-transcript-review.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-safari-fixture-loaded.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-safari-before-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-safari-after-app-group.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3-transcribe-complete.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3-transcript-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3-transcript-review.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3-stale-insert-blocked.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-transcribe-complete.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-transcript-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-transcript-review.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-fixture-loaded.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-before-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-after-app-group.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-post-success-reset-before.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-post-success-reset-after.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-post-success-reset-after-app-group.json"
+      proven:
+        - "Three total current-head sterile audio cycles are proven: one operator-spoken cycle plus two Apple-voice cycles."
+        - "The two added Apple-voice cycles reached provider complete with non-empty hashed transcripts."
+        - "The two added Safari insertions moved the sterile field transcript count from 0 to exactly 1."
+        - "Insert Latest was enabled before insertion and disabled after insertion."
+        - "App Group returned to idle/no transcript after each successful insertion."
+        - "A stale transcript was blocked before insertion rather than inserted or overclaimed."
+        - "Post-success reset cleared App Group state, removed the transcript review panel, and restored the idle recording surface."
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    objective: "Run the final v0.45 physical release-gate audit."
+    acceptance_criteria:
+      - "Audit names the strongest realistic false-complete failure mode."
+      - "Audit maps provider completion, Full Access-backed insertion, App Group cleanup, exact-once insertion, stale blocking, and reset-after-success to receipts."
+      - "GoalBuddy state checker passes."
+    receipt:
+      result: done
+      task_id: T999
+      decision: complete
+      full_outcome_complete: true
+      note: "notes/T999-final-audit.md"
+      summary: "Final audit accepts the v0.45 recording/transcription quality loop release gate. The board now has three total current-head sterile audio insert cycles, stale transcript blocking, post-success reset recovery, sanitized receipts, and passing state/format/privacy checks."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T999-final-audit.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3-stale-insert-blocked.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-post-success-reset-after.json"

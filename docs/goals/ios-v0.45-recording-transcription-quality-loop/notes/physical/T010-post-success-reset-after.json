@@ -1,0 +1,42 @@
+{
+  "appGroup": {
+    "snapshot": {
+      "file": "app-group-after-reset-click.json",
+      "hasTranscript": false,
+      "phase": null,
+      "sha256": "d69c51ace65367165d38cf902c9e62273c746e64827c7dab79df5ccfe07f9971"
+    }
+  },
+  "checks": [
+    {
+      "identifier": "start-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "transcript-review-panel",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "attribute": "enabled",
+      "expected": "true",
+      "identifier": "start-recording-button",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "true"
+      ],
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-after-reset-source.xml",
+    "nodeCount": 134,
+    "sha256": "46c6de32e457890ef27e5ff97ff745910e5c2aa0a6e9976a022ec9419d8121c2"
+  },
+  "target": "pr30-tts-post-success-reset-after"
+}

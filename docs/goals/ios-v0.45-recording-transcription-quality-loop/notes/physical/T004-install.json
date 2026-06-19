@@ -1,0 +1,17 @@
+{
+  "appBundlePathSha256": "070656479fe1cc56",
+  "appInfoPlistSha256": "edb3f6938ef419ea",
+  "bundleID": "com.neonwatty.FoilIOS",
+  "device": "iPhone-preview",
+  "deviceIdentifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+  "devicectlReturncode": 0,
+  "installed": true,
+  "privacy": {
+    "committedArchiveOrIpa": false,
+    "printedPrivatePhoneContent": false,
+    "printedProviderKeys": false
+  },
+  "rawDevicectlJsonSha256": "b549a6d6ad0ae27b",
+  "schema": "foil.physicalInstallReceipt.v1",
+  "target": "pr30-recording-quality-loop"
+}

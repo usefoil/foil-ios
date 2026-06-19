@@ -13,13 +13,16 @@ extension URLSession: FoilTranscriptionUploading {}
 struct FoilTranscriptionClient: FoilTranscriptionProviding {
     private let endpoint = URL(string: "https://api.groq.com/openai/v1/audio/transcriptions")!
     private let model = "whisper-large-v3-turbo"
+    private let requestTimeout: TimeInterval
     private let transport: FoilTranscriptionUploading
     private let boundaryProvider: () -> String
 
     init(
+        requestTimeout: TimeInterval = 45,
         transport: FoilTranscriptionUploading = URLSession.shared,
         boundaryProvider: @escaping () -> String = { "Boundary-\(UUID().uuidString)" }
     ) {
+        self.requestTimeout = requestTimeout
         self.transport = transport
         self.boundaryProvider = boundaryProvider
     }
@@ -28,6 +31,7 @@ struct FoilTranscriptionClient: FoilTranscriptionProviding {
         let boundary = boundaryProvider()
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
+        request.timeoutInterval = requestTimeout
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 
