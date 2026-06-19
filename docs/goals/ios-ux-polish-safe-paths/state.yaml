@@ -5,7 +5,7 @@ goal:
   slug: "ios-ux-polish-safe-paths"
   kind: open_ended
   tranche: "Audit then polish the current iOS beta UX before starting the Mac bridge conveyor."
-  status: blocked
+  status: done
   oracle:
     signal: "Current iOS beta UX claims are intuitive, narrow, physically checked, and backed by tests/receipts/merged PRs."
     cadence: "after UX audit, after each implementation slice, after physical walkthrough, and before final merge/readiness claims"
@@ -108,7 +108,7 @@ tasks:
   - id: T002
     type: scout
     assignee: Scout
-    status: blocked
+    status: done
     reasoning_hint: high
     objective: "Run or prepare the physical safe-host-app UX walkthrough and record sanitized receipts."
     inputs:
@@ -125,17 +125,33 @@ tasks:
       - "Sanitized pass/fail receipts for app setup, keyboard health, provider route, App Group idle/reset, Safari insertion, Notes blank editor if safe, Messages fake/dedicated draft if safe, secure-field rejection, stale-state recovery, and exact-once behavior."
       - "Exact blocker receipts for any host app that cannot be safely touched."
     receipt:
-      result: external_blocker
-      summary: "Strict preflight against direct WDA URL did not allow safe host-app walkthrough. iPhone-preview is present but unavailable, WDA is unreachable, and safeToTouchHostApps is false, so no Safari/Notes/Messages/private surfaces were touched."
+      result: done
+      summary: "Resumed after preview-device/WDA recovery and collected current-main physical UX receipts. Verified route/setup readiness, Mac route not-ready behavior, iPhone API route readiness after keyboard refresh, Safari exact-once insertion, secure-field rejection, blank Notes exact-once insertion, user-prepared Messages draft exact-once insertion without sending, and App Group idle/no-transcript recovery."
       evidence:
-        - "docs/goals/ios-ux-polish-safe-paths/notes/T002-preflight.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T015-healthy-preflight-after-install.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T015-current-main-route-visible-receipt.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T015-current-main-mac-route-not-ready-receipt.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T015-current-main-incomplete-setup-leads-layout.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T016-current-main-ready-after-keyboard-refresh-receipt.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T017-current-main-safari-before-insert-receipt.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T017-current-main-safari-after-insert-receipt.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T017-current-main-app-group-after-insert.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T018-current-main-secure-field-rejection-receipt.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T018-current-main-app-group-after-secure-reset.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T019-current-main-notes-before-insert-receipt.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T019-current-main-notes-after-insert-receipt.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T019-current-main-app-group-after-notes-insert.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T020-messages-healthy-preflight-rerun.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T020-current-main-messages-before-insert-receipt.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T020-current-main-messages-after-insert-receipt.json"
+        - "docs/goals/ios-ux-polish-safe-paths/notes/T020-current-main-app-group-after-messages-insert.json"
       commands:
         - cmd: "python3 scripts/ios-physical-harness.py preflight --strict --wda-url http://192.168.1.40:8100"
-          status: fail
-      next_owner: "operator"
-      next_action: "Unlock/connect iPhone-preview, confirm Xcode device preparation is healthy, and rerun strict preflight before touching host apps."
+          status: pass
+      next_owner: "PM"
+      next_action: "Finalize the resumed audit receipts and open the evidence PR."
       privacy:
-        openedHostApps: false
+        openedHostApps: true
         printedRawWdaSource: false
         printedScreenshots: false
         printedTranscriptBodies: false
@@ -268,25 +284,31 @@ tasks:
   - id: T006
     type: worker
     assignee: Worker
-    status: blocked
+    status: done
     reasoning_hint: high
     objective: "Implement a second safe UX polish slice if T005 approves one."
-    allowed_files: []
+    allowed_files:
+      - "docs/goals/ios-ux-polish-safe-paths/**"
     verify: []
     stop_if:
       - "T005 did not approve this slice."
       - "Need private phone content, raw WDA source, screenshots of private apps, provider keys, App Store Connect keys, JWTs, archives, or IPAs."
       - "The change expands unsupported host-app or Mac bridge claims."
     receipt:
-      result: not_approved
-      summary: "T005 did not approve a second source-only UX slice. The next useful work is physical common-app walkthrough proof after preview-device/WDA recovery."
-      next_owner: "operator"
-      next_action: "Restore iPhone-preview/WDA availability, then rerun strict preflight and host-app UX receipts."
+      result: done
+      summary: "T005 did not approve a second source-only UX implementation slice. This task is complete as not applicable; the tranche proceeded through resumed physical proof instead of more source changes."
+      changed_files:
+        - "docs/goals/ios-ux-polish-safe-paths/state.yaml"
+      commands:
+        - cmd: "T005 judge decision"
+          status: pass
+      next_owner: "PM"
+      next_action: "Use T002 resumed physical receipts and T999 final audit for completion."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: blocked
+    status: done
     reasoning_hint: high
     objective: "Final audit: decide whether the iOS UX polish tranche is complete before the Mac bridge conveyor."
     inputs:
@@ -300,27 +322,23 @@ tasks:
       - "Evidence that the app does not claim setup is complete when Full Access, keyboard health, provider route, App Group state, insertion, or host-app targeting still fails."
       - "Remaining blockers or next board if not complete."
     receipt:
-      result: external_blocker
-      decision: "not_complete"
-      full_outcome_complete: false
-      note: "docs/goals/ios-ux-polish-safe-paths/notes/T999-final-audit.md"
-      summary: "The iOS UX polish tranche has one merged improvement, but the full common-app UX review is blocked. Strict preflight still reports iPhone-preview present but unavailable, WDA unreachable, and safeToTouchHostApps false, so Safari/Notes/Messages/secure-field physical receipts cannot be collected safely."
+      result: done
+      decision: "complete"
+      full_outcome_complete: true
+      note: "docs/goals/ios-ux-polish-safe-paths/notes/T999-resumed-final-audit.md"
+      summary: "The iOS UX polish tranche is complete. PR #50 merged the setup-ordering polish, and resumed current-main physical receipts prove route/setup readiness, no Mac-route overclaim, Full Access and keyboard health readiness after extension check-in, Safari/Notes/Messages exact-once insertion, secure-field rejection, and App Group idle/no-transcript recovery."
       completed:
         - "Current UX surfaces audited."
         - "PR #50 merged after fresh green checks."
         - "Setup now leads incomplete idle first-run states without hiding active dictation or transcript flows."
         - "Presenter and bridge tests passed before merge."
-      missing_evidence:
-        - "Current-build physical route/setup walkthrough after PR #50."
-        - "Current-build Foil Keyboard health and Full Access confirmation in a sterile host app."
-        - "Current-build Safari exact-once insertion after the UX ordering change."
-        - "Current-build blank Notes editor walkthrough."
-        - "Current-build fake/dedicated Messages draft walkthrough."
-        - "Secure-field rejection after the UX ordering change."
-      next_owner: "operator"
-      next_action: "Unlock/connect iPhone-preview, confirm Xcode reports it available, restore WDA at http://192.168.1.40:8100, then rerun strict preflight."
+        - "Current-main route/setup, readiness, Safari, Notes, Messages, secure-field, and App Group recovery receipts were collected after preview-device/WDA recovery."
+        - "Messages proof used a user-prepared sterile draft and was not sent."
+      missing_evidence: []
+      next_owner: "PM"
+      next_action: "Open and monitor the sanitized evidence PR, then start the Mac bridge conveyor."
       privacy:
-        openedHostApps: false
+        openedHostApps: true
         printedRawWdaSource: false
         printedScreenshots: false
         printedTranscriptBodies: false

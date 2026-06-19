@@ -1,0 +1,20 @@
+{
+  "appGroup": "group.com.neonwatty.FoilIOS",
+  "copyFrom": {
+    "returncode": 0,
+    "stderrBytes": 0,
+    "stderrSha256": null,
+    "stdoutBytes": 263,
+    "stdoutSha256": "92018b3ddb165049"
+  },
+  "deviceId": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+  "schema": "foil.iosPhysicalHarness.appGroupSummary.v1",
+  "source": "Library/foil-keyboard-snapshot.json",
+  "summary": {
+    "file": "foil-keyboard-snapshot.json",
+    "hasTranscript": false,
+    "messageHash": "5fa7aac5375c5815",
+    "phase": "idle",
+    "sha256": "6a548c14a43a93c9154a109e181ccd7013da01ae757e8c9107a8c681d81e8a6b"
+  }
+}

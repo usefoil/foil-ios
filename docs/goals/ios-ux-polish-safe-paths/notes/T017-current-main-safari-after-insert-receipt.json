@@ -1,0 +1,50 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "foil-keyboard-root",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 24,
+      "textSha256": "9094659807f52c60"
+    },
+    {
+      "actual": 1,
+      "expected": 1,
+      "kind": "expectValueTextCount",
+      "passed": true,
+      "textLength": 42,
+      "textSha256": "d73b6bdbd7e17b17"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "T017-current-main-safari-after-insert-source.xml",
+    "nodeCount": 168,
+    "sha256": "25894c8c652fc292fbe1fc859c95f2a72dea39c548385564b369592d873a307d"
+  },
+  "target": "ux-polish-current-main-safari-after-insert-exact-once"
+}

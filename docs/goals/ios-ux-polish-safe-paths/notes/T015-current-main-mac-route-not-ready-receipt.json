@@ -1,0 +1,51 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "route-first-onboarding",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-use-my-mac",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-not-ready",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-ready",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 43,
+      "textSha256": "e79d80fe71940132"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 56,
+      "textSha256": "170ede1b84a482e2"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "T015-foil-mac-route-incomplete-source.xml",
+    "nodeCount": 95,
+    "sha256": "8593634c9013a67ed0e60a585fe0a65080dc175e76312aed707d0207b2b9205f"
+  },
+  "target": "ux-polish-current-main-mac-route-not-ready-no-overclaim"
+}
