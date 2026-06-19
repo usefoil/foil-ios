@@ -32,7 +32,7 @@ tasks:
     receipt:
       result: done
       decision: pass_with_accepted_blockers
-      summary: "Every v0.42-v0.52 board is mapped to a merged PR/receipt, accepted blocker, or superseding TestFlight physical-gate receipt; the ledger supports narrow internal build-13 beta only."
+      summary: "Every v0.42-v0.52 board is mapped to a merged PR/receipt, accepted blocker, or superseding TestFlight physical-gate receipt. Post-merge refresh confirms PRs #27, #29, #30, and #31 are merged; the ledger supports narrow internal build-13 beta only while future release-candidate TestFlight proof and broader host-app expansion remain bounded."
       evidence:
         - "docs/goals/ios-v0.53-closed-beta-final-readiness-audit/notes/T001-child-board-audit.md"
   - id: T002
@@ -60,6 +60,6 @@ tasks:
       result: done
       decision: complete
       recommendation: invite_narrow_internal_build13_only
-      summary: "Keep narrow internal build 13 feedback moving, but hold broader closed beta on draft UX PRs, fresh host-app matrix expansion, and currently unhealthy WDA for new physical reruns."
+      summary: "Keep narrow internal build 13 feedback moving, but hold broader closed beta on future release-candidate TestFlight proof and fresh host-app matrix expansion. The former draft blockers #27, #29, #30, and #31 are now merged."
       evidence:
         - "docs/goals/ios-v0.53-closed-beta-final-readiness-audit/notes/T003-final-recommendation.md"

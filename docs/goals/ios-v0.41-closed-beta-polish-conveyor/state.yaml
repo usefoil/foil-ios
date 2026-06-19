@@ -59,7 +59,7 @@ tasks:
   - id: T001
     type: worker
     assignee: Worker
-    status: blocked
+    status: done
     reasoning_hint: high
     objective: "Run the first-run onboarding polish child board."
     child_board: "docs/goals/ios-v0.42-first-run-onboarding-polish/goal.md"
@@ -79,13 +79,20 @@ tasks:
       - "A tester can understand what to do first, what is done, what remains, and which targets are safe without reading external docs."
       - "No copy implies broad iPhone app support, Mail support, Messages delivery, or secure-field support."
     receipt:
-      result: external_blocker
-      summary: "v0.42 implementation PR #27 is open as a draft with local/simulator proof, but the child board is exactly blocked before merge because iPhone-preview is unavailable, WDA is not reachable, and installing the branch requires operator approval."
+      result: done
+      summary: "PR #27 merged on 2026-06-19. The earlier physical blocker was superseded by v0.42 T006 receipts proving route-first onboarding, no-overclaim setup states, keyboard health/Full Access readiness, app-owned App Group reset, and final onboarding-ready state on iPhone-preview."
       evidence:
-        - "https://github.com/mean-weasel/foil-ios/pull/27"
+        - "https://github.com/usefoil/foil-ios/pull/27"
         - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T001-v0.42-blocker.md"
-      next_owner: "operator"
-      next_action: "Make iPhone-preview available/unlocked, approve installing PR #27's development build, and restore WDA/equivalent physical UI automation."
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/notes/T006-onboarding-ready-physical-receipt.md"
+      changed_files:
+        - "docs/goals/ios-v0.42-first-run-onboarding-polish/**"
+        - "docs/ios-closed-beta-tester-handoff.md"
+      commands:
+        - cmd: "gh pr view 27 --json state,mergedAt,mergeCommit"
+          status: pass
+        - cmd: "node check-goal-state.mjs docs/goals/ios-v0.42-first-run-onboarding-polish/state.yaml"
+          status: pass
 
   - id: T002
     type: worker
@@ -118,12 +125,22 @@ tasks:
         - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
         - "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO"
         - "git diff --check"
-        - "Secret/copy scans for provider keys, Authorization, Bearer, and provider-body sentinels."
+        - "Secret/copy scans for provider keys, credential headers, and provider-body sentinels."
+      changed_files:
+        - "FoiliOS/FoilIOSTests/FoilProviderFailurePresentationTests.swift"
+        - "docs/goals/ios-v0.43-provider-configuration-health/**"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+          status: pass
+        - cmd: "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
 
   - id: T003
     type: worker
     assignee: Worker
-    status: blocked
+    status: done
     reasoning_hint: high
     objective: "Run the keyboard setup, Full Access, and recovery child board."
     child_board: "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/goal.md"
@@ -142,17 +159,25 @@ tasks:
     acceptance_criteria:
       - "A tester can recover from the common keyboard-extension failure modes using in-app guidance and verified handoff steps."
     receipt:
-      result: external_blocker
-      summary: "Draft PR #29 remains open for keyboard setup recovery; merge is blocked until physical setup/Full Access proof can be captured safely."
+      result: done
+      summary: "PR #29 merged on 2026-06-14. The keyboard setup recovery board is complete with Full Access/setup recovery guidance and follow-up physical receipts; no draft PR #29 blocker remains."
       evidence:
-        - "https://github.com/mean-weasel/foil-ios/pull/29"
-      next_owner: "operator"
-      next_action: "Restore healthy physical UI automation or provide guided physical proof for Add Keyboard, Allow Full Access, cycling/refocus, stale recovery, and disabled Insert Latest states."
+        - "https://github.com/usefoil/foil-ios/pull/29"
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/state.yaml"
+        - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T003-v0.44-blocker.md"
+      changed_files:
+        - "docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/**"
+        - "docs/ios-closed-beta-tester-handoff.md"
+      commands:
+        - cmd: "gh pr view 29 --json state,mergedAt,mergeCommit"
+          status: pass
+        - cmd: "node check-goal-state.mjs docs/goals/ios-v0.44-keyboard-setup-full-access-recovery/state.yaml"
+          status: pass
 
   - id: T004
     type: worker
     assignee: Worker
-    status: blocked
+    status: done
     reasoning_hint: high
     objective: "Run the recording and transcription quality-loop child board."
     child_board: "docs/goals/ios-v0.45-recording-transcription-quality-loop/goal.md"
@@ -171,17 +196,25 @@ tasks:
     acceptance_criteria:
       - "The app makes transcription status legible and recoverable, with evidence for three repeated safe real-audio cycles plus realistic failure paths."
     receipt:
-      result: external_blocker
-      summary: "Draft PR #30 remains open for recording quality-loop recovery; merge is blocked until current physical/live audio proof can be captured without private speech or credential exposure."
+      result: done
+      summary: "PR #30 merged on 2026-06-19. The recording/transcription quality loop now has three current-head sterile audio insert cycles, stale transcript blocking, post-success reset recovery, sanitized receipts, and passing final audit."
       evidence:
-        - "https://github.com/mean-weasel/foil-ios/pull/30"
-      next_owner: "operator"
-      next_action: "Provide a safe physical audio proof path or restore WDA/app automation for three sanitized record/transcribe/insert/reset cycles."
+        - "https://github.com/usefoil/foil-ios/pull/30"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T999-final-audit.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-after-insert.json"
+      changed_files:
+        - "FoiliOS/**"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/**"
+      commands:
+        - cmd: "gh pr view 30 --json state,mergedAt,mergeCommit"
+          status: pass
+        - cmd: "node check-goal-state.mjs docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml"
+          status: pass
 
   - id: T005
     type: worker
     assignee: Worker
-    status: blocked
+    status: done
     reasoning_hint: high
     objective: "Run the Insert Latest usage UX child board."
     child_board: "docs/goals/ios-v0.46-insert-latest-usage-ux/goal.md"
@@ -199,12 +232,19 @@ tasks:
     acceptance_criteria:
       - "Insert Latest feels predictable and cannot silently double-insert or expose stale text in the tested safe paths."
     receipt:
-      result: external_blocker
-      summary: "Draft PR #31 remains open for Insert Latest freshness; local tests passed, but merge is blocked until physical host-field exact-once/stale/reset proof can be captured safely."
+      result: done
+      summary: "PR #31 merged on 2026-06-12. Insert Latest freshness/exact-once polish is no longer a draft blocker; broader host-app expansion remains bounded by the v0.47 matrix and privacy rules."
       evidence:
-        - "https://github.com/mean-weasel/foil-ios/pull/31"
-      next_owner: "operator"
-      next_action: "Restore healthy WDA/physical host-field proof or run a guided sterile host-app insertion proof."
+        - "https://github.com/usefoil/foil-ios/pull/31"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/state.yaml"
+      changed_files:
+        - "FoiliOS/**"
+        - "docs/goals/ios-v0.46-insert-latest-usage-ux/**"
+      commands:
+        - cmd: "gh pr view 31 --json state,mergedAt,mergeCommit"
+          status: pass
+        - cmd: "node check-goal-state.mjs docs/goals/ios-v0.46-insert-latest-usage-ux/state.yaml"
+          status: pass
 
   - id: T006
     type: worker
@@ -231,8 +271,14 @@ tasks:
       result: done
       summary: "PR #32 merged; matrix rows now record v0.47 blocked/not-rerun, privacy-blocked, and deferred classifications without unsafe host-app claims."
       evidence:
-        - "https://github.com/mean-weasel/foil-ios/pull/32"
+        - "https://github.com/usefoil/foil-ios/pull/32"
         - "docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md"
+      changed_files:
+        - "docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/**"
+        - "docs/ios-keyboard-host-app-matrix.md"
+      commands:
+        - cmd: "gh pr view 32 --json state,mergedAt,mergeCommit"
+          status: pass
 
   - id: T007
     type: worker
@@ -259,8 +305,15 @@ tasks:
       result: done
       summary: "PR #33 merged; `scripts/ios-physical-harness.py preflight` now fails closed when WDA is unreachable and reports sanitized readiness without touching host apps."
       evidence:
-        - "https://github.com/mean-weasel/foil-ios/pull/33"
+        - "https://github.com/usefoil/foil-ios/pull/33"
         - "docs/goals/ios-v0.48-physical-automation-hardening/notes/T003-healthy-path-blocker.md"
+      changed_files:
+        - "docs/goals/ios-v0.48-physical-automation-hardening/**"
+        - "docs/ios-physical-automation-runbook.md"
+        - "scripts/**"
+      commands:
+        - cmd: "gh pr view 33 --json state,mergedAt,mergeCommit"
+          status: pass
 
   - id: T008
     type: worker
@@ -286,8 +339,15 @@ tasks:
       result: done
       summary: "PR #34 merged; privacy-safe beta feedback issue form and triage guidance are in place."
       evidence:
-        - "https://github.com/mean-weasel/foil-ios/pull/34"
+        - "https://github.com/usefoil/foil-ios/pull/34"
         - "docs/goals/ios-v0.49-beta-feedback-intake-loop/notes/T003-judge-audit.md"
+      changed_files:
+        - ".github/ISSUE_TEMPLATE/**"
+        - "docs/goals/ios-v0.49-beta-feedback-intake-loop/**"
+        - "docs/ios-closed-beta-tester-handoff.md"
+      commands:
+        - cmd: "gh pr view 34 --json state,mergedAt,mergeCommit"
+          status: pass
 
   - id: T009
     type: worker
@@ -312,8 +372,14 @@ tasks:
       result: done
       summary: "PR #35 merged; simulator sanity lane runs full simulator tests plus unsigned generic iOS build and explicitly does not claim physical keyboard/host-app behavior."
       evidence:
-        - "https://github.com/mean-weasel/foil-ios/pull/35"
+        - "https://github.com/usefoil/foil-ios/pull/35"
         - "docs/goals/ios-v0.50-simulator-sanity-regression/notes/T003-judge-audit.md"
+      changed_files:
+        - "FoiliOS/**"
+        - "docs/goals/ios-v0.50-simulator-sanity-regression/**"
+      commands:
+        - cmd: "gh pr view 35 --json state,mergedAt,mergeCommit"
+          status: pass
 
   - id: T010
     type: judge
@@ -337,6 +403,7 @@ tasks:
       - "Evidence is safe to keep in-repo and strong enough to support or block beta claims."
     receipt:
       result: done
+      decision: complete
       summary: "v0.51 redacted legacy transcript/host-field bodies to metadata and passed post-redaction hygiene scans for tracked repo artifacts."
       evidence:
         - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T010-v0.51-done.md"
@@ -397,8 +464,11 @@ tasks:
     acceptance_criteria:
       - "Final audit gives invite/hold recommendation and a tester scope that matches only proven behavior."
     receipt:
-      result: invite_narrow_internal_only
-      summary: "Final audit completed the conveyor by mapping v0.42-v0.52 to merged receipts or accepted blockers and aligning tester/public copy with proven build-scoped behavior."
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      recommendation: invite_narrow_internal_only
+      summary: "Final audit completed the conveyor by mapping v0.42-v0.52 to merged receipts or accepted blockers and aligning tester/public copy with proven build-scoped behavior. Post-merge refresh confirms PRs #27, #29, #30, and #31 are now merged; broader expansion remains gated on fresh release-candidate TestFlight proof and host-app matrix expansion."
       evidence:
         - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/notes/T012-v0.53-done.md"
         - "docs/goals/ios-v0.53-closed-beta-final-readiness-audit/notes/T003-final-recommendation.md"

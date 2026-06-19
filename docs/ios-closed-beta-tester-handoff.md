@@ -36,7 +36,7 @@ in safe text fields.
 ## Known Caveats
 
 - This is not arbitrary iPhone app support.
-- Mail compose is deferred: `https://github.com/mean-weasel/foil-ios/issues/12`.
+- Mail compose is deferred: `https://github.com/usefoil/foil-ios/issues/12`.
 - Notes and Messages are safe feedback targets only when you create a blank,
   non-private editor/draft first.
 - Messages delivery and existing private-thread behavior are not claimed.

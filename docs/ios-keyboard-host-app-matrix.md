@@ -53,13 +53,13 @@ bodies from non-sterile contexts must not be committed.
 | Notes blank editor | Privacy blocked, not rerun | `docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md` | Notes can reopen private or unknown existing content. The v0.47 attempt does not navigate Notes without physical automation and a sterile editor precheck. |
 | Messages fake or dedicated draft | Privacy blocked, not rerun | `docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md` | Messages can expose private thread lists or send controls. The v0.47 attempt does not navigate Messages without a sterile compose/draft surface. |
 | Reminders or another safe Apple text surface | Blocked, not rerun | `docs/goals/ios-v0.47-host-app-sterile-matrix-expansion/notes/T002-physical-blocker.md` | An additional row would need physical proof of intended-field mutation and cleanup. WDA is unavailable. |
-| Mail blank compose | Deferred | `https://github.com/mean-weasel/foil-ios/issues/12` | Mail requires a sterile blank compose surface and must not expose inbox/account/private email content or send mail. |
+| Mail blank compose | Deferred | `https://github.com/usefoil/foil-ios/issues/12` | Mail requires a sterile blank compose surface and must not expose inbox/account/private email content or send mail. |
 
 ## Next Useful Rows
 
 - Mail compose after confirming Mail is installed or installing/configuring a
   sterile mail account. Deferred in
-  `https://github.com/mean-weasel/foil-ios/issues/12`.
+  `https://github.com/usefoil/foil-ios/issues/12`.
 - Calendar new-event title after operator setup opens a blank unsaved event
   sheet with the title field focused.
 - Foil secure-field rejection after adding a first-party deep link or

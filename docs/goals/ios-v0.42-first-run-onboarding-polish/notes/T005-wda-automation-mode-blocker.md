@@ -1,5 +1,9 @@
 # T005 WDA Automation Mode Blocker
 
+Superseded: this WDA blocker was later resolved. T006 used a healthy direct WDA
+URL to collect final onboarding-ready physical receipts, and PR #27 merged on
+2026-06-19.
+
 Claim: PR #27 cannot collect the final onboarding-ready physical receipt until WebDriverAgent can enable UI automation mode on iPhone-preview.
 
 Strongest realistic failure mode: the conveyor proceeds to touch host apps or claims setup-ready proof while WDA is unreachable after a failed XCTest runner launch.

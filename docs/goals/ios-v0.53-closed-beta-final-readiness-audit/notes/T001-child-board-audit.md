@@ -1,6 +1,7 @@
 # T001 Child Board Readiness Audit
 
 Date: 2026-06-12T02:26Z
+Post-merge refresh: 2026-06-19
 Branch: `codex/ios-v0.53-final-audit-rerun`
 Result: `done`
 Decision: `pass_with_accepted_blockers`
@@ -9,11 +10,11 @@ Decision: `pass_with_accepted_blockers`
 
 | Board | PR | State | Audit finding |
 | --- | --- | --- | --- |
-| v0.42 first-run onboarding polish | [#27](https://github.com/usefoil/foil-ios/pull/27) | Draft/open; mergeable with green CodeQL | Accepted blocker. The branch was refreshed against main and remains draft because the physical/setup proof gate is not complete for that PR. |
+| v0.42 first-run onboarding polish | [#27](https://github.com/usefoil/foil-ios/pull/27) | Merged 2026-06-19 | Done after post-audit physical receipts. v0.42 T006 proves route-first onboarding, no-overclaim setup states, keyboard health/Full Access readiness, app-owned App Group reset, and final onboarding-ready state. |
 | v0.43 provider configuration health | [#28](https://github.com/usefoil/foil-ios/pull/28) | Merged 2026-06-09 | Done. Mocked controller receipts cover configured, missing-key, invalid-key, network, provider-response, transcription-quality, and recovered-success states without live provider secrets. |
-| v0.44 keyboard setup/full-access recovery | [#29](https://github.com/usefoil/foil-ios/pull/29) | Draft/open; mergeable with green CodeQL | Accepted blocker. The branch was refreshed against main, but Full Access/setup recovery copy is not merged and should remain a required polish item. |
-| v0.45 recording/transcription quality loop | [#30](https://github.com/usefoil/foil-ios/pull/30) | Draft/open; mergeable with green CodeQL | Accepted blocker. The branch was refreshed against main, but recording cancel/retry quality proof is not merged and should not be described as completed. |
-| v0.46 Insert Latest usage UX | [#31](https://github.com/usefoil/foil-ios/pull/31) | Draft/open; mergeable with green CodeQL | Accepted blocker. Freshness/exact-once polish is pushed and locally tested, but remains draft pending physical host-field proof. |
+| v0.44 keyboard setup/full-access recovery | [#29](https://github.com/usefoil/foil-ios/pull/29) | Merged 2026-06-14 | Done. The earlier draft/setup blocker is superseded; the board records keyboard setup and Full Access recovery guidance plus follow-up receipts. |
+| v0.45 recording/transcription quality loop | [#30](https://github.com/usefoil/foil-ios/pull/30) | Merged 2026-06-19 | Done. Final audit proves three current-head sterile audio insert cycles, stale transcript blocking, post-success reset recovery, sanitized receipts, and passing board checks. |
+| v0.46 Insert Latest usage UX | [#31](https://github.com/usefoil/foil-ios/pull/31) | Merged 2026-06-12 | Done. Insert Latest freshness/exact-once polish is merged; broader host-app expansion remains bounded by v0.47 privacy/matrix rules. |
 | v0.47 host-app sterile matrix expansion | [#32](https://github.com/usefoil/foil-ios/pull/32) | Merged 2026-06-09 | Blocked for new rows by physical automation. Matrix rows record WDA unreachable and privacy boundaries rather than new host-app pass claims. |
 | v0.48 physical automation hardening | [#33](https://github.com/usefoil/foil-ios/pull/33), metadata fix [#46](https://github.com/usefoil/foil-ios/pull/46) | Merged hardening; #46 merged 2026-06-12 after fresh green CodeQL | The preflight fails closed when WDA is unreachable. #46 only fixes GoalBuddy receipt metadata and does not change product claims. |
 | v0.49 beta feedback intake loop | [#34](https://github.com/usefoil/foil-ios/pull/34) | Merged 2026-06-09 | Done. Issue form, triage guide, and handoff pointers ask for actionable beta state while prohibiting private content and credentials. |
@@ -24,6 +25,6 @@ Decision: `pass_with_accepted_blockers`
 
 ## Decision
 
-Every v0.42-v0.52 child board is either merged with a receipt, has an explicit accepted blocker, or is superseded for release gating by the later TestFlight physical-gate board. The remaining blockers are material enough to reject a broad closed-beta invite, but they do not invalidate a narrow internal feedback scope for build `0.1.0 (13)`.
+Every v0.42-v0.52 child board is either merged with a receipt, has an explicit accepted blocker, or is superseded for release gating by the later TestFlight physical-gate board. The post-merge refresh removes the old #27/#29/#30/#31 draft blockers from the current ledger. The remaining blockers are fresh TestFlight/readiness proof for future release candidates and broader host-app expansion, which are material enough to reject a broad closed-beta invite but do not invalidate a narrow internal feedback scope for build `0.1.0 (13)`.
 
 Recommended downstream decision: `invite_narrow_internal_build13_only`.
