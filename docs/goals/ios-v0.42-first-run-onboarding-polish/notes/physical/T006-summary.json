@@ -1,0 +1,72 @@
+{
+  "schema": "foil.physicalReceipt.v1",
+  "task": "T006",
+  "createdAt": "2026-06-18T23:00:16Z",
+  "claim": "Current PR #27 physical onboarding-ready proof passed after keyboard refresh and app-owned App Group reset.",
+  "device": {
+    "name": "iPhone-preview",
+    "identifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+    "wdaUrl": "http://192.168.1.40:8100"
+  },
+  "proof": {
+    "preflightHealthy": true,
+    "currentDebugBuildInstalled": true,
+    "initialNoOverclaim": {
+      "routeChoicesPresent": true,
+      "onboardingReady": false,
+      "onboardingNotReady": true,
+      "blocker": "stale keyboard health after reinstall"
+    },
+    "appGroupResetBeforeReady": {
+      "phase": "idle",
+      "hasTranscript": false
+    },
+    "sterileSafariFixtureLoaded": true,
+    "foilKeyboardAfterCycle": {
+      "visible": true,
+      "insertLatestEnabled": false,
+      "fullAccessWarningPresent": false
+    },
+    "keyboardRefreshBeforeAppReset": {
+      "keyboardCheckedIn": true,
+      "fullAccessReady": true,
+      "onboardingReady": false,
+      "remainingBlocker": "app-visible reset"
+    },
+    "afterAppOwnedReset": {
+      "routeChoicesPresent": true,
+      "onboardingReady": true,
+      "onboardingNotReady": false,
+      "keyboardCheckedIn": true,
+      "fullAccessReady": true,
+      "staleKeyboardWarningPresent": false,
+      "appGroupResetWarningPresent": false,
+      "appGroupPhase": "idle",
+      "hasTranscript": false
+    }
+  },
+  "evidence": [
+    "T006-preflight-healthy.json",
+    "T006-install-current-build.json",
+    "T006-onboarding-ready-initial.json",
+    "T006-reset-before-ready.json",
+    "T006-app-group-after-reset.json",
+    "T006-safari-fixture-loaded.json",
+    "T006-safari-normal-focused-keyboard.json",
+    "T006-safari-foil-keyboard-after-cycle.json",
+    "T006-onboarding-ready-after-keyboard-refresh.json",
+    "T006-app-group-ready.json",
+    "T006-onboarding-ready-after-app-reset.json",
+    "T006-app-group-after-app-reset.json"
+  ],
+  "privacy": {
+    "committedRawWdaSource": false,
+    "committedScreenshots": false,
+    "committedAudio": false,
+    "committedTranscriptBodies": false,
+    "committedProviderKeys": false,
+    "committedPrivatePhoneContent": false
+  },
+  "result": "done",
+  "nextAction": "Monitor fresh CI and review PR #27 for merge once checks are green and mergeability is clean."
+}
