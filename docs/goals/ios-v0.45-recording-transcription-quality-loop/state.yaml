@@ -246,10 +246,13 @@ tasks:
       - "Receipts keep provider keys, raw transcripts, raw WDA source, screenshots, audio, and private phone content out of commits."
     receipt:
       result: external_blocker
-      summary: "The timeout-fix build is installed and idle, but the post-fix watcher did not observe a phone-side Record/Stop transition. Start remained enabled, Stop and Cancel remained disabled, and no Transcribe control appeared through the bounded watch window."
+      summary: "The timeout-fix build is installed and idle. Fresh post-push WDA proof is healthy and Foil is reachable, but App Group remains idle with no transcript and the Foil surface shows Start enabled while Stop, Cancel, and Transcribe are disabled. The post-fix watcher did not observe a phone-side Record/Stop transition."
       evidence:
         - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-summary.json"
         - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T007-timeout-fix-idle-ui.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-postpush-preflight.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-postpush-app-group-idle.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-postpush-idle-controls.json"
       missing:
         - "Post-timeout-fix phone-side Record/Stop pass."
         - "Post-timeout-fix Transcribe result receipt."
