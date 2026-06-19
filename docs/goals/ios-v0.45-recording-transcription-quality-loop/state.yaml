@@ -4,7 +4,7 @@ goal:
   slug: "ios-v0.45-recording-transcription-quality-loop"
   kind: specific
   tranche: "Recording, transcription, retry, and reset polish."
-  status: blocked
+  status: done
   oracle:
     signal: "Safe audio loop succeeds and realistic failure states are recoverable."
     cadence: "after each recording/transcription scenario"
@@ -316,20 +316,66 @@ tasks:
   - id: T010
     type: pm
     assignee: PM
-    status: blocked
+    status: done
     objective: "Collect the remaining repeated live insert cycles and post-success recovery receipts for the v0.45 release gate."
     acceptance_criteria:
       - "Two additional sterile real-audio record -> transcribe -> Insert Latest cycles pass on the current PR head."
       - "Receipts prove retry/reset behavior after a successful transcription without exposing raw transcripts, audio, screenshots, raw WDA trees, provider keys, or private host-app content."
     receipt:
-      result: external_blocker
-      summary: "One current-head live cycle is now proven. The stricter v0.45 gate still asks for three repeated real-audio insert cycles and retry/reset-after-success evidence; two more operator-spoken cycles remain."
+      result: done
+      summary: "The stricter v0.45 physical gate is now satisfied on iPhone-preview. In addition to the existing operator-spoken current-head cycle, two Apple-voice sterile cycles produced provider-complete transcripts, proved Insert Latest enabled before insertion, inserted exactly one copy into the sterile Safari normal field, disabled Insert Latest afterward, and returned App Group state to idle/no transcript. A stale third transcript was correctly blocked before insertion after WDA recovery, then rerun fresh as cycle 3b. Post-success reset proof shows the transcript review reset control clears App Group state and returns to the idle recording surface without leaving a waiting transcript."
       evidence:
         - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert.json"
         - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert-app-group.json"
-      missing:
-        - "Second sterile real-audio record -> transcribe -> Insert Latest cycle."
-        - "Third sterile real-audio record -> transcribe -> Insert Latest cycle."
-        - "Post-success retry/reset receipt."
-      next_owner: "operator"
-      next_action: "Repeat the sterile phrase recording flow two more times on iPhone-preview, then let PM collect the repeat-cycle and recovery receipts."
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-transcribe-complete.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-transcript-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-transcript-review.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-safari-fixture-loaded.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-safari-before-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-safari-after-app-group.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3-transcribe-complete.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3-transcript-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3-transcript-review.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3-stale-insert-blocked.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-transcribe-complete.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-transcript-summary.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-transcript-review.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-fixture-loaded.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-before-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-after-app-group.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-post-success-reset-before.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-post-success-reset-after.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-post-success-reset-after-app-group.json"
+      proven:
+        - "Three total current-head sterile audio cycles are proven: one operator-spoken cycle plus two Apple-voice cycles."
+        - "The two added Apple-voice cycles reached provider complete with non-empty hashed transcripts."
+        - "The two added Safari insertions moved the sterile field transcript count from 0 to exactly 1."
+        - "Insert Latest was enabled before insertion and disabled after insertion."
+        - "App Group returned to idle/no transcript after each successful insertion."
+        - "A stale transcript was blocked before insertion rather than inserted or overclaimed."
+        - "Post-success reset cleared App Group state, removed the transcript review panel, and restored the idle recording surface."
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    objective: "Run the final v0.45 physical release-gate audit."
+    acceptance_criteria:
+      - "Audit names the strongest realistic false-complete failure mode."
+      - "Audit maps provider completion, Full Access-backed insertion, App Group cleanup, exact-once insertion, stale blocking, and reset-after-success to receipts."
+      - "GoalBuddy state checker passes."
+    receipt:
+      result: done
+      task_id: T999
+      decision: complete
+      full_outcome_complete: true
+      note: "notes/T999-final-audit.md"
+      summary: "Final audit accepts the v0.45 recording/transcription quality loop release gate. The board now has three total current-head sterile audio insert cycles, stale transcript blocking, post-success reset recovery, sanitized receipts, and passing state/format/privacy checks."
+      evidence:
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/T999-final-audit.md"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T008-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle2-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3b-safari-after-insert.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-tts-cycle3-stale-insert-blocked.json"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/notes/physical/T010-post-success-reset-after.json"

@@ -1,0 +1,50 @@
+{
+  "appGroup": {
+    "snapshot": {
+      "file": "safari-after-app-group.json",
+      "hasTranscript": false,
+      "phase": null,
+      "sha256": "087c6aec8995f55909015209782a4c85564cee9ffa2db1ffb779aad86e036de4"
+    }
+  },
+  "checks": [
+    {
+      "identifier": "foil-keyboard-root",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "attribute": "enabled",
+      "expected": "false",
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "expectIdentifierState",
+      "observed": [
+        "false"
+      ],
+      "passed": true
+    },
+    {
+      "actual": 1,
+      "expected": 1,
+      "kind": "expectValueTextCount",
+      "passed": true,
+      "textLength": 30,
+      "textSha256": "17fbda1b49e55135"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "safari-after-source.xml",
+    "nodeCount": 161,
+    "sha256": "63f4a68e98c1ea6dd6f18db089c9534984596350dceaa7f0844d65270795405f"
+  },
+  "target": "pr30-tts-cycle3b-safari-after-insert"
+}

@@ -1,0 +1,37 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "transcript-review-panel",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "transcript-review-body",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "transcript-review-reset-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "transcript-review-retry-recording-button",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-complete-source.xml",
+    "nodeCount": 142,
+    "sha256": "e49d5a3037fc1d709ef05ef95ba5d13041173a692d0970489f5bf43f79f6684e"
+  },
+  "target": "pr30-tts-post-success-reset-before"
+}

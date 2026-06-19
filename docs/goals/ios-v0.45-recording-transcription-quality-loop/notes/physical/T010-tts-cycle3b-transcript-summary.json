@@ -1,0 +1,8 @@
+{
+  "length": 30,
+  "nonEmpty": true,
+  "schema": "foil.transcriptSummary.v1",
+  "sha256": "17fbda1b49e551354826de8f77973ed1e7f2c87f9cce1bbdee13fa9fe7f16a5f",
+  "source": "transcript-review-body",
+  "wordCount": 6
+}

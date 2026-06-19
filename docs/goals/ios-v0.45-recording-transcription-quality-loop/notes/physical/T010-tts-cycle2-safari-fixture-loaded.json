@@ -1,0 +1,27 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 24,
+      "textSha256": "9094659807f52c60"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 16,
+      "textSha256": "59e36826b62a36cd"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "safari-fixture-source.xml",
+    "nodeCount": 105,
+    "sha256": "ba54a8e84e97c07acb33a8b8a473d28a1213cc5fe7d71a41a150527ebbd8015e"
+  },
+  "target": "pr30-tts-cycle2-safari-fixture"
+}
