@@ -1,0 +1,202 @@
+version: 2
+
+goal:
+  title: "Foil iOS UX Polish Safe Paths"
+  slug: "ios-ux-polish-safe-paths"
+  kind: open_ended
+  tranche: "Audit then polish the current iOS beta UX before starting the Mac bridge conveyor."
+  status: active
+  oracle:
+    signal: "Current iOS beta UX claims are intuitive, narrow, physically checked, and backed by tests/receipts/merged PRs."
+    cadence: "after UX audit, after each implementation slice, after physical walkthrough, and before final merge/readiness claims"
+    final_proof: "Final Judge audit maps UX improvements to focused tests, sanitized physical receipts, host-app matrix boundaries, PR/CI/merge evidence, and no-overclaim scans."
+  intake:
+    original_request: "Before we start the bridge conveyor, let's do a thorough review of the iOS UX."
+    interpreted_outcome: "Run an audit-then-polish conveyor for the current iOS app, keyboard, and safe host-app experiences before Mac bridge work."
+    input_shape: vague
+    audience: "Foil owner and internal iOS beta testers"
+    authority: approved
+    proof_type: demo
+    completion_proof: "Merged scoped UX polish PRs plus final sanitized physical walkthrough/audit proving the current beta path is intuitive without overclaiming unsupported apps."
+    likely_misfire: "Polishing copy or UI in a way that makes unsupported host apps, stale keyboard health, missing Full Access, missing provider route, or failed insertion look complete."
+    blind_spots_considered:
+      - "Messages and Notes can expose private user content unless the surface is prepared as sterile."
+      - "A route-choice UI can sound complete before Mac pairing exists."
+      - "Full Access explanation can become too broad or too scary."
+      - "Keyboard health can be fresh in the app but stale in the extension if check-in proof is not current."
+      - "Exact-once insertion can regress if the UI encourages repeated taps or stale transcript reuse."
+    selected_posture: "audit_then_polish_safe_paths"
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_completion_without_judge_or_pm_audit: true
+  no_secret_printing: true
+  no_private_phone_content: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: queued
+    url: "http://goalbuddy.localhost:41737/ios-ux-polish-safe-paths/"
+    command: "npx goalbuddy board docs/goals/ios-ux-polish-safe-paths"
+
+active_task: T001
+
+source_context:
+  iOS_repo: "https://github.com/usefoil/foil-ios"
+  recent_readiness_pr: "https://github.com/usefoil/foil-ios/pull/49"
+  route_first_issue: "https://github.com/usefoil/foil-ios/issues/39"
+  proven_build: "0.1.0 (13)"
+  known_safe_current_path:
+    - "Use an API key on this iPhone."
+    - "Foil Keyboard Allow Full Access enabled."
+    - "Keyboard health recent after extension check-in."
+    - "Sterile Safari field insertion proof."
+  future_path:
+    - "Use my Mac is recommended/future-facing until bridge proof exists."
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: active
+    reasoning_hint: high
+    objective: "Inventory current iOS UX surfaces, existing proof, and likely friction before touching code."
+    inputs:
+      - "AGENTS.md"
+      - "docs/acceptance-evidence.md"
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "docs/ios-keyboard-host-app-matrix.md"
+      - "docs/goals/ios-v0.41-closed-beta-polish-conveyor/state.yaml"
+      - "docs/goals/ios-testflight-readiness-physical-gate/state.yaml"
+      - "FoiliOS app and keyboard source files"
+    constraints:
+      - "Read-only task; do not edit product files."
+      - "Do not collect or commit raw WDA trees, screenshots, recordings, transcripts, private phone content, keys, JWTs, archives, or IPAs."
+      - "Use sanitized notes only."
+    expected_output:
+      - "A UX surface map covering app setup, route choice, provider health, recording/transcription, keyboard health, insertion, recovery, and host-app boundaries."
+      - "A list of top friction points with evidence and risk."
+      - "Candidate physical walkthrough script using sterile surfaces only."
+      - "Recommended next Judge task inputs."
+    receipt: null
+
+  - id: T002
+    type: scout
+    assignee: Scout
+    status: queued
+    reasoning_hint: high
+    objective: "Run or prepare the physical safe-host-app UX walkthrough and record sanitized receipts."
+    inputs:
+      - "T001 UX surface map"
+      - "iPhone-preview availability"
+      - "Direct WDA URL if healthy, likely http://192.168.1.40:8100"
+    constraints:
+      - "Use only sterile phrases and operator-prepared blank/fake host surfaces."
+      - "Messages must use a fake or dedicated draft surface only; do not inspect private threads or contacts."
+      - "Notes must use a blank note/editor only; do not inspect existing notes."
+      - "Mail remains deferred unless a sterile blank compose surface and account privacy are explicitly prepared."
+      - "Secure/password fields are rejection proof only, never insertion support."
+    expected_output:
+      - "Sanitized pass/fail receipts for app setup, keyboard health, provider route, App Group idle/reset, Safari insertion, Notes blank editor if safe, Messages fake/dedicated draft if safe, secure-field rejection, stale-state recovery, and exact-once behavior."
+      - "Exact blocker receipts for any host app that cannot be safely touched."
+    receipt: null
+
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Prioritize the first safe UX polish implementation slice."
+    inputs:
+      - "T001 surface map"
+      - "T002 physical walkthrough receipts or blockers"
+      - "Current test coverage"
+    constraints:
+      - "Prefer the largest reversible slice that improves real tester intuition without expanding unsupported claims."
+      - "Reject fixes that require private content, broad host-app claims, or Mac bridge behavior."
+    expected_output:
+      - "Decision: approve first Worker slice or request more evidence."
+      - "Exact Worker objective."
+      - "Allowed files."
+      - "Verification commands."
+      - "Stop conditions."
+      - "Whether the slice should become one PR or be split."
+    receipt: null
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Implement the first safe UX polish slice selected by T003."
+    allowed_files:
+      - "FoiliOS/**"
+      - "docs/ios-closed-beta-tester-handoff.md"
+      - "docs/ios-keyboard-host-app-matrix.md"
+      - "docs/ios-beta-feedback-triage.md"
+      - "docs/goals/ios-ux-polish-safe-paths/**"
+    verify:
+      - "Run focused tests selected by T003."
+      - "Run the strongest realistic proof from docs/acceptance-evidence.md for changed behavior."
+      - "Run no-overclaim and privacy scans over changed docs/receipts."
+      - "Open a PR, monitor CI, and merge only when fresh checks are green and mergeability is clean."
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need private phone content, raw WDA source, screenshots of private apps, provider keys, App Store Connect keys, JWTs, archives, or IPAs."
+      - "The fix would imply Mac bridge support, Mail support, arbitrary-app support, Messages delivery, secure-field insertion, or unsupported private-thread behavior."
+      - "Focused verification fails twice without a clear small fix."
+    receipt: null
+
+  - id: T005
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Review the merged first polish slice and decide whether another safe polish slice is required."
+    inputs:
+      - "T004 PR, tests, CI, merge evidence, and physical receipts"
+      - "Original T001/T002 UX findings"
+    expected_output:
+      - "Decision: continue with another Worker slice, collect more physical proof, or proceed to final audit."
+      - "If continuing, exact next Worker objective, allowed files, verification, and stop conditions."
+    receipt: null
+
+  - id: T006
+    type: worker
+    assignee: Worker
+    status: queued
+    reasoning_hint: high
+    objective: "Implement a second safe UX polish slice if T005 approves one."
+    allowed_files: []
+    verify: []
+    stop_if:
+      - "T005 did not approve this slice."
+      - "Need private phone content, raw WDA source, screenshots of private apps, provider keys, App Store Connect keys, JWTs, archives, or IPAs."
+      - "The change expands unsupported host-app or Mac bridge claims."
+    receipt: null
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Final audit: decide whether the iOS UX polish tranche is complete before the Mac bridge conveyor."
+    inputs:
+      - "All task receipts"
+      - "Merged PRs and CI status"
+      - "Sanitized physical receipts"
+      - "Current dirty diff"
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Evidence that the app does not claim setup is complete when Full Access, keyboard health, provider route, App Group state, insertion, or host-app targeting still fails."
+      - "Remaining blockers or next board if not complete."
+    receipt: null
