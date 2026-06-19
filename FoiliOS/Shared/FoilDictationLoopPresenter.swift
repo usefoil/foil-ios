@@ -140,6 +140,21 @@ struct FoilBetaGuidanceItem: Equatable, Identifiable {
     var id: String { title }
 }
 
+enum FoilMicrophoneSetupState: Equatable {
+    case allowed
+    case blocked
+    case needsPrompt
+    case unavailable
+}
+
+struct FoilSetupReadinessPresentation: Equatable {
+    var title: String
+    var detail: String
+    var nextAction: String
+    var systemImage: String
+    var tone: FoilLoopTone
+}
+
 enum FoilDictationLoopPresenter {
     static let macRouteID = "use-my-mac"
     static let iPhoneAPIKeyRouteID = "iphone-api-key"
@@ -152,6 +167,112 @@ enum FoilDictationLoopPresenter {
         "openai-whisper",
         "custom-openai-compatible"
     ]
+
+    static func setupReadinessPresentation(
+        hasProviderKey: Bool,
+        microphoneState: FoilMicrophoneSetupState,
+        keyboardHealth: FoilKeyboardHealthReport,
+        snapshot: FoilKeyboardSnapshot,
+        now: Date = Date()
+    ) -> FoilSetupReadinessPresentation {
+        if !hasProviderKey {
+            return FoilSetupReadinessPresentation(
+                title: "Setup not started",
+                detail: "Save your Groq provider key before recording.",
+                nextAction: "Paste the key below, then tap Save key.",
+                systemImage: "key",
+                tone: .attention
+            )
+        }
+
+        switch microphoneState {
+        case .blocked:
+            return FoilSetupReadinessPresentation(
+                title: "Microphone blocked",
+                detail: "Foil cannot record until microphone access is enabled in Settings.",
+                nextAction: "Open iOS Settings for Foil and allow Microphone.",
+                systemImage: "mic.slash",
+                tone: .attention
+            )
+        case .needsPrompt:
+            return FoilSetupReadinessPresentation(
+                title: "Ready for microphone prompt",
+                detail: "Provider is saved. Foil will ask for microphone access when you record.",
+                nextAction: "Tap Record in Foil and allow microphone access.",
+                systemImage: "mic.badge.plus",
+                tone: .ready
+            )
+        case .unavailable:
+            return FoilSetupReadinessPresentation(
+                title: "Check microphone",
+                detail: "Foil cannot read microphone permission on this device right now.",
+                nextAction: "Try recording once, then check iOS Settings if recording fails.",
+                systemImage: "mic",
+                tone: .attention
+            )
+        case .allowed:
+            break
+        }
+
+        let keyboardPresentation = keyboardHealthPresentation(report: keyboardHealth, now: now)
+        if keyboardHealth.fullAccessState != .enabled {
+            return FoilSetupReadinessPresentation(
+                title: keyboardHealth.fullAccessState == .disabled ? "Keyboard blocked" : "Keyboard not verified",
+                detail: keyboardPresentation.detail,
+                nextAction: keyboardPresentation.recoverySteps.first ?? "Open a safe text field and switch to Foil Keyboard.",
+                systemImage: "keyboard.badge.exclamationmark",
+                tone: .attention
+            )
+        }
+
+        if let recoveryMessage = keyboardPresentation.recoveryMessage {
+            return FoilSetupReadinessPresentation(
+                title: "Refresh keyboard",
+                detail: recoveryMessage,
+                nextAction: keyboardPresentation.recoverySteps.first ?? "Cycle away from Foil Keyboard, then back.",
+                systemImage: "arrow.triangle.2.circlepath",
+                tone: .attention
+            )
+        }
+
+        if snapshot.insertableTranscript != nil {
+            return FoilSetupReadinessPresentation(
+                title: "Ready to insert",
+                detail: "A transcript is waiting for Foil Keyboard.",
+                nextAction: "Return to a safe text field and tap Insert latest once.",
+                systemImage: "keyboard.badge.ellipsis",
+                tone: .success
+            )
+        }
+
+        if snapshot.phase == .processing {
+            return FoilSetupReadinessPresentation(
+                title: "Transcript in progress",
+                detail: "Foil is preparing text for the keyboard.",
+                nextAction: "Wait for the ready state before returning to the target field.",
+                systemImage: "text.bubble",
+                tone: .working
+            )
+        }
+
+        if snapshot.phase == .failed {
+            return FoilSetupReadinessPresentation(
+                title: "Recovery needed",
+                detail: snapshot.message,
+                nextAction: "Record again or reset shared state before inserting.",
+                systemImage: "exclamationmark.circle",
+                tone: .attention
+            )
+        }
+
+        return FoilSetupReadinessPresentation(
+            title: "Setup ready",
+            detail: "Provider, microphone, and Foil Keyboard are ready for the narrow closed beta loop.",
+            nextAction: "Record in Foil, then return to a safe text field and insert once.",
+            systemImage: "checkmark.circle",
+            tone: .success
+        )
+    }
 
     static func routeChoicePresentation() -> [FoilSetupRoutePresentation] {
         [

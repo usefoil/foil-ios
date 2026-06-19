@@ -1,0 +1,43 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "advanced-support-disclosure",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "complete-fake-transcript-button",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "identifier": "mark-listening-button",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "identifier": "reset-keyboard-state-button",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "identifier": "secure-rejection-field",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "pr27-api-route.json",
+    "nodeCount": 140,
+    "sha256": "9f580918e9771cd9ec90b9a3b01ea1286997ca58a7989154196d903c34471a83"
+  },
+  "target": "pr27-advanced-collapsed"
+}

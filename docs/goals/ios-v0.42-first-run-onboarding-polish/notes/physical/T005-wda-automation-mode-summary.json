@@ -1,0 +1,60 @@
+{
+  "schema": "foil.physicalReceipt.v1",
+  "task": "T005",
+  "createdAt": "2026-06-18T22:22:08Z",
+  "claim": "Final PR #27 onboarding-ready physical proof is blocked because WDA cannot enable UI automation mode.",
+  "device": {
+    "name": "iPhone-preview",
+    "identifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+    "wdaDestinationId": "00008030-001A0C980A33C02E",
+    "pairedAndAvailable": true,
+    "rawDeviceLineSha256Prefix": "0628112e1234a5a0"
+  },
+  "wda": {
+    "url": "http://192.168.1.40:8100",
+    "readyAfterRetry": false,
+    "latestFailure": "Timed out while enabling automation mode.",
+    "attempts": [
+      {
+        "label": "initial",
+        "bytes": 2793504,
+        "sha256": "44525bb805d2a8e2ddd30ba14b778600f4d352921265ddd5956922b12bea61ae"
+      },
+      {
+        "label": "retry",
+        "bytes": 9365,
+        "sha256": "55cc03e47283d42b9cad32416bb52c99318565049d95d07fc9ea6c747d6fb978"
+      },
+      {
+        "label": "unlocked-retry",
+        "bytes": 5132,
+        "sha256": "7748ebb61c024fc2214339ff179527d0faeaf043d9c4052b981a9f556f2467fc"
+      }
+    ]
+  },
+  "strictPreflightAfterRetry": {
+    "returncode": 1,
+    "classification": "wda_unreachable",
+    "safeToTouchHostApps": false,
+    "automationProcessCount": 0,
+    "devicePresent": true,
+    "deviceLooksAvailable": true,
+    "deviceState": "available (paired)",
+    "wdaReady": false,
+    "wdaStatusError": "URLError",
+    "openedHostApps": false,
+    "printedRawWdaSource": false,
+    "printedScreenshots": false,
+    "printedTranscriptBodies": false,
+    "redactionSelfTestPassed": true
+  },
+  "privacy": {
+    "committedRawWdaLogs": false,
+    "committedXcresult": false,
+    "committedScreenshots": false,
+    "committedPrivatePhoneContent": false,
+    "committedTranscriptBodies": false
+  },
+  "result": "blocked",
+  "nextAction": "Repair WDA/UI automation mode on iPhone-preview, rerun strict preflight, then collect onboarding-ready receipts."
+}

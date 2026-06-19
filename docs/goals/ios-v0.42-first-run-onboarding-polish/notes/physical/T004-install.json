@@ -1,0 +1,17 @@
+{
+  "appBundlePathSha256": "87d63afca4f892a6",
+  "appInfoPlistSha256": "edb3f6938ef419ea",
+  "bundleID": "com.neonwatty.FoilIOS",
+  "device": "iPhone-preview",
+  "deviceIdentifier": "5320F5AD-2A71-50AC-94FE-207B544B6247",
+  "devicectlReturncode": 0,
+  "installed": true,
+  "privacy": {
+    "committedArchiveOrIpa": false,
+    "printedPrivatePhoneContent": false,
+    "printedProviderKeys": false
+  },
+  "rawDevicectlJsonSha256": "5406fd1e978c3677",
+  "schema": "foil.physicalInstallReceipt.v1",
+  "target": "pr27-onboarding-polish"
+}
