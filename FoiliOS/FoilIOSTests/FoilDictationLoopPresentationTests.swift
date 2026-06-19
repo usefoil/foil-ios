@@ -563,7 +563,7 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         )
 
         XCTAssertEqual(presentation.status, "Ready to dictate")
-        XCTAssertEqual(presentation.insertTitle, "No transcript yet")
+        XCTAssertEqual(presentation.insertTitle, "No transcript to insert")
         XCTAssertEqual(presentation.startTitle, "Dictate in Foil")
         XCTAssertTrue(presentation.message.contains("record in the app"))
     }
@@ -581,6 +581,7 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
 
         XCTAssertEqual(presentation.status, "Try again in Foil")
         XCTAssertEqual(presentation.startTitle, "Record again in Foil")
+        XCTAssertEqual(presentation.insertTitle, "No insertable transcript")
         XCTAssertTrue(presentation.message.contains("No speech detected"))
         XCTAssertTrue(presentation.message.contains("Open Foil"))
     }
@@ -645,8 +646,52 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
 
         XCTAssertEqual(presentation.status, "Transcript may be stale")
         XCTAssertEqual(presentation.insertTitle, "Stale transcript")
-        XCTAssertTrue(presentation.message.contains("Clear latest"))
+        XCTAssertEqual(presentation.clearTitle, "Clear stale transcript")
+        XCTAssertTrue(presentation.message.contains("Clear stale transcript"))
+        XCTAssertTrue(presentation.message.contains("record again in Foil"))
         XCTAssertFalse(presentation.message.contains("Insert latest"))
+    }
+
+    func testKeyboardCompleteStateSaysInsertOnceAndContinueTyping() {
+        let presentation = FoilDictationLoopPresenter.keyboardPresentation(
+            snapshot: FoilKeyboardSnapshot(
+                phase: .complete,
+                transcript: "ready transcript",
+                message: "Ready",
+                updatedAt: Date(timeIntervalSince1970: 100)
+            ),
+            fullAccessEnabled: true,
+            now: Date(timeIntervalSince1970: 110),
+            staleAfter: 120
+        )
+
+        XCTAssertEqual(presentation.status, "Transcript ready")
+        XCTAssertEqual(presentation.insertTitle, "Insert latest")
+        XCTAssertTrue(presentation.message.contains("Insert latest once"))
+        XCTAssertTrue(presentation.message.contains("switch keyboards"))
+    }
+
+    func testKeyboardNonInsertableStatesExplainWhyInsertIsUnavailable() {
+        let cases: [(FoilKeyboardPhase, String, String)] = [
+            (.handoffRequested, "Finish in Foil", "Finish recording"),
+            (.listening, "Finish in Foil", "Finish recording"),
+            (.processing, "Waiting for transcript", "preparing text")
+        ]
+
+        for (phase, insertTitle, messageFragment) in cases {
+            let presentation = FoilDictationLoopPresenter.keyboardPresentation(
+                snapshot: FoilKeyboardSnapshot(
+                    phase: phase,
+                    transcript: nil,
+                    message: phase.displayName,
+                    updatedAt: Date()
+                ),
+                fullAccessEnabled: true
+            )
+
+            XCTAssertEqual(presentation.insertTitle, insertTitle, "Unexpected insert title for \(phase.rawValue)")
+            XCTAssertTrue(presentation.message.contains(messageFragment), "Expected \(phase.rawValue) to explain \(messageFragment)")
+        }
     }
 
     func testKeyboardFullAccessOffTellsUserToEnableAndCycleBack() {
@@ -656,7 +701,8 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         )
 
         XCTAssertEqual(presentation.status, "Open Foil")
-        XCTAssertEqual(presentation.insertTitle, "Insert unavailable")
+        XCTAssertEqual(presentation.insertTitle, "Enable Full Access")
+        XCTAssertEqual(presentation.clearTitle, "Full Access off")
         XCTAssertTrue(presentation.message.contains("Allow Full Access"))
         XCTAssertTrue(presentation.message.contains("refocus the field"))
         XCTAssertTrue(presentation.message.contains("cycle back"))

@@ -118,12 +118,12 @@ final class KeyboardViewController: UIInputViewController {
     @objc private func insertTapped() {
         guard let transcript = bridge.consumeTranscriptForInsertion() else {
             refreshState()
-            messageLabel.text = "No transcript yet."
+            messageLabel.text = "No transcript to insert. Record in Foil first."
             return
         }
         textDocumentProxy.insertText(transcript)
         refreshState()
-        messageLabel.text = "Inserted."
+        messageLabel.text = "Inserted once. Switch keyboards to keep typing."
     }
 
     @objc private func resetTapped() {
