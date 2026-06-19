@@ -375,6 +375,99 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         XCTAssertTrue(presentation.detail.contains("Return to your keyboard"))
     }
 
+    func testSetupLeadsWhenSetupIsNotReadyAndNoDictationIsActive() {
+        let readiness = FoilOnboardingReadinessPresentation(
+            title: "Finish setup",
+            detail: "Setup is not ready.",
+            systemImage: "exclamationmark.circle.fill",
+            isComplete: false,
+            blockers: ["Save an API key on this iPhone."]
+        )
+
+        XCTAssertTrue(
+            FoilDictationLoopPresenter.shouldPrioritizeSetup(
+                onboardingReadiness: readiness,
+                snapshot: .initial,
+                isRecording: false,
+                hasSavedRecording: false,
+                isTranscribing: false
+            )
+        )
+    }
+
+    func testSetupDoesNotLeadWhenSetupIsReadyOrDictationIsActive() {
+        let ready = FoilOnboardingReadinessPresentation(
+            title: "Ready to dictate and insert",
+            detail: "Setup is ready.",
+            systemImage: "checkmark.circle.fill",
+            isComplete: true,
+            blockers: []
+        )
+        let notReady = FoilOnboardingReadinessPresentation(
+            title: "Finish setup",
+            detail: "Setup is not ready.",
+            systemImage: "exclamationmark.circle.fill",
+            isComplete: false,
+            blockers: ["Verify Foil Keyboard."]
+        )
+
+        XCTAssertFalse(
+            FoilDictationLoopPresenter.shouldPrioritizeSetup(
+                onboardingReadiness: ready,
+                snapshot: .initial,
+                isRecording: false,
+                hasSavedRecording: false,
+                isTranscribing: false
+            )
+        )
+        XCTAssertFalse(
+            FoilDictationLoopPresenter.shouldPrioritizeSetup(
+                onboardingReadiness: notReady,
+                snapshot: .initial,
+                isRecording: true,
+                hasSavedRecording: false,
+                isTranscribing: false
+            )
+        )
+        XCTAssertFalse(
+            FoilDictationLoopPresenter.shouldPrioritizeSetup(
+                onboardingReadiness: notReady,
+                snapshot: .initial,
+                isRecording: false,
+                hasSavedRecording: true,
+                isTranscribing: false
+            )
+        )
+        XCTAssertFalse(
+            FoilDictationLoopPresenter.shouldPrioritizeSetup(
+                onboardingReadiness: notReady,
+                snapshot: FoilKeyboardSnapshot(
+                    phase: .processing,
+                    transcript: nil,
+                    message: "Transcribing.",
+                    updatedAt: Date()
+                ),
+                isRecording: false,
+                hasSavedRecording: false,
+                isTranscribing: false
+            )
+        )
+        XCTAssertFalse(
+            FoilDictationLoopPresenter.shouldPrioritizeSetup(
+                onboardingReadiness: notReady,
+                snapshot: FoilKeyboardSnapshot(
+                    phase: .complete,
+                    transcript: "ready text",
+                    message: "Ready.",
+                    updatedAt: Date()
+                ),
+                isRecording: false,
+                hasSavedRecording: false,
+                isTranscribing: false
+            )
+        )
+    }
+
     func testRecordingStateOffersFinishAndCancelActions() {
         let presentation = FoilDictationLoopPresenter.appPresentation(
             snapshot: .initial,
