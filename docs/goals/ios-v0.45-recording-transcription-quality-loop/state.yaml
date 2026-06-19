@@ -256,3 +256,44 @@ tasks:
         - "Sterile Insert Latest receipt."
       next_owner: "operator"
       next_action: "On the installed timeout-fix build, tap Record, speak `Foil safe test phrase June twelve`, tap Stop, then rerun Transcribe and sterile insertion receipts."
+  - id: T009
+    type: worker
+    assignee: Worker
+    status: done
+    objective: "Repair the setup-readiness merge regression after bringing PR #27 into PR #30."
+    allowed_files:
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "docs/goals/ios-v0.45-recording-transcription-quality-loop/**"
+    verify:
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests/testSetupReadinessCompleteStateKeepsClosedBetaScopeNarrow"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml"
+      - "git diff --check"
+    stop_if:
+      - "The regression fix requires changing route, provider, keyboard, App Group, or insertion semantics beyond the stale transcript readiness check."
+      - "Verification fails twice."
+    acceptance_criteria:
+      - "Idle setup-ready state is no longer misclassified as a waiting transcript."
+      - "Focused and full simulator tests pass after the main merge."
+    receipt:
+      result: done
+      summary: "Fixed the post-main-merge readiness regression by calling the insertable transcript predicate instead of treating the method reference as truthy. This restores idle setup-ready presentation and removes the Swift warning."
+      changed_files:
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests/testSetupReadinessCompleteStateKeepsClosedBetaScopeNarrow"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17'"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(\"docs/goals/ios-v0.45-recording-transcription-quality-loop/state.yaml\"); puts \"yaml ok\"'"
+          status: pass
+        - cmd: "targeted privacy scan over changed code and v0.45 GoalBuddy receipts"
+          status: pass
+      evidence:
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"

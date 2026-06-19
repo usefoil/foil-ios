@@ -261,7 +261,7 @@ enum FoilDictationLoopPresenter {
             )
         }
 
-        if snapshot.insertableTranscript != nil {
+        if snapshot.insertableTranscript(now: now) != nil {
             return FoilSetupReadinessPresentation(
                 title: "Ready to insert",
                 detail: "A transcript is waiting for Foil Keyboard.",
