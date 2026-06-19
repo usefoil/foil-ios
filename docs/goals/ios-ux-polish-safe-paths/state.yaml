@@ -202,6 +202,7 @@ tasks:
       - "Focused verification fails twice without a clear small fix."
     receipt:
       result: done
+      pr: "https://github.com/usefoil/foil-ios/pull/50"
       summary: "Implemented the first UX polish slice. ContentView now leads with route/setup readiness when setup is not ready and no dictation/transcript flow is active, while preserving dictation-first ordering for setup-ready, recording, saved-recording, transcribing, processing, and transcript-ready states. Added presenter tests for the layout decision and left keyboard insertion/consume/reset logic untouched."
       changed_files:
         - "FoiliOS/FoilIOSApp/ContentView.swift"
