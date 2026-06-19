@@ -1,0 +1,7 @@
+Sanitized current-main install receipt.
+
+- result: pass
+- bundleID: com.neonwatty.FoilIOS
+- installed build: 0.1.0 (13)
+- Info.plist sha256: edb3f6938ef419ea57ddc7b2bf7d35bab59bdadc81cedd03634ec1a84724a187
+- privacy: device-local installation URL, database UUID, and raw device paths omitted

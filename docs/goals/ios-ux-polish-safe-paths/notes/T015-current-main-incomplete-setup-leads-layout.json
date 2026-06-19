@@ -1,0 +1,32 @@
+{
+  "checks": [
+    {
+      "identifier": "route-first-onboarding",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "dictation-console",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "after": "dictation-console",
+      "afterY": 1218,
+      "before": "route-first-onboarding",
+      "beforeY": -364,
+      "kind": "verticalOrder",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosUxLayoutReceipt.v1",
+  "source": {
+    "file": "T015-foil-mac-route-incomplete-source.xml",
+    "nodeCount": 95,
+    "sha256": "8593634c9013a67ed0e60a585fe0a65080dc175e76312aed707d0207b2b9205f"
+  },
+  "target": "current-main-incomplete-idle-setup-leads"
+}

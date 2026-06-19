@@ -1,0 +1,65 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "route-first-onboarding",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-iphone-api-key",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-ready",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "onboarding-not-ready",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 24,
+      "textSha256": "4c73a67cb1c5711c"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 36,
+      "textSha256": "3efd8cd7c0661f36"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 42,
+      "textSha256": "2783003ac125d972"
+    },
+    {
+      "kind": "forbidAccessibleText",
+      "passed": true,
+      "present": false,
+      "textLength": 19,
+      "textSha256": "02bb5e37de8b32ee"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "T016-foil-after-current-refresh-source.xml",
+    "nodeCount": 125,
+    "sha256": "8196a43d4227119316d79faa4fbd04a29b102d3b76b004631003c300b529c74e"
+  },
+  "target": "ux-polish-current-main-ready-after-keyboard-refresh"
+}

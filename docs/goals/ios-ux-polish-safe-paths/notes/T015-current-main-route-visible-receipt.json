@@ -1,0 +1,43 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "route-first-onboarding",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-use-my-mac",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "route-choice-iphone-api-key",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "dictation-console",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    },
+    {
+      "identifier": "provider-key-field",
+      "kind": "requireIdentifier",
+      "passed": true,
+      "present": true
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "T015-foil-current-main-source.xml",
+    "nodeCount": 125,
+    "sha256": "cedcd3956d4968020905a4fa79ca2143175c85e220cf549b56db95e987d4b4fb"
+  },
+  "target": "ux-polish-current-main-setup-first-route-visible"
+}
