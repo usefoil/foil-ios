@@ -122,9 +122,10 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         XCTAssertEqual(presentation.tone, .success)
     }
 
-    func testRouteChoicesPutMacFirstButKeepIPhoneAPIKeyUsable() {
+    func testRouteChoicesKeepMacFutureFacingButDefaultToCurrentBetaPath() {
         let routes = FoilDictationLoopPresenter.routeChoicePresentation()
 
+        XCTAssertEqual(FoilDictationLoopPresenter.defaultBetaRouteID, "iphone-api-key")
         XCTAssertEqual(
             routes.map(\.title),
             [
@@ -137,12 +138,14 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         XCTAssertTrue(routes[0].isRecommended)
         XCTAssertFalse(routes[0].isUsableNow)
         XCTAssertTrue(routes[0].detail.contains("pairing is coming soon"))
-        XCTAssertTrue(routes[0].detail.contains("After pairing is available"))
+        XCTAssertTrue(routes[0].detail.contains("future product path"))
+        XCTAssertTrue(routes[0].detail.contains("not the current beta setup route"))
         XCTAssertFalse(routes[0].detail.contains("Mac actually handled"))
         XCTAssertEqual(routes[1].routeID, "iphone-api-key")
         XCTAssertFalse(routes[1].isRecommended)
         XCTAssertTrue(routes[1].isUsableNow)
-        XCTAssertTrue(routes[1].detail.contains("fully usable today"))
+        XCTAssertEqual(routes[1].badge, "Current beta path")
+        XCTAssertTrue(routes[1].detail.contains("fully usable for this beta"))
         XCTAssertEqual(routes[2].routeID, "advanced")
     }
 
@@ -184,6 +187,7 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
             ]
         )
         XCTAssertTrue(combined.contains("read and clear Foil's shared transcript state"))
+        XCTAssertTrue(combined.contains("iOS shows a broad keyboard warning"))
         XCTAssertTrue(combined.contains("Open a safe text field"))
         XCTAssertTrue(combined.contains("Foil Keyboard checked in"))
         XCTAssertTrue(combined.contains("Insert latest once"))
@@ -352,6 +356,7 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         let items = FoilDictationLoopPresenter.betaGuidancePresentation()
         let combined = items.map { "\($0.title) \($0.detail)" }.joined(separator: " ")
 
+        XCTAssertTrue(combined.contains("Tested targets"))
         XCTAssertTrue(combined.contains("Notes"))
         XCTAssertTrue(combined.contains("Safari"))
         XCTAssertTrue(combined.contains("Messages draft"))
@@ -372,7 +377,9 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
 
         XCTAssertEqual(presentation.title, "Record in Foil")
         XCTAssertEqual(presentation.primaryAction, .record)
-        XCTAssertTrue(presentation.detail.contains("Return to your keyboard"))
+        XCTAssertTrue(presentation.detail.contains("return to the target field"))
+        XCTAssertTrue(presentation.detail.contains("switch to Foil Keyboard"))
+        XCTAssertTrue(presentation.detail.contains("insert once"))
     }
 
     func testSetupLeadsWhenSetupIsNotReadyAndNoDictationIsActive() {
@@ -497,8 +504,10 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
 
         XCTAssertEqual(presentation.title, "Ready for keyboard")
         XCTAssertNil(presentation.primaryAction)
-        XCTAssertTrue(presentation.detail.contains("Return to the text field"))
-        XCTAssertTrue(presentation.detail.contains("Insert latest"))
+        XCTAssertTrue(presentation.detail.contains("Return to your target field"))
+        XCTAssertTrue(presentation.detail.contains("switch to Foil Keyboard"))
+        XCTAssertTrue(presentation.detail.contains("Insert latest once"))
+        XCTAssertTrue(presentation.detail.contains("Tested targets"))
     }
 
     func testTranscriptReviewShowsBodyAndRetryOptionsWhenTranscriptIsReady() {
