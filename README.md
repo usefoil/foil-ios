@@ -55,15 +55,19 @@ Closed-beta feedback triage is documented in
 
 ## Claim Boundary
 
-The safe current released TestFlight claim is narrow: build `0.1.0 (12)` can complete the
-app-to-keyboard dictation loop on a physical iPhone for the sterile Safari
-normal-field fixture, and secure fields are expected to reject the custom
-keyboard. The preview also has physical build 12 onboarding/setup proof.
+The safe current released TestFlight claim is narrow: build `0.1.0 (13)` can
+complete the route-first setup, record-in-Foil, return-to-keyboard, and
+Insert-latest loop on a physical iPhone for the sterile Safari normal-field
+fixture, and secure fields are expected to reject the custom keyboard. The
+preview also has physical build 13 onboarding/setup proof, provider-route
+readiness, keyboard-health recovery, App Group idle/no-transcript recovery, and
+exact-once Safari insertion proof.
 
 Do not claim arbitrary app support. Earlier builds proved sterile Notes
 insertion and fake-recipient Messages draft insertion without sending, but the
-build 12 rerun stopped before insertion when Notes and Messages did not open to
-sterile surfaces. Messages delivery and existing private-thread behavior are
-not claimed. Mail compose proof is intentionally deferred in
-`https://github.com/mean-weasel/foil-ios/issues/12`. Full Access, keyboard
+current safe claim remains gated to sterile surfaces: Notes and Messages are
+tester feedback targets only when a blank note or fake/dedicated draft is
+prepared first. Messages delivery and existing private-thread behavior are not
+claimed. Mail compose proof is intentionally deferred in
+`https://github.com/usefoil/foil-ios/issues/12`. Full Access, keyboard
 cycling, and host-app refresh friction remain expected beta caveats.

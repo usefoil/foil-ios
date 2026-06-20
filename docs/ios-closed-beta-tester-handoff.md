@@ -133,7 +133,13 @@ private history visible.
   before creating a transcript and record again.
 - If the transcript is stale or wrong, use **Reset shared state** in Foil and
   record again.
-- If recording or transcription fails, retry with a shorter phrase.
+- If Foil says the provider key is missing or rejected, update the provider key
+  in Foil before retrying transcription. Do not include the key in feedback.
+- If Foil says processing may be stuck, retry transcription if the recording is
+  still saved, or use **Reset shared state** before recording again.
+- If Foil says App Group storage or verification failed, use **Reset shared
+  state**, then confirm Shared state returns to **Ready, no transcript**.
+- If recording or temporary transcription fails, retry with a shorter phrase.
 
 ## Feedback Template
 
@@ -151,7 +157,8 @@ Please include:
 - Whether Foil showed Keyboard health ready before recording.
 - Whether Full Access was enabled.
 - Whether keyboard cycling/refocus was needed.
-- Whether recording, transcription, insertion, and reset each worked.
+- Whether recording, transcription, insertion, App Group recovery, and reset
+  each worked.
 - Whether text inserted exactly once.
 - Which recovery step helped, if any.
 

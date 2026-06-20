@@ -11,8 +11,8 @@ body:
     id: build
     attributes:
       label: TestFlight build
-      description: "Example: 0.1.0 (12)"
-      placeholder: 0.1.0 (12)
+      description: "Example: 0.1.0 (13)"
+      placeholder: 0.1.0 (13)
     validations:
       required: true
   - type: input
@@ -53,6 +53,7 @@ body:
       options:
         - label: Foil app installed or updated from TestFlight
         - label: Provider key saved, if requested
+        - label: Provider key was verified by a successful transcription
         - label: Microphone permission allowed
         - label: Foil Keyboard added
         - label: Allow Full Access enabled
@@ -84,6 +85,9 @@ body:
         - Keyboard setup or Full Access
         - Keyboard cycling or refocus
         - Insert latest
+        - Provider key missing or rejected
+        - Processing appeared stuck
+        - App Group/shared state recovery
         - Reset/recovery
         - Target app was not sterile
     validations:
@@ -97,7 +101,10 @@ body:
         - label: Refocused the target field
         - label: Cycled away from Foil Keyboard and back
         - label: Enabled Allow Full Access
+        - label: Updated provider key before retrying
+        - label: Retried transcription after stuck processing
         - label: Used Reset shared state
+        - label: Verified Shared state returned to Ready, no transcript
         - label: Recorded a shorter safe phrase
         - label: Stopped because private content appeared
   - type: textarea

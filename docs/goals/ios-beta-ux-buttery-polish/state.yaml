@@ -47,7 +47,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-beta-ux-buttery-polish/"
     command: "npx goalbuddy board docs/goals/ios-beta-ux-buttery-polish"
 
-active_task: T005
+active_task: T006
 
 source_context:
   iOS_repo: "https://github.com/usefoil/foil-ios"
@@ -302,7 +302,7 @@ tasks:
   - id: T005
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Fifth PR: align beta docs and feedback templates with the current tester build and app boundaries."
     allowed_files:
@@ -320,11 +320,44 @@ tasks:
     expected_output:
       - "Current tester docs and feedback template no longer contradict build 13 handoff."
       - "Historical build claims are marked historical if retained."
+    receipt:
+      result: done
+      note: "docs/goals/ios-beta-ux-buttery-polish/notes/T005-worker-receipt.md"
+      summary: "README, closed-beta handoff, and the iOS beta feedback template now align with build 0.1.0 (13), preserve narrow host-app boundaries, and include provider/stuck-processing/App Group recovery feedback choices."
+      changed_files:
+        - "README.md"
+        - "docs/ios-closed-beta-tester-handoff.md"
+        - ".github/ISSUE_TEMPLATE/ios_beta_feedback.yml"
+        - "docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+        - "docs/goals/ios-beta-ux-buttery-polish/notes/T005-worker-receipt.md"
+      commands:
+        - cmd: "rg -n \"0\\.1\\.0 \\(12\\)|build 12|Build 12|mean-weasel/foil-ios\" README.md docs/ios-closed-beta-tester-handoff.md .github/ISSUE_TEMPLATE/ios_beta_feedback.yml || true"
+          status: pass
+          summary: "No hits in edited current tester-facing surfaces."
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(\".github/ISSUE_TEMPLATE/ios_beta_feedback.yml\"); puts \"yaml ok\"'"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+          status: pass
+          summary: "Passed before receipt update with active task T005."
+        - cmd: "privacy/no-overclaim scan over edited surfaces"
+          status: pass
+          summary: "Hits were negative guardrails only."
+        - cmd: "rg -n \"0\\.1\\.0 \\(12\\)|build 12|Build 12\" README.md docs .github/ISSUE_TEMPLATE/ios_beta_feedback.yml"
+          status: pass
+          summary: "Remaining hits are historical matrix rows, archived build-12 boards/receipts, and this board's critique/verify text; current README, handoff, and feedback template are clean."
+      evidence:
+        - "Feedback template build placeholder now says 0.1.0 (13)."
+        - "README safe claim now names build 13 physical proof and uses usefoil/foil-ios issue URL."
+        - "Handoff recovery names provider-key, stuck-processing, App Group, and Ready/no-transcript verification paths."
+        - "Edited docs still explicitly reject arbitrary app support, Mail support, Messages delivery, and existing private-thread claims."
+      next_active_task: "T006"
 
   - id: T006
     type: judge
     assignee: Judge
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Decide whether simulator proof is enough or physical iPhone proof is required for the polished UX."
     inputs:
