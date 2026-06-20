@@ -681,8 +681,8 @@ enum FoilDictationLoopPresenter {
             return FoilKeyboardLoopPresentation(
                 status: "Open Foil",
                 message: "Allow Full Access in Settings, then refocus the field and cycle back to Foil Keyboard.",
-                insertTitle: "Insert unavailable",
-                clearTitle: "Clear unavailable",
+                insertTitle: "Enable Full Access",
+                clearTitle: "Full Access off",
                 startTitle: "Open Foil"
             )
         }
@@ -693,7 +693,7 @@ enum FoilDictationLoopPresenter {
         case .complete where hasInsertableTranscript:
             return FoilKeyboardLoopPresentation(
                 status: "Transcript ready",
-                message: "Tap Insert latest once, then keep typing.",
+                message: "Tap Insert latest once, then switch keyboards to keep typing.",
                 insertTitle: "Insert latest",
                 clearTitle: "Clear latest",
                 startTitle: "Dictate again in Foil"
@@ -701,16 +701,16 @@ enum FoilDictationLoopPresenter {
         case .complete where hasTranscript:
             return FoilKeyboardLoopPresentation(
                 status: "Transcript may be stale",
-                message: "Clear latest, then dictate again in Foil if this is not the text you expect.",
+                message: "This transcript is stale. Clear stale transcript, then record again in Foil.",
                 insertTitle: "Stale transcript",
-                clearTitle: "Clear latest",
+                clearTitle: "Clear stale transcript",
                 startTitle: "Dictate again in Foil"
             )
         case .failed:
             return FoilKeyboardLoopPresentation(
                 status: "Try again in Foil",
                 message: "\(snapshot.message) Open Foil to recover or record again.",
-                insertTitle: "No transcript yet",
+                insertTitle: "No insertable transcript",
                 clearTitle: "Clear",
                 startTitle: "Record again in Foil"
             )
@@ -718,7 +718,7 @@ enum FoilDictationLoopPresenter {
             return FoilKeyboardLoopPresentation(
                 status: "Recording in Foil",
                 message: "Finish recording in Foil, then return here when the transcript is ready.",
-                insertTitle: "No transcript yet",
+                insertTitle: "Finish in Foil",
                 clearTitle: "Clear",
                 startTitle: "Open Foil"
             )
@@ -726,7 +726,7 @@ enum FoilDictationLoopPresenter {
             return FoilKeyboardLoopPresentation(
                 status: "Creating transcript",
                 message: "Foil is preparing text. Return here when Insert latest is ready.",
-                insertTitle: "No transcript yet",
+                insertTitle: "Waiting for transcript",
                 clearTitle: "Clear",
                 startTitle: "Open Foil"
             )
@@ -734,7 +734,7 @@ enum FoilDictationLoopPresenter {
             return FoilKeyboardLoopPresentation(
                 status: "Ready to dictate",
                 message: "Tap Dictate in Foil to record in the app, then return here.",
-                insertTitle: "No transcript yet",
+                insertTitle: "No transcript to insert",
                 clearTitle: "Clear",
                 startTitle: "Dictate in Foil"
             )

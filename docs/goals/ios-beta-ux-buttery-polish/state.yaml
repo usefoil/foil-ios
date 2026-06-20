@@ -47,7 +47,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-beta-ux-buttery-polish/"
     command: "npx goalbuddy board docs/goals/ios-beta-ux-buttery-polish"
 
-active_task: T002
+active_task: T003
 
 source_context:
   iOS_repo: "https://github.com/usefoil/foil-ios"
@@ -124,7 +124,7 @@ tasks:
   - id: T002
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Second PR: make keyboard disabled, stale, inserted, and recovery states self-explaining."
     allowed_files:
@@ -147,11 +147,42 @@ tasks:
       - "Stale state distinguishes clear/re-record guidance from no-transcript guidance."
       - "Post-insert state says inserted once and suggests switching keyboards to continue typing."
       - "Tests cover the state matrix."
+    receipt:
+      result: done
+      note: "docs/goals/ios-beta-ux-buttery-polish/notes/T002-worker-receipt.md"
+      summary: "Keyboard disabled, stale, processing, failed, idle, complete, and post-insert states now explain the tester's next step while preserving non-insertable and exact-once behavior."
+      changed_files:
+        - "FoiliOS/FoilKeyboard/KeyboardViewController.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+        - "docs/goals/ios-beta-ux-buttery-polish/notes/T002-worker-receipt.md"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+          status: pass
+          summary: "Executed 33 tests, 0 failures."
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+          status: pass
+          summary: "Executed 7 tests, 0 failures."
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+          status: pass
+          summary: "Passed before receipt update with active task T002."
+        - cmd: "privacy/no-overclaim scan over changed files"
+          status: pass
+          summary: "Only intended guardrail text hits in goal/state docs."
+      evidence:
+        - "Presentation tests assert Full Access off labels Enable Full Access."
+        - "Presentation tests assert stale complete transcripts do not advertise Insert latest and offer Clear stale transcript."
+        - "Presentation tests assert complete state says Insert latest once and switch keyboards."
+        - "Bridge tests assert exact-once consume and stale/non-complete rejection still pass."
+      next_active_task: "T003"
 
   - id: T003
     type: worker
     assignee: Worker
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Third PR: improve provider/key recovery and avoid key-saved equals provider-verified overclaim."
     allowed_files:
