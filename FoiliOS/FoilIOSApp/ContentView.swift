@@ -765,6 +765,9 @@ struct ContentView: View {
         if snapshot.phase == .failed {
             return snapshot.message
         }
+        if let storageRecovery = storageHealthPresentation.recoveryMessage {
+            return storageRecovery
+        }
         if let keyboardRecovery = keyboardHealthPresentation.recoveryMessage {
             return keyboardRecovery
         }
@@ -833,6 +836,13 @@ struct ContentView: View {
         FoilDictationLoopPresenter.keyboardHealthPresentation(report: keyboardHealth)
     }
 
+    private var storageHealthPresentation: FoilStorageHealthPresentation {
+        FoilDictationLoopPresenter.storageHealthPresentation(
+            snapshot: snapshot,
+            storageReport: storageReport
+        )
+    }
+
     private var setupReadiness: FoilSetupReadinessPresentation {
         FoilDictationLoopPresenter.setupReadinessPresentation(
             hasProviderKey: transcription.hasConfiguredAPIKey,
@@ -843,13 +853,7 @@ struct ContentView: View {
     }
 
     private var storageHealthSummary: String {
-        if snapshot.transcript?.isEmpty == false {
-            return "Transcript pending"
-        }
-        if snapshot.phase == .idle {
-            return "Ready, no transcript"
-        }
-        return snapshot.phase.displayName
+        storageHealthPresentation.detail
     }
 
     private var onboardingReadiness: FoilOnboardingReadinessPresentation {

@@ -280,7 +280,7 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
             now: Date(timeIntervalSince1970: 110)
         )
         XCTAssertFalse(badStorage.isComplete)
-        XCTAssertTrue(badStorage.blockers.contains("Reset shared state so the keyboard bridge can write a clean App Group snapshot."))
+        XCTAssertTrue(badStorage.blockers.contains("App Group write or verification failed. Reset shared state, then verify Ready, no transcript."))
 
         let pendingTranscript = FoilDictationLoopPresenter.onboardingReadinessPresentation(
             selectedRouteID: "iphone-api-key",
@@ -298,6 +298,23 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         )
         XCTAssertFalse(pendingTranscript.isComplete)
         XCTAssertTrue(pendingTranscript.blockers.contains("Insert or reset the waiting transcript before calling setup complete."))
+
+        let stuckProcessing = FoilDictationLoopPresenter.onboardingReadinessPresentation(
+            selectedRouteID: "iphone-api-key",
+            hasConfiguredAPIKey: true,
+            microphoneAllowed: true,
+            keyboardHealth: freshEnabledHealth,
+            storageReport: healthyStorage,
+            snapshot: FoilKeyboardSnapshot(
+                phase: .processing,
+                transcript: nil,
+                message: "Transcribing",
+                updatedAt: Date(timeIntervalSince1970: 1)
+            ),
+            now: Date(timeIntervalSince1970: 200)
+        )
+        XCTAssertFalse(stuckProcessing.isComplete)
+        XCTAssertTrue(stuckProcessing.blockers.contains("Retry transcription or reset stuck processing before calling setup complete."))
     }
 
     func testOnboardingReadinessCompletesOnlyForHealthyIPhoneAPIKeyRoute() {
@@ -559,6 +576,43 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         XCTAssertTrue(presentation.detail.contains("No speech detected"))
     }
 
+    func testAppAgedProcessingOffersRecoveryWithoutInsertability() {
+        let presentation = FoilDictationLoopPresenter.appPresentation(
+            snapshot: FoilKeyboardSnapshot(
+                phase: .processing,
+                transcript: nil,
+                message: "Transcribing",
+                updatedAt: Date(timeIntervalSince1970: 100)
+            ),
+            isRecording: false,
+            hasSavedRecording: true,
+            isTranscribing: false,
+            recoveryMessage: nil,
+            now: Date(timeIntervalSince1970: 250)
+        )
+
+        XCTAssertEqual(presentation.title, "Processing may be stuck")
+        XCTAssertEqual(presentation.primaryAction, .retryTranscript)
+        XCTAssertTrue(presentation.detail.contains("longer than expected"))
+
+        let waiting = FoilDictationLoopPresenter.appPresentation(
+            snapshot: FoilKeyboardSnapshot(
+                phase: .processing,
+                transcript: nil,
+                message: "Transcribing",
+                updatedAt: Date(timeIntervalSince1970: 200)
+            ),
+            isRecording: false,
+            hasSavedRecording: true,
+            isTranscribing: true,
+            recoveryMessage: nil,
+            now: Date(timeIntervalSince1970: 250)
+        )
+
+        XCTAssertEqual(waiting.title, "Creating transcript")
+        XCTAssertNil(waiting.primaryAction)
+    }
+
     func testAppProviderKeyFailureDoesNotOfferRetryAsPrimaryRecovery() {
         let presentation = FoilDictationLoopPresenter.appPresentation(
             snapshot: FoilKeyboardSnapshot(
@@ -716,6 +770,68 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
             XCTAssertEqual(presentation.insertTitle, insertTitle, "Unexpected insert title for \(phase.rawValue)")
             XCTAssertTrue(presentation.message.contains(messageFragment), "Expected \(phase.rawValue) to explain \(messageFragment)")
         }
+    }
+
+    func testKeyboardAgedProcessingExplainsRecoveryAndStaysNonInsertable() {
+        let presentation = FoilDictationLoopPresenter.keyboardPresentation(
+            snapshot: FoilKeyboardSnapshot(
+                phase: .processing,
+                transcript: nil,
+                message: "Transcribing",
+                updatedAt: Date(timeIntervalSince1970: 100)
+            ),
+            fullAccessEnabled: true,
+            now: Date(timeIntervalSince1970: 250)
+        )
+
+        XCTAssertEqual(presentation.status, "Processing may be stuck")
+        XCTAssertEqual(presentation.insertTitle, "Waiting for transcript")
+        XCTAssertEqual(presentation.clearTitle, "Clear stuck processing")
+        XCTAssertTrue(presentation.message.contains("Nothing can be inserted yet"))
+    }
+
+    func testStorageHealthPresentationNamesAppGroupRecovery() {
+        let failedStorage = FoilKeyboardStorageReport(
+            operation: "save",
+            phase: .idle,
+            hasTranscript: false,
+            canonicalPath: nil,
+            canonicalWriteSucceeded: false,
+            canonicalWriteError: "Missing app group container",
+            canonicalVerificationPhase: nil,
+            canonicalVerificationHasTranscript: nil,
+            defaultsWriteAttempted: true,
+            fallbackRemovalResults: [],
+            updatedAt: Date(timeIntervalSince1970: 100)
+        )
+
+        let failedPresentation = FoilDictationLoopPresenter.storageHealthPresentation(
+            snapshot: .initial,
+            storageReport: failedStorage
+        )
+
+        XCTAssertEqual(failedPresentation.detail, "App Group write failed. Reset shared state, then verify Ready, no transcript.")
+        XCTAssertTrue(failedPresentation.recoveryMessage?.contains("App Group storage failed") == true)
+
+        let healthyPresentation = FoilDictationLoopPresenter.storageHealthPresentation(
+            snapshot: .initial,
+            storageReport: FoilKeyboardStorageReport(
+                operation: "reset",
+                phase: .idle,
+                hasTranscript: false,
+                canonicalPath: "/tmp/foil-keyboard-snapshot.json",
+                canonicalWriteSucceeded: true,
+                canonicalWriteError: nil,
+                canonicalVerificationPhase: .idle,
+                canonicalVerificationHasTranscript: false,
+                defaultsWriteAttempted: true,
+                fallbackRemovalResults: [],
+                updatedAt: Date(timeIntervalSince1970: 100)
+            )
+        )
+
+        XCTAssertEqual(healthyPresentation.detail, "Ready, no transcript")
+        XCTAssertNil(healthyPresentation.recoveryMessage)
     }
 
     func testKeyboardFullAccessOffTellsUserToEnableAndCycleBack() {
