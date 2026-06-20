@@ -47,7 +47,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-beta-ux-buttery-polish/"
     command: "npx goalbuddy board docs/goals/ios-beta-ux-buttery-polish"
 
-active_task: T004
+active_task: T005
 
 source_context:
   iOS_repo: "https://github.com/usefoil/foil-ios"
@@ -245,7 +245,7 @@ tasks:
   - id: T004
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Fourth PR: add aged processing and App Group recovery UX that feels like a path, not a dead end."
     allowed_files:
@@ -266,11 +266,43 @@ tasks:
       - "Aged processing offers retry/reset recovery."
       - "Keyboard storage/App Group failure is named distinctly from stale transcript."
       - "A single primary recovery action is visible with one verification step."
+    receipt:
+      result: done
+      note: "docs/goals/ios-beta-ux-buttery-polish/notes/T004-worker-receipt.md"
+      summary: "Aged processing now offers retry/reset recovery while remaining non-insertable, App Group write/verification failure is named distinctly with reset plus Ready/no-transcript verification, and bridge tests prove reset clears processing back to idle."
+      changed_files:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "FoiliOS/FoilIOSTests/FoilKeyboardBridgeTests.swift"
+        - "docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+        - "docs/goals/ios-beta-ux-buttery-polish/notes/T004-worker-receipt.md"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+          status: pass
+          summary: "Executed 37 tests, 0 failures."
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+          status: pass
+          summary: "Executed 8 tests, 0 failures."
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+          status: pass
+          summary: "Passed before receipt update with active task T004."
+        - cmd: "privacy/no-overclaim scan over changed files"
+          status: pass
+          summary: "Only intended guardrail text in goal/state docs and prior provider no-leak receipt text were found."
+      evidence:
+        - "Presentation tests assert aged processing shows recovery and no insertable path."
+        - "Keyboard presentation tests assert aged processing says nothing can be inserted yet."
+        - "Storage presentation tests assert App Group write failure gets its own reset and Ready/no-transcript verification guidance."
+        - "Bridge tests assert reset clears processing snapshots and reports idle shared state."
+      next_active_task: "T005"
 
   - id: T005
     type: worker
     assignee: Worker
-    status: queued
+    status: active
     reasoning_hint: medium
     objective: "Fifth PR: align beta docs and feedback templates with the current tester build and app boundaries."
     allowed_files:

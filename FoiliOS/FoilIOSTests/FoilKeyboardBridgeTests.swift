@@ -98,6 +98,30 @@ final class FoilKeyboardBridgeTests: XCTestCase {
         }
     }
 
+    func testResetClearsProcessingSnapshotAndReportsIdleSharedState() {
+        bridge.save(
+            FoilKeyboardSnapshot(
+                phase: .processing,
+                transcript: nil,
+                message: "Transcribing",
+                updatedAt: Date()
+            )
+        )
+
+        bridge.reset()
+
+        let snapshot = bridge.load()
+        XCTAssertEqual(snapshot.phase, .idle)
+        XCTAssertNil(snapshot.transcript)
+
+        let report = bridge.storageReport()
+        XCTAssertEqual(report.operation, "reset")
+        XCTAssertEqual(report.phase, .idle)
+        XCTAssertFalse(report.hasTranscript)
+        XCTAssertEqual(report.canonicalVerificationPhase, .idle)
+        XCTAssertEqual(report.canonicalVerificationHasTranscript, false)
+    }
+
     func testStorageReportDecodesLegacyPayloadWithoutInsertionReceipt() throws {
         let payload = """
         {

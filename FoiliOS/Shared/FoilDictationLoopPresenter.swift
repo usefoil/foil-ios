@@ -110,6 +110,11 @@ struct FoilKeyboardHealthPresentation: Equatable {
     var recoverySteps: [String]
 }
 
+struct FoilStorageHealthPresentation: Equatable {
+    var detail: String
+    var recoveryMessage: String?
+}
+
 struct FoilTranscriptReviewPresentation: Equatable {
     var transcript: String
     var guidance: String
@@ -182,6 +187,7 @@ struct FoilSetupReadinessPresentation: Equatable {
 }
 
 enum FoilDictationLoopPresenter {
+    static let processingRecoveryAfter: TimeInterval = 90
     static let macRouteID = "use-my-mac"
     static let iPhoneAPIKeyRouteID = "iphone-api-key"
     static let advancedRouteID = "advanced"
@@ -273,6 +279,16 @@ enum FoilDictationLoopPresenter {
         }
 
         if snapshot.phase == .processing {
+            if now.timeIntervalSince(snapshot.updatedAt) > processingRecoveryAfter {
+                return FoilSetupReadinessPresentation(
+                    title: "Transcript stuck",
+                    detail: "Foil has been processing longer than expected. Nothing is insertable yet.",
+                    nextAction: "Retry transcription if the recording is saved, or reset shared state before starting again.",
+                    systemImage: "exclamationmark.arrow.triangle.2.circlepath",
+                    tone: .attention
+                )
+            }
+
             return FoilSetupReadinessPresentation(
                 title: "Transcript in progress",
                 detail: "Foil is preparing text for the keyboard.",
@@ -503,6 +519,38 @@ enum FoilDictationLoopPresenter {
         }
     }
 
+    static func storageHealthPresentation(
+        snapshot: FoilKeyboardSnapshot,
+        storageReport: FoilKeyboardStorageReport
+    ) -> FoilStorageHealthPresentation {
+        if snapshot.transcript?.isEmpty == false {
+            return FoilStorageHealthPresentation(detail: "Transcript pending", recoveryMessage: nil)
+        }
+
+        if storageReport.operation != "none", !storageReport.canonicalWriteSucceeded {
+            let error = storageReport.canonicalWriteError ?? "App Group write did not complete."
+            return FoilStorageHealthPresentation(
+                detail: "App Group write failed. Reset shared state, then verify Ready, no transcript.",
+                recoveryMessage: "App Group storage failed: \(error). Reset shared state, then verify the Shared state row returns to Ready, no transcript."
+            )
+        }
+
+        if storageReport.operation != "none",
+           storageReport.canonicalVerificationPhase == nil ||
+            storageReport.canonicalVerificationHasTranscript == nil {
+            return FoilStorageHealthPresentation(
+                detail: "App Group verification missing. Reset shared state, then verify again.",
+                recoveryMessage: "Foil could not verify the App Group snapshot after writing it. Reset shared state before trying another insertion."
+            )
+        }
+
+        if snapshot.phase == .idle {
+            return FoilStorageHealthPresentation(detail: "Ready, no transcript", recoveryMessage: nil)
+        }
+
+        return FoilStorageHealthPresentation(detail: snapshot.phase.displayName, recoveryMessage: nil)
+    }
+
     static func onboardingReadinessPresentation(
         selectedRouteID: String,
         hasConfiguredAPIKey: Bool,
@@ -552,6 +600,9 @@ enum FoilDictationLoopPresenter {
 
         if snapshot.insertableTranscript(now: now, staleAfter: staleAfter) != nil {
             blockers.append("Insert or reset the waiting transcript before calling setup complete.")
+        } else if snapshot.phase == .processing,
+                  now.timeIntervalSince(snapshot.updatedAt) > processingRecoveryAfter {
+            blockers.append("Retry transcription or reset stuck processing before calling setup complete.")
         } else if snapshot.phase != .idle {
             blockers.append("Reset shared state so setup starts from an idle keyboard bridge.")
         }
@@ -562,7 +613,7 @@ enum FoilDictationLoopPresenter {
             storageReport.defaultsWriteAttempted &&
             verifiedCleanSnapshot
         if !bridgeWriteHealthy {
-            blockers.append("Reset shared state so the keyboard bridge can write a clean App Group snapshot.")
+            blockers.append("App Group write or verification failed. Reset shared state, then verify Ready, no transcript.")
         }
 
         if blockers.isEmpty {
@@ -590,7 +641,8 @@ enum FoilDictationLoopPresenter {
         hasSavedRecording: Bool,
         isTranscribing: Bool,
         recoveryMessage: String?,
-        providerRecoveryRequiresKeyUpdate: Bool = false
+        providerRecoveryRequiresKeyUpdate: Bool = false,
+        now: Date = Date()
     ) -> FoilAppLoopPresentation {
         if isRecording || snapshot.phase == .listening {
             return FoilAppLoopPresentation(
@@ -616,6 +668,19 @@ enum FoilDictationLoopPresenter {
         }
 
         if snapshot.phase == .processing || isTranscribing {
+            if snapshot.phase == .processing,
+               !isTranscribing,
+               now.timeIntervalSince(snapshot.updatedAt) > processingRecoveryAfter {
+                return FoilAppLoopPresentation(
+                    title: "Processing may be stuck",
+                    badge: "Recover",
+                    detail: "This transcript has been processing longer than expected. Retry transcription if the recording is saved, or reset shared state before recording again.",
+                    systemImage: "exclamationmark.arrow.triangle.2.circlepath",
+                    tone: .attention,
+                    primaryAction: hasSavedRecording ? .retryTranscript : .reset
+                )
+            }
+
             return FoilAppLoopPresentation(
                 title: "Creating transcript",
                 badge: "Working",
@@ -735,6 +800,16 @@ enum FoilDictationLoopPresenter {
                 startTitle: "Open Foil"
             )
         case .processing:
+            if now.timeIntervalSince(snapshot.updatedAt) > processingRecoveryAfter {
+                return FoilKeyboardLoopPresentation(
+                    status: "Processing may be stuck",
+                    message: "Open Foil to retry transcription or reset shared state. Nothing can be inserted yet.",
+                    insertTitle: "Waiting for transcript",
+                    clearTitle: "Clear stuck processing",
+                    startTitle: "Open Foil"
+                )
+            }
+
             return FoilKeyboardLoopPresentation(
                 status: "Creating transcript",
                 message: "Foil is preparing text. Return here when Insert latest is ready.",
