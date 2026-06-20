@@ -1,0 +1,40 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "identifier": "foil-keyboard-root",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "identifier": "foil-keyboard-insert-latest",
+      "kind": "forbidIdentifier",
+      "passed": true,
+      "present": false
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 16,
+      "textSha256": "41316e1f3cda28d0"
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "kind": "expectValueTextCount",
+      "passed": true,
+      "textLength": 23,
+      "textSha256": "70aa6d013b214ee5"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-ios-beta-ux-t007-secure-focused-source.json",
+    "nodeCount": 189,
+    "sha256": "1ea86b9d3db3e0d8d8d17fbb210b881c6b7454bb3cbb2fd18273ac49b2363cdc"
+  },
+  "target": "secure-field-rejection"
+}

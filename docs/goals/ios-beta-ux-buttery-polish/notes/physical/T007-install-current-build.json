@@ -1,0 +1,18 @@
+{
+  "schema": "foil.iosBetaUxT007.install.v1",
+  "branch": "codex/ios-beta-ux-buttery-polish-t006",
+  "commit": "9dc6ca00590c86f0a534141ec19dcd242df31f24",
+  "bundleIdentifier": "com.neonwatty.FoilIOS",
+  "version": "0.1.0",
+  "build": "13",
+  "appPathHash": "cc9f1e5d5fb53e44",
+  "install": {
+    "returncode": 0,
+    "outputBytes": 449,
+    "outputHash": "332e34960a178e98"
+  },
+  "privacy": {
+    "printedRawInstallOutput": false,
+    "committedArchiveOrIpa": false
+  }
+}

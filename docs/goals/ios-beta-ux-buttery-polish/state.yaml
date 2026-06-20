@@ -5,7 +5,7 @@ goal:
   slug: "ios-beta-ux-buttery-polish"
   kind: existing_plan
   tranche: "Turn the three-agent UX critique into scoped iOS beta polish PRs with tests and sanitized proof."
-  status: active
+  status: done
   oracle:
     signal: "A first-time beta tester can complete the current iPhone API-key path and understand the record-return-keyboard-insert loop without docs-only guidance or false-ready states."
     cadence: "after each implementation slice, after focused tests, after simulator/physical proof, and before PR merge"
@@ -47,7 +47,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-beta-ux-buttery-polish/"
     command: "npx goalbuddy board docs/goals/ios-beta-ux-buttery-polish"
 
-active_task: T007
+active_task: null
 
 source_context:
   iOS_repo: "https://github.com/usefoil/foil-ios"
@@ -381,7 +381,7 @@ tasks:
   - id: T007
     type: scout
     assignee: Scout
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Collect the strongest realistic UX proof after polish."
     constraints:
@@ -390,11 +390,40 @@ tasks:
     expected_output:
       - "Simulator receipts and, if approved/available, physical receipts showing the revised first-run path and record-return-keyboard-insert loop."
       - "Sanitized pass/fail evidence for route no-overclaim, provider copy, safe target guidance, keyboard disabled states, exact-once insertion, secure-field rejection, and App Group idle recovery."
+    receipt:
+      result: done
+      note: "docs/goals/ios-beta-ux-buttery-polish/notes/T007-physical-ux-proof-receipt.md"
+      summary: "Physical iPhone-preview receipts prove the current polished build's route-first setup, future-facing Mac route, provider/full-access/tested-target copy, Safari sterile exact-once insertion, stale and processing non-insertable states, secure-field rejection, and final App Group idle cleanup."
+      evidence:
+        - "physical/T007-preflight-healthy.json"
+        - "physical/T007-install-current-build.json"
+        - "physical/T007-route-setup-ready-receipt.json"
+        - "physical/T007-safari-before-insert-receipt.json"
+        - "physical/T007-safari-after-insert-receipt.json"
+        - "physical/T007-safari-after-second-click-receipt.json"
+        - "physical/T007-stale-disabled-receipt.json"
+        - "physical/T007-processing-disabled-receipt.json"
+        - "physical/T007-secure-field-rejection-receipt.json"
+        - "physical/T007-app-group-final-idle.json"
+      commands:
+        - cmd: "python3 scripts/ios-physical-harness.py preflight --strict --wda-url http://192.168.1.40:8100"
+          status: pass
+          summary: "classification healthy; safeToTouchHostApps true; device connected; WDA ready; redaction self-test passed."
+        - cmd: "xcodebuild build -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -configuration Debug -destination 'id=00008030-001A0C980A33C02E' -derivedDataPath /tmp/foil-ios-beta-ux-t007-dd DEVELOPMENT_TEAM=B3A6AN2HA4 CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates"
+          status: pass
+          summary: "Debug build succeeded for iPhone-preview."
+        - cmd: "xcrun devicectl device install app --device 5320F5AD-2A71-50AC-94FE-207B544B6247 /tmp/foil-ios-beta-ux-t007-dd/Build/Products/Debug-iphoneos/Foil iOS.app"
+          status: pass
+          summary: "Installed current build 0.1.0 (13); committed receipt stores only metadata and output hash."
+        - cmd: "scripts/ios-physical-harness.py receipt over route/setup, Safari, stale, processing, and secure-field WDA sources"
+          status: pass
+          summary: "Sanitized receipts passed; raw WDA sources stayed in /tmp."
+      next_active_task: "T999"
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Final audit: prove the iOS beta UX polish goal is complete or exactly blocked."
     expected_output:
@@ -402,3 +431,30 @@ tasks:
       - "full_outcome_complete: true | false"
       - "Evidence map from each original critique risk to merged PRs, tests, receipts, and remaining limitations."
       - "Explicit no-overclaim and privacy audit."
+    receipt:
+      result: done
+      decision: "complete"
+      full_outcome_complete: true
+      note: "docs/goals/ios-beta-ux-buttery-polish/notes/T999-final-audit.md"
+      summary: "The iOS beta UX buttery polish goal is complete: PRs #53-#58 landed, focused tests pass, and current physical receipts prove route-first setup, provider/Full Access copy, exact-once insertion, stale/processing non-insertability, secure-field rejection, and App Group idle cleanup."
+      completed:
+        - "Current beta path defaults to iPhone API key while Mac remains future-facing."
+        - "Provider saved-key and Full Access copy avoid overclaiming verification or broad data access."
+        - "Keyboard idle, complete, inserted-once, stale, failed, and processing states have guided recovery copy."
+        - "Advanced/demo/test tooling is behind Advanced / Support."
+        - "Docs and feedback template match the current beta build and narrow target support."
+        - "Physical iPhone-preview receipts prove route/setup, sterile Safari exact-once insertion, stale/processing disabled states, secure-field rejection, and final App Group cleanup."
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests -only-testing:FoilIOSTests/FoilKeyboardBridgeTests -only-testing:FoilIOSTests/FoilProviderFailurePresentationTests"
+          status: pass
+          summary: "Executed 58 tests, 0 failures."
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+          status: pass
+        - cmd: "privacy/no-overclaim scan over goal state and notes"
+          status: pass
+          summary: "Only intended guardrail text hits; no raw WDA, transcript body, provider key, App Store Connect key, JWT, archive, or IPA artifacts."
+      missing_evidence: []
+      next_owner: "PM"
+      next_action: "Open and monitor the sanitized T007/T999 evidence PR, then merge when fresh checks are green and mergeability is clean."
