@@ -47,7 +47,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-beta-ux-buttery-polish/"
     command: "npx goalbuddy board docs/goals/ios-beta-ux-buttery-polish"
 
-active_task: T006
+active_task: T007
 
 source_context:
   iOS_repo: "https://github.com/usefoil/foil-ios"
@@ -357,7 +357,7 @@ tasks:
   - id: T006
     type: judge
     assignee: Judge
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Decide whether simulator proof is enough or physical iPhone proof is required for the polished UX."
     inputs:
@@ -367,11 +367,21 @@ tasks:
     expected_output:
       - "Decision: simulator-only acceptable, physical proof required, or blocked."
       - "If physical proof is required, exact sterile walkthrough script and receipt list."
+    receipt:
+      result: done
+      note: "docs/goals/ios-beta-ux-buttery-polish/notes/T006-judge-proof-decision.md"
+      decision: "physical proof required if preview device and WDA are available"
+      summary: "Focused tests and CI are sufficient for the merged PR slices, but final completion of the UX goal requires a sterile physical iPhone walkthrough when available because the owner outcome is a real first-time tester experience."
+      evidence:
+        - "docs/acceptance-evidence.md calls for stronger proof for onboarding, visible app UI, provider/API-key, keyboard insertion, and release/beta-facing changes."
+        - "T001-T005 receipts prove model/provider/bridge/docs slices but do not by themselves show the final physical route-first loop."
+        - "T007 receipt script lists route, readiness, provider, App Group, keyboard state, host-app safety, exact-once, secure-field, and cleanup proof."
+      next_active_task: "T007"
 
   - id: T007
     type: scout
     assignee: Scout
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Collect the strongest realistic UX proof after polish."
     constraints:
