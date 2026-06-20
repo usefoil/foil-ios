@@ -1,0 +1,42 @@
+{
+  "appGroup": {},
+  "checks": [
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 24,
+      "textSha256": "9094659807f52c60"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 17,
+      "textSha256": "aaa099d87a16c6a8"
+    },
+    {
+      "kind": "requireAccessibleText",
+      "passed": true,
+      "present": true,
+      "textLength": 16,
+      "textSha256": "41316e1f3cda28d0"
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "kind": "expectValueTextCount",
+      "passed": true,
+      "textLength": 23,
+      "textSha256": "70aa6d013b214ee5"
+    }
+  ],
+  "passed": true,
+  "schema": "foil.iosPhysicalWdaEvidence.v1",
+  "source": {
+    "file": "foil-ios-beta-ux-t007-secure-fixture-source.json",
+    "nodeCount": 105,
+    "sha256": "061490e901f2d66db6eb29bc31d2f8cbdf6d5c7544c6c6eab23027cbbedd950f"
+  },
+  "target": "secure-fixture-loaded"
+}
