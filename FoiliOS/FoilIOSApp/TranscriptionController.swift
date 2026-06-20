@@ -4,6 +4,7 @@ import Foundation
 final class TranscriptionController: ObservableObject {
     @Published private(set) var status = "Transcription idle"
     @Published private(set) var recoveryMessage: String?
+    @Published private(set) var providerRecoveryKind: FoilProviderRecoveryKind?
 
     private let bridge = FoilKeyboardBridge()
     private let client: any FoilTranscriptionProviding
@@ -25,7 +26,13 @@ final class TranscriptionController: ObservableObject {
     }
 
     var credentialSummary: String {
-        hasConfiguredAPIKey ? "Groq key configured" : "Groq key needed"
+        hasConfiguredAPIKey
+            ? "Groq key saved on this iPhone. Provider verifies on the next transcription."
+            : "Groq key needed"
+    }
+
+    var providerRecoveryRequiresKeyUpdate: Bool {
+        providerRecoveryKind == .updateProviderKey
     }
 
     func saveGroqAPIKey(_ value: String) throws {
@@ -42,17 +49,20 @@ final class TranscriptionController: ObservableObject {
         guard let recordingURL else {
             status = TranscriptionError.missingRecording.localizedDescription
             recoveryMessage = "Record first, then tap Transcribe."
+            providerRecoveryKind = nil
             return
         }
         guard let apiKey else {
             status = TranscriptionError.missingAPIKey.localizedDescription
-            recoveryMessage = "Save a Groq key, then tap Transcribe again."
-            bridge.fail(message: "Groq key needed. Open Foil app to recover.")
+            recoveryMessage = "Save a Groq key below, then tap Transcribe again."
+            providerRecoveryKind = .updateProviderKey
+            bridge.fail(message: "Groq key needed. Open Foil app to add provider key.")
             return
         }
 
         status = "Transcribing"
         recoveryMessage = nil
+        providerRecoveryKind = nil
         bridge.save(
             FoilKeyboardSnapshot(
                 phase: .processing,
@@ -67,17 +77,20 @@ final class TranscriptionController: ObservableObject {
             guard FoilTranscriptQuality.isAcceptable(transcript) else {
                 status = "No speech detected"
                 recoveryMessage = "Record again, or reset shared state to return the keyboard to ready."
+                providerRecoveryKind = nil
                 bridge.fail(message: "No speech detected. Record again in Foil.")
                 return
             }
             let finalTranscript = transcript
             status = "Transcription complete"
             recoveryMessage = nil
+            providerRecoveryKind = nil
             bridge.complete(transcript: finalTranscript, message: "Groq transcript ready. Switch back and tap Insert latest.")
         } catch {
             let presentation = Self.providerFailurePresentation(for: error)
             status = presentation.status
             recoveryMessage = presentation.recoveryMessage
+            providerRecoveryKind = presentation.recoveryKind
             bridge.fail(message: presentation.keyboardMessage)
         }
     }
@@ -88,32 +101,37 @@ final class TranscriptionController: ObservableObject {
             case .httpStatus(401), .httpStatus(403):
                 return FoilProviderFailurePresentation(
                     status: "Provider key rejected",
-                    recoveryMessage: "Replace the Groq key, then tap Transcribe again.",
-                    keyboardMessage: "Groq key rejected. Open Foil app to update provider setup."
+                    recoveryMessage: "Replace the saved Groq key below, then tap Transcribe again.",
+                    keyboardMessage: "Groq key rejected. Open Foil app to update provider key.",
+                    recoveryKind: .updateProviderKey
                 )
             case .httpStatus(let status):
                 return FoilProviderFailurePresentation(
                     status: "Provider error HTTP \(status)",
                     recoveryMessage: "Wait a moment, then tap Transcribe again. If this repeats, check provider status.",
-                    keyboardMessage: "Provider error. Open Foil app to retry."
+                    keyboardMessage: "Provider error. Open Foil app to retry.",
+                    recoveryKind: .retryable
                 )
             case .invalidResponse:
                 return FoilProviderFailurePresentation(
                     status: "Provider response unreadable",
                     recoveryMessage: "Tap Transcribe again. If this repeats, reset shared state and record again.",
-                    keyboardMessage: "Provider response unreadable. Open Foil app to retry."
+                    keyboardMessage: "Provider response unreadable. Open Foil app to retry.",
+                    recoveryKind: .retryable
                 )
             case .missingAPIKey:
                 return FoilProviderFailurePresentation(
                     status: TranscriptionError.missingAPIKey.localizedDescription,
-                    recoveryMessage: "Save a Groq key, then tap Transcribe again.",
-                    keyboardMessage: "Groq key needed. Open Foil app to recover."
+                    recoveryMessage: "Save a Groq key below, then tap Transcribe again.",
+                    keyboardMessage: "Groq key needed. Open Foil app to add provider key.",
+                    recoveryKind: .updateProviderKey
                 )
             case .missingRecording:
                 return FoilProviderFailurePresentation(
                     status: TranscriptionError.missingRecording.localizedDescription,
                     recoveryMessage: "Record first, then tap Transcribe.",
-                    keyboardMessage: "Recording needed. Open Foil app to recover."
+                    keyboardMessage: "Recording needed. Open Foil app to recover.",
+                    recoveryKind: .retryable
                 )
             }
         }
@@ -124,13 +142,15 @@ final class TranscriptionController: ObservableObject {
                 return FoilProviderFailurePresentation(
                     status: "Network unavailable",
                     recoveryMessage: "Check the connection, then tap Transcribe again.",
-                    keyboardMessage: "Network unavailable. Open Foil app to retry."
+                    keyboardMessage: "Network unavailable. Open Foil app to retry.",
+                    recoveryKind: .retryable
                 )
             default:
                 return FoilProviderFailurePresentation(
                     status: "Network request failed",
                     recoveryMessage: "Check the connection or provider status, then tap Transcribe again.",
-                    keyboardMessage: "Network request failed. Open Foil app to retry."
+                    keyboardMessage: "Network request failed. Open Foil app to retry.",
+                    recoveryKind: .retryable
                 )
             }
         }
@@ -138,7 +158,8 @@ final class TranscriptionController: ObservableObject {
         return FoilProviderFailurePresentation(
             status: "Transcription failed",
             recoveryMessage: "Check the key or network, then tap Transcribe again.",
-            keyboardMessage: "Transcription failed. Open Foil app to retry."
+            keyboardMessage: "Transcription failed. Open Foil app to retry.",
+            recoveryKind: .retryable
         )
     }
 
@@ -170,8 +191,14 @@ final class TranscriptionController: ObservableObject {
     }
 }
 
+enum FoilProviderRecoveryKind: Equatable {
+    case retryable
+    case updateProviderKey
+}
+
 struct FoilProviderFailurePresentation: Equatable {
     var status: String
     var recoveryMessage: String
     var keyboardMessage: String
+    var recoveryKind: FoilProviderRecoveryKind
 }

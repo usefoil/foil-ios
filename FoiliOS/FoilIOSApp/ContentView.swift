@@ -47,6 +47,14 @@ struct ContentView: View {
                                 .font(.headline)
                             statusRow(recoveryMessage, systemImage: "exclamationmark.arrow.triangle.2.circlepath")
                                 .font(.callout)
+                            if transcription.providerRecoveryRequiresKeyUpdate {
+                                setupRow(
+                                    title: "Update provider key",
+                                    detail: "A saved key is not provider-verified until transcription succeeds.",
+                                    systemImage: "key.fill"
+                                )
+                                providerCredentialEditor
+                            }
                             keyboardRecoveryChecklist
                             testedTargetsPanel
 
@@ -716,7 +724,7 @@ struct ContentView: View {
         do {
             try transcription.saveGroqAPIKey(providerKeyEntry)
             providerKeyEntry = ""
-            providerCredentialMessage = "Groq key saved"
+            providerCredentialMessage = "Groq key saved. Provider will verify on the next transcription."
         } catch {
             providerCredentialMessage = error.localizedDescription
         }
@@ -781,7 +789,10 @@ struct ContentView: View {
     }
 
     private var canRetryTranscription: Bool {
-        transcription.recoveryMessage != nil && audioCapture.lastRecordingURL != nil && !audioCapture.isRecording
+        transcription.recoveryMessage != nil &&
+            !transcription.providerRecoveryRequiresKeyUpdate &&
+            audioCapture.lastRecordingURL != nil &&
+            !audioCapture.isRecording
     }
 
     private var microphonePermissionSummary: String {
@@ -858,7 +869,8 @@ struct ContentView: View {
             isRecording: audioCapture.isRecording,
             hasSavedRecording: audioCapture.lastRecordingURL != nil,
             isTranscribing: transcription.status == "Transcribing",
-            recoveryMessage: recoveryMessage
+            recoveryMessage: recoveryMessage,
+            providerRecoveryRequiresKeyUpdate: transcription.providerRecoveryRequiresKeyUpdate
         )
     }
 

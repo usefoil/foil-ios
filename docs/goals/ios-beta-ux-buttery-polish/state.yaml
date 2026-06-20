@@ -47,7 +47,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/ios-beta-ux-buttery-polish/"
     command: "npx goalbuddy board docs/goals/ios-beta-ux-buttery-polish"
 
-active_task: T003
+active_task: T004
 
 source_context:
   iOS_repo: "https://github.com/usefoil/foil-ios"
@@ -182,7 +182,7 @@ tasks:
   - id: T003
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: high
     objective: "Third PR: improve provider/key recovery and avoid key-saved equals provider-verified overclaim."
     allowed_files:
@@ -205,11 +205,47 @@ tasks:
       - "Rejected/missing key recovery surfaces Update provider key as the primary repair."
       - "Retry is not visually dominant when the key must change first."
       - "Tests assert no key/header/body leakage."
+    receipt:
+      result: done
+      note: "docs/goals/ios-beta-ux-buttery-polish/notes/T003-worker-receipt.md"
+      summary: "Provider copy now distinguishes saved keys from successful provider verification, missing/rejected key failures surface key update first, retry is hidden for key-update failures, and tests continue to assert no key/header/body leakage."
+      changed_files:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/FoilIOSApp/TranscriptionController.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "FoiliOS/FoilIOSTests/FoilProviderFailurePresentationTests.swift"
+        - "docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+        - "docs/goals/ios-beta-ux-buttery-polish/notes/T003-worker-receipt.md"
+      commands:
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilDictationLoopPresentationTests"
+          status: pass
+          summary: "Executed 34 tests, 0 failures."
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilProviderFailurePresentationTests"
+          status: pass
+          summary: "Executed 13 tests, 0 failures."
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.8/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/ios-beta-ux-buttery-polish/state.yaml"
+          status: pass
+          summary: "Passed before receipt update with active task T003."
+        - cmd: "privacy/key leakage scan over changed files"
+          status: pass
+          summary: "Only existing fake unit-test key/sentinel strings and intended guardrail text were found."
+        - cmd: "provider no-overclaim scan over changed files"
+          status: pass
+          summary: "Provider-verification hits explicitly say verification still depends on successful transcription."
+      evidence:
+        - "Provider failure tests assert missing/rejected keys classify as updateProviderKey and do not leak gsk_, Authorization, Bearer, or provider body sentinels."
+        - "Presentation tests assert saved-key copy says verification depends on successful transcription."
+        - "Presentation tests assert provider-key failure shows Update provider key and has no primary retry action."
+        - "ContentView hides Retry transcription for provider-key update failures and shows the provider key editor in Recovery."
+      next_active_task: "T004"
 
   - id: T004
     type: worker
     assignee: Worker
-    status: queued
+    status: active
     reasoning_hint: high
     objective: "Fourth PR: add aged processing and App Group recovery UX that feels like a path, not a dead end."
     allowed_files:

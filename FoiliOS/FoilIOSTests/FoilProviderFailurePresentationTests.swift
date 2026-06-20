@@ -13,7 +13,7 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
         )
 
         XCTAssertTrue(controller.hasConfiguredAPIKey)
-        XCTAssertEqual(controller.credentialSummary, "Groq key configured")
+        XCTAssertEqual(controller.credentialSummary, "Groq key saved on this iPhone. Provider verifies on the next transcription.")
     }
 
     func testControllerMissingKeyStateIsActionable() async throws {
@@ -26,7 +26,9 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
         await controller.transcribeLatestRecording(try writeTemporaryAudioFile())
 
         XCTAssertEqual(controller.status, "Groq key needed")
-        XCTAssertEqual(controller.recoveryMessage, "Save a Groq key, then tap Transcribe again.")
+        XCTAssertEqual(controller.recoveryMessage, "Save a Groq key below, then tap Transcribe again.")
+        XCTAssertEqual(controller.providerRecoveryKind, .updateProviderKey)
+        XCTAssertTrue(controller.providerRecoveryRequiresKeyUpdate)
     }
 
     func testControllerInvalidKeyStateIsActionableWithoutLeakingKey() async throws {
@@ -39,7 +41,9 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
         await controller.transcribeLatestRecording(try writeTemporaryAudioFile())
 
         XCTAssertEqual(controller.status, "Provider key rejected")
-        XCTAssertEqual(controller.recoveryMessage, "Replace the Groq key, then tap Transcribe again.")
+        XCTAssertEqual(controller.recoveryMessage, "Replace the saved Groq key below, then tap Transcribe again.")
+        XCTAssertEqual(controller.providerRecoveryKind, .updateProviderKey)
+        XCTAssertTrue(controller.providerRecoveryRequiresKeyUpdate)
         XCTAssertFalse(controller.status.contains("gsk_"))
         XCTAssertFalse(controller.recoveryMessage?.contains("gsk_") == true)
     }
@@ -55,6 +59,8 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
 
         XCTAssertEqual(controller.status, "Network unavailable")
         XCTAssertEqual(controller.recoveryMessage, "Check the connection, then tap Transcribe again.")
+        XCTAssertEqual(controller.providerRecoveryKind, .retryable)
+        XCTAssertFalse(controller.providerRecoveryRequiresKeyUpdate)
     }
 
     func testControllerTranscriptionQualityFailureIsRecoverable() async throws {
@@ -68,6 +74,7 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
 
         XCTAssertEqual(controller.status, "No speech detected")
         XCTAssertEqual(controller.recoveryMessage, "Record again, or reset shared state to return the keyboard to ready.")
+        XCTAssertNil(controller.providerRecoveryKind)
     }
 
     func testControllerRecoveredSuccessClearsRecoveryMessage() async throws {
@@ -81,6 +88,7 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
 
         XCTAssertEqual(controller.status, "Transcription complete")
         XCTAssertNil(controller.recoveryMessage)
+        XCTAssertNil(controller.providerRecoveryKind)
     }
 
     func testMissingKeyStateIsActionableWithoutSecretText() {
@@ -90,6 +98,7 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
 
         XCTAssertEqual(presentation.status, "Groq key needed")
         XCTAssertTrue(presentation.recoveryMessage.contains("Save a Groq key"))
+        XCTAssertEqual(presentation.recoveryKind, .updateProviderKey)
         XCTAssertTrue(presentation.keyboardMessage.contains("Groq key needed"))
         assertDoesNotLeakSensitiveProviderText(presentation)
     }
@@ -100,8 +109,9 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
         )
 
         XCTAssertEqual(presentation.status, "Provider key rejected")
-        XCTAssertTrue(presentation.recoveryMessage.contains("Replace the Groq key"))
-        XCTAssertTrue(presentation.keyboardMessage.contains("update provider setup"))
+        XCTAssertTrue(presentation.recoveryMessage.contains("Replace the saved Groq key"))
+        XCTAssertTrue(presentation.keyboardMessage.contains("update provider key"))
+        XCTAssertEqual(presentation.recoveryKind, .updateProviderKey)
         assertDoesNotLeakSensitiveProviderText(presentation)
     }
 
@@ -111,7 +121,8 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
         )
 
         XCTAssertEqual(presentation.status, "Provider key rejected")
-        XCTAssertTrue(presentation.recoveryMessage.contains("Replace the Groq key"))
+        XCTAssertTrue(presentation.recoveryMessage.contains("Replace the saved Groq key"))
+        XCTAssertEqual(presentation.recoveryKind, .updateProviderKey)
         assertDoesNotLeakSensitiveProviderText(presentation)
     }
 
@@ -123,6 +134,7 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
         XCTAssertEqual(presentation.status, "Provider error HTTP 500")
         XCTAssertTrue(presentation.recoveryMessage.contains("tap Transcribe again"))
         XCTAssertTrue(presentation.recoveryMessage.contains("provider status"))
+        XCTAssertEqual(presentation.recoveryKind, .retryable)
         assertDoesNotLeakSensitiveProviderText(presentation)
     }
 
@@ -133,6 +145,7 @@ final class FoilProviderFailurePresentationTests: XCTestCase {
 
         XCTAssertEqual(presentation.status, "Network unavailable")
         XCTAssertTrue(presentation.recoveryMessage.contains("Check the connection"))
+        XCTAssertEqual(presentation.recoveryKind, .retryable)
         assertDoesNotLeakSensitiveProviderText(presentation)
     }
 
