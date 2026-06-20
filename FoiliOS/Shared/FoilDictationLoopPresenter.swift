@@ -205,7 +205,7 @@ enum FoilDictationLoopPresenter {
         if !hasProviderKey {
             return FoilSetupReadinessPresentation(
                 title: "Setup not started",
-                detail: "Save your Groq provider key before recording.",
+                detail: "Save your Groq provider key on this iPhone before recording. A saved key is verified only after a successful transcription.",
                 nextAction: "Paste the key below, then tap Save key.",
                 systemImage: "key",
                 tone: .attention
@@ -224,7 +224,7 @@ enum FoilDictationLoopPresenter {
         case .needsPrompt:
             return FoilSetupReadinessPresentation(
                 title: "Ready for microphone prompt",
-                detail: "Provider is saved. Foil will ask for microphone access when you record.",
+                detail: "Provider key is saved on this iPhone. Foil will verify it when transcription succeeds.",
                 nextAction: "Tap Record in Foil and allow microphone access.",
                 systemImage: "mic.badge.plus",
                 tone: .ready
@@ -294,7 +294,7 @@ enum FoilDictationLoopPresenter {
 
         return FoilSetupReadinessPresentation(
             title: "Setup ready",
-            detail: "Provider, microphone, and Foil Keyboard are ready for the narrow closed beta loop.",
+            detail: "Saved provider key, microphone, and Foil Keyboard are ready for the narrow closed beta loop. Provider verification still depends on a successful transcription.",
             nextAction: "Record in Foil, then return to a safe text field and insert once.",
             systemImage: "checkmark.circle",
             tone: .success
@@ -568,7 +568,7 @@ enum FoilDictationLoopPresenter {
         if blockers.isEmpty {
             return FoilOnboardingReadinessPresentation(
                 title: "Ready to dictate and insert",
-                detail: "API key, microphone, Foil Keyboard health, Full Access, and App Group state are ready.",
+                detail: "Saved API key, microphone, Foil Keyboard health, Full Access, and App Group state are ready. Provider verification still depends on a successful transcription.",
                 systemImage: "checkmark.circle.fill",
                 isComplete: true,
                 blockers: []
@@ -589,7 +589,8 @@ enum FoilDictationLoopPresenter {
         isRecording: Bool,
         hasSavedRecording: Bool,
         isTranscribing: Bool,
-        recoveryMessage: String?
+        recoveryMessage: String?,
+        providerRecoveryRequiresKeyUpdate: Bool = false
     ) -> FoilAppLoopPresentation {
         if isRecording || snapshot.phase == .listening {
             return FoilAppLoopPresentation(
@@ -626,6 +627,17 @@ enum FoilDictationLoopPresenter {
         }
 
         if snapshot.phase == .failed || recoveryMessage != nil {
+            if providerRecoveryRequiresKeyUpdate {
+                return FoilAppLoopPresentation(
+                    title: "Update provider key",
+                    badge: "Provider",
+                    detail: recoveryMessage ?? "Update the saved provider key, then transcribe again.",
+                    systemImage: "key.fill",
+                    tone: .attention,
+                    primaryAction: nil
+                )
+            }
+
             return FoilAppLoopPresentation(
                 title: "Try again",
                 badge: "Recover",

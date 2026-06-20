@@ -12,6 +12,7 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
 
         XCTAssertEqual(presentation.title, "Setup not started")
         XCTAssertTrue(presentation.detail.contains("Groq provider key"))
+        XCTAssertTrue(presentation.detail.contains("verified only after a successful transcription"))
         XCTAssertTrue(presentation.nextAction.contains("Save key"))
         XCTAssertEqual(presentation.tone, .attention)
     }
@@ -25,7 +26,8 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         )
 
         XCTAssertEqual(presentation.title, "Ready for microphone prompt")
-        XCTAssertTrue(presentation.detail.contains("Provider is saved"))
+        XCTAssertTrue(presentation.detail.contains("Provider key is saved on this iPhone"))
+        XCTAssertTrue(presentation.detail.contains("verify it when transcription succeeds"))
         XCTAssertTrue(presentation.nextAction.contains("allow microphone access"))
         XCTAssertEqual(presentation.tone, .ready)
     }
@@ -89,6 +91,7 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
 
         let combined = "\(presentation.title) \(presentation.detail) \(presentation.nextAction)"
         XCTAssertEqual(presentation.title, "Setup ready")
+        XCTAssertTrue(combined.contains("Provider verification still depends on a successful transcription"))
         XCTAssertTrue(combined.contains("narrow closed beta loop"))
         XCTAssertTrue(combined.contains("safe text field"))
         XCTAssertFalse(combined.contains("Mail support"))
@@ -554,6 +557,27 @@ final class FoilDictationLoopPresentationTests: XCTestCase {
         XCTAssertEqual(presentation.title, "Try again")
         XCTAssertEqual(presentation.primaryAction, .retryTranscript)
         XCTAssertTrue(presentation.detail.contains("No speech detected"))
+    }
+
+    func testAppProviderKeyFailureDoesNotOfferRetryAsPrimaryRecovery() {
+        let presentation = FoilDictationLoopPresenter.appPresentation(
+            snapshot: FoilKeyboardSnapshot(
+                phase: .failed,
+                transcript: nil,
+                message: "Groq key rejected. Open Foil app to update provider key.",
+                updatedAt: Date()
+            ),
+            isRecording: false,
+            hasSavedRecording: true,
+            isTranscribing: false,
+            recoveryMessage: "Replace the saved Groq key below, then tap Transcribe again.",
+            providerRecoveryRequiresKeyUpdate: true
+        )
+
+        XCTAssertEqual(presentation.title, "Update provider key")
+        XCTAssertEqual(presentation.badge, "Provider")
+        XCTAssertNil(presentation.primaryAction)
+        XCTAssertTrue(presentation.detail.contains("Replace the saved Groq key"))
     }
 
     func testKeyboardIdleStateExplainsHandoffInsteadOfSayingNoTranscriptOnly() {
