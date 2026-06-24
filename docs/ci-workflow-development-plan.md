@@ -17,11 +17,11 @@ The first required GitHub Actions layer should be named
 - `scripts/ios-physical-harness.py self-test`.
 - `scripts/ios-simulator-sanity.sh`.
 
-The hosted workflow is split into two check names that branch protection can
-later require after their first Actions run confirms the exact names:
+The hosted workflow is split into two job names. After the first GitHub Actions
+run, the required-status-check API contexts were confirmed as:
 
-- `iOS Simulator Sanity (non-physical) / Hosted simulator sanity`
-- `iOS Simulator Sanity (non-physical) / Repo hygiene ratchet`
+- `Hosted simulator sanity`
+- `Repo hygiene ratchet`
 
 This lane proves project visibility, deterministic simulator tests, helper
 syntax, redaction fixture behavior, and unsigned device-SDK compilation. It

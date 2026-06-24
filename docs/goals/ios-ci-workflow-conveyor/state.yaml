@@ -169,7 +169,7 @@ tasks:
         - "Workflow triggers: `pull_request`, `push` to `main`, `merge_group`, and `workflow_dispatch`."
         - "Generated drift policy: fail on any diff under `FoiliOS/FoilIOS.xcodeproj`, `FoiliOS/FoilIOSApp/Generated`, or `FoiliOS/FoilKeyboard/Generated` after XcodeGen."
         - "Artifact policy: upload only allowlisted hosted-CI text artifacts or sanitized JSON reports, preferably on failure with short retention; forbid broad temp globs, keys, raw WDA/accessibility trees, phone screenshots, recordings, `.ipa`, and `.xcarchive`."
-        - "Recommended required checks to confirm after first GitHub run: `iOS Simulator Sanity (non-physical) / Hosted simulator sanity` and `iOS Simulator Sanity (non-physical) / Repo hygiene ratchet`."
+        - "Recommended required checks to confirm after first GitHub run: the hosted workflow jobs `Hosted simulator sanity` and `Repo hygiene ratchet`."
       missing_evidence:
         - "Exact GitHub required-check names must be confirmed from the first Actions run before branch protection is changed."
       required_board_updates:
@@ -354,12 +354,12 @@ tasks:
       - "Receipt explaining what remains outside Board 1."
     receipt:
       result: done
-      summary: "Recorded branch-protection handoff and follow-up conveyor starters. The intended checks are `iOS Simulator Sanity (non-physical) / Hosted simulator sanity` and `iOS Simulator Sanity (non-physical) / Repo hygiene ratchet`, but exact GitHub context names must be confirmed from the first Actions run before branch protection is updated."
+      summary: "Recorded branch-protection handoff and follow-up conveyor starters. The intended jobs are `Hosted simulator sanity` and `Repo hygiene ratchet`, with exact GitHub context names to be confirmed from the first Actions run before branch protection is updated."
       required_check_handoff:
         status: "pending_first_actions_run_confirmation"
         intended_checks:
-          - "iOS Simulator Sanity (non-physical) / Hosted simulator sanity"
-          - "iOS Simulator Sanity (non-physical) / Repo hygiene ratchet"
+          - "Hosted simulator sanity"
+          - "Repo hygiene ratchet"
         do_not_change_branch_protection_until:
           - "The workflow has run on GitHub at least once."
           - "The exact check context names are visible in the PR or merge queue UI/API."
@@ -517,7 +517,7 @@ tasks:
         - "Workflow YAML parse passed."
         - "`scripts/source-line-ratchet.py --json` reported max_lines 500, 22 counted files, four historical allowlist baselines, and no violations."
         - "Hosted CI overclaim check: docs say this lane does not prove physical iPhone install, TestFlight, microphone/provider live behavior, Full Access, WDA, or host-app keyboard insertion; workflow physical references are syntax/self-test fixture only."
-        - "Branch-protection handoff exists: docs and T006 name intended checks `iOS Simulator Sanity (non-physical) / Hosted simulator sanity` and `iOS Simulator Sanity (non-physical) / Repo hygiene ratchet`, with first Actions-run confirmation required before settings changes."
+        - "Branch-protection handoff exists: docs and T006 name intended jobs `Hosted simulator sanity` and `Repo hygiene ratchet`, with first Actions-run confirmation required before settings changes."
       residual_risk:
         - "Exact GitHub check context names remain unconfirmed until the first hosted Actions run."
       required_followups:
