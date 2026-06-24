@@ -36,7 +36,7 @@ struct ContentView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Handoff")
                                 .font(.headline)
-                            statusRow(handoffGuidance, systemImage: "arrow.left.arrow.right")
+                            FoilStatusRow(handoffGuidance, systemImage: "arrow.left.arrow.right")
                                 .font(.callout)
                         }
                     }
@@ -45,10 +45,10 @@ struct ContentView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Recovery")
                                 .font(.headline)
-                            statusRow(recoveryMessage, systemImage: "exclamationmark.arrow.triangle.2.circlepath")
+                            FoilStatusRow(recoveryMessage, systemImage: "exclamationmark.arrow.triangle.2.circlepath")
                                 .font(.callout)
                             if transcription.providerRecoveryRequiresKeyUpdate {
-                                setupRow(
+                                FoilSetupRow(
                                     title: "Update provider key",
                                     detail: "A saved key is not provider-verified until transcription succeeds.",
                                     systemImage: "key.fill"
@@ -84,51 +84,25 @@ struct ContentView: View {
                         }
                     }
 
-                    DisclosureGroup("Advanced / Support", isExpanded: $showDiagnostics) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            ForEach(FoilDictationLoopPresenter.advancedSupportPresentation()) { item in
-                                setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
-                            }
-
-                            Divider()
-
-                            Text("Safe test targets")
-                                .font(.callout.weight(.semibold))
-
-                            ForEach(FoilDictationLoopPresenter.betaGuidancePresentation()) { item in
-                                setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
-                            }
-
-                            Divider()
-
-                            statusRow(storageReportSummary, systemImage: "externaldrive")
-                                .accessibilityIdentifier("keyboard-storage-report-summary")
-                            if transcriptReviewPresentation != nil {
-                                statusRow("Transcript visible in review", systemImage: "text.quote")
-                                    .accessibilityIdentifier("diagnostics-transcript-review-visible")
-                            }
-                            if let lastRecordingURL = audioCapture.lastRecordingURL {
-                                statusRow(lastRecordingURL.lastPathComponent, systemImage: "waveform.path")
-                                    .font(.caption.monospaced())
-                            }
-
-                            SecureField("Secure field rejection test", text: $secureEntry)
-                                .textContentType(.password)
-                                .textInputAutocapitalization(.never)
-                                .autocorrectionDisabled()
-                                .accessibilityIdentifier("secure-rejection-field")
-                                .textFieldStyle(.roundedBorder)
-
-                            LazyVGrid(columns: actionColumns, alignment: .leading, spacing: 10) {
-                                diagnosticButtons
-                            }
-                            .controlSize(.large)
-                            .labelStyle(.titleAndIcon)
-                            .buttonBorderShape(.roundedRectangle(radius: 8))
+                    FoilAdvancedSupportDisclosure(
+                        isExpanded: $showDiagnostics,
+                        secureEntry: $secureEntry,
+                        storageReportSummary: storageReportSummary,
+                        transcriptReviewVisible: transcriptReviewPresentation != nil,
+                        lastRecordingName: audioCapture.lastRecordingURL?.lastPathComponent,
+                        markListening: {
+                            bridge.markListening()
+                            refresh()
+                        },
+                        completeFakeTranscript: {
+                            bridge.completeFakeTranscript()
+                            refresh()
+                        },
+                        resetSharedState: {
+                            bridge.reset()
+                            refresh()
                         }
-                        .padding(.top, 8)
-                    }
-                    .accessibilityIdentifier("advanced-support-disclosure")
+                    )
 
                     Spacer(minLength: 0)
                 }
@@ -184,501 +158,82 @@ struct ContentView: View {
     }
 
     private var dictationConsole: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Label(dictationStage.title, systemImage: dictationStage.systemImage)
-                    .font(.headline)
-                Spacer(minLength: 8)
-                Text(dictationStage.badge)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(dictationStage.tone.color)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(dictationStage.tone.color.opacity(0.12), in: Capsule())
+        FoilDictationConsoleView(
+            stage: dictationStage,
+            snapshotMessage: snapshot.message,
+            audioStatus: audioCapture.status,
+            transcriptionStatus: transcription.status,
+            isRecording: audioCapture.isRecording,
+            hasSavedRecording: audioCapture.lastRecordingURL != nil,
+            performPrimary: perform,
+            performSecondary: perform,
+            startRecording: {
+                Task { await audioCapture.startRecording() }
+            },
+            stopRecording: {
+                audioCapture.stopRecording()
+                refresh()
+            },
+            cancelRecording: {
+                audioCapture.cancelRecording()
+                refresh()
+            },
+            transcribeLatest: {
+                Task { await transcription.transcribeLatestRecording(audioCapture.lastRecordingURL) }
             }
-
-            Text(dictationStage.detail)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .lineLimit(3)
-                .minimumScaleFactor(0.8)
-                .accessibilityIdentifier("dictation-stage-detail")
-
-            if let primaryAction = dictationStage.primaryAction {
-                Button {
-                    perform(primaryAction)
-                } label: {
-                    Label(primaryAction.title, systemImage: primaryAction.systemImage)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .buttonBorderShape(.roundedRectangle(radius: 8))
-                .accessibilityIdentifier(primaryAction.accessibilityIdentifier)
-            }
-
-            if let secondaryAction = dictationStage.secondaryAction {
-                Button {
-                    perform(secondaryAction)
-                } label: {
-                    Label(secondaryAction.title, systemImage: secondaryAction.systemImage)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .buttonBorderShape(.roundedRectangle(radius: 8))
-                .accessibilityIdentifier(secondaryAction.accessibilityIdentifier)
-            }
-
-            VStack(alignment: .leading, spacing: 10) {
-                statusRow(snapshot.message, systemImage: "keyboard")
-                statusRow(audioCapture.status, systemImage: "mic")
-                statusRow(transcription.status, systemImage: "text.bubble")
-            }
-            .font(.callout)
-            .accessibilityIdentifier("dictation-status-stack")
-
-            LazyVGrid(columns: actionColumns, alignment: .leading, spacing: 10) {
-                recordingButtons
-            }
-            .controlSize(.regular)
-            .labelStyle(.titleAndIcon)
-            .buttonBorderShape(.roundedRectangle(radius: 8))
-        }
-        .padding(14)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(dictationStage.tone.color.opacity(0.28))
         )
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("dictation-console")
     }
 
     private func transcriptReviewPanel(_ presentation: FoilTranscriptReviewPresentation) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Review transcript", systemImage: "text.quote")
-                .font(.headline)
-
-            Text(presentation.guidance)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .accessibilityIdentifier("transcript-review-guidance")
-
-            Text(presentation.transcript)
-                .font(.body)
-                .textSelection(.enabled)
-                .padding(12)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(.background, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .strokeBorder(.secondary.opacity(0.24))
-                )
-                .accessibilityIdentifier("transcript-review-body")
-
-            VStack(alignment: .leading, spacing: 10) {
-                Button {
-                    retryRecordingFromTranscriptReview()
-                } label: {
-                    Label(presentation.retryTitle, systemImage: "arrow.clockwise")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(!presentation.canRetryRecording || audioCapture.isRecording)
-                .accessibilityIdentifier("transcript-review-retry-recording-button")
-
-                Button {
-                    bridge.reset()
-                    refresh()
-                } label: {
-                    Label(presentation.resetTitle, systemImage: "arrow.counterclockwise")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .accessibilityIdentifier("transcript-review-reset-button")
+        FoilTranscriptReviewPanel(
+            presentation: presentation,
+            canRetry: presentation.canRetryRecording && !audioCapture.isRecording,
+            retry: retryRecordingFromTranscriptReview,
+            reset: {
+                bridge.reset()
+                refresh()
             }
-            .controlSize(.large)
-            .labelStyle(.titleAndIcon)
-            .buttonBorderShape(.roundedRectangle(radius: 8))
-        }
-        .padding(14)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(Color.accentColor.opacity(0.28))
         )
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("transcript-review-panel")
-    }
-
-    @ViewBuilder
-    private var recordingButtons: some View {
-        Button {
-            Task { await audioCapture.startRecording() }
-        } label: {
-            Label("Record", systemImage: "record.circle")
-        }
-        .buttonStyle(.borderedProminent)
-        .disabled(audioCapture.isRecording)
-        .accessibilityIdentifier("start-recording-button")
-
-        Button {
-            audioCapture.stopRecording()
-            refresh()
-        } label: {
-            Label("Stop", systemImage: "stop.circle")
-        }
-        .buttonStyle(.bordered)
-        .disabled(!audioCapture.isRecording)
-        .accessibilityIdentifier("stop-recording-button")
-
-        Button {
-            audioCapture.cancelRecording()
-            refresh()
-        } label: {
-            Label("Cancel", systemImage: "xmark.circle")
-        }
-        .buttonStyle(.bordered)
-        .disabled(!audioCapture.isRecording)
-        .accessibilityIdentifier("cancel-recording-button")
-
-        Button {
-            Task { await transcription.transcribeLatestRecording(audioCapture.lastRecordingURL) }
-        } label: {
-            Label("Transcribe", systemImage: "text.bubble")
-        }
-        .buttonStyle(.bordered)
-        .disabled(audioCapture.lastRecordingURL == nil || audioCapture.isRecording)
-        .accessibilityIdentifier("transcribe-latest-button")
     }
 
     private var providerCredentialEditor: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SecureField("Groq API key", text: $providerKeyEntry)
-                .textContentType(.password)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .textFieldStyle(.roundedBorder)
-                .accessibilityIdentifier("provider-key-field")
-
-            HStack(spacing: 10) {
-                Button {
-                    saveProviderKey()
-                } label: {
-                    Label("Save key", systemImage: "key")
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(providerKeyEntry.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .accessibilityIdentifier("save-provider-key-button")
-
-                Button {
-                    clearProviderKey()
-                } label: {
-                    Label("Clear key", systemImage: "trash")
-                }
-                .buttonStyle(.bordered)
-                .disabled(!transcription.hasConfiguredAPIKey)
-                .accessibilityIdentifier("clear-provider-key-button")
-            }
-
-            if !providerCredentialMessage.isEmpty {
-                Text(providerCredentialMessage)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .accessibilityIdentifier("provider-credential-message")
-            }
-        }
-        .accessibilityElement(children: .contain)
+        FoilProviderCredentialEditor(
+            providerKeyEntry: $providerKeyEntry,
+            message: providerCredentialMessage,
+            hasConfiguredAPIKey: transcription.hasConfiguredAPIKey,
+            save: saveProviderKey,
+            clear: clearProviderKey
+        )
     }
 
     private var routeFirstOnboardingPanel: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Choose your setup route")
-                    .font(.headline)
-                Text("For this beta, finish setup with an API key on this iPhone. The Mac path stays visible as the future route.")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(FoilDictationLoopPresenter.routeChoicePresentation()) { route in
-                    routeChoiceButton(route)
-                }
-            }
-
-            Divider()
-
-            selectedRouteDetails
-        }
-        .font(.callout)
-        .padding(14)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(.secondary.opacity(0.18))
-        )
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("route-first-onboarding")
-    }
-
-    private func routeChoiceButton(_ route: FoilSetupRoutePresentation) -> some View {
-        Button {
-            selectedRouteID = route.routeID
-        } label: {
-            HStack(alignment: .top, spacing: 10) {
-                Image(systemName: selectedRouteID == route.routeID ? "checkmark.circle.fill" : route.systemImage)
-                    .foregroundStyle(selectedRouteID == route.routeID ? Color.accentColor : Color.secondary)
-                    .frame(width: 22)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text(route.title)
-                            .font(.callout.weight(.semibold))
-                        Text(route.badge)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(route.isUsableNow ? .green : .orange)
-                    }
-                    Text(route.detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
-                }
-                Spacer(minLength: 0)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .buttonStyle(.plain)
-        .padding(10)
-        .background(.background.opacity(0.6), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(selectedRouteID == route.routeID ? Color.accentColor.opacity(0.5) : Color.secondary.opacity(0.18))
-        )
-        .accessibilityIdentifier("route-choice-\(route.routeID)")
-    }
-
-    @ViewBuilder
-    private var selectedRouteDetails: some View {
-        switch selectedRouteID {
-        case FoilDictationLoopPresenter.macRouteID:
-            macRouteDetails
-        case FoilDictationLoopPresenter.advancedRouteID:
-            advancedRouteDetails
-        default:
-            iPhoneAPIKeyRouteDetails
-        }
-    }
-
-    private var macRouteDetails: some View {
-        let preview = FoilDictationLoopPresenter.macPairingPreviewPresentation()
-
-        return VStack(alignment: .leading, spacing: 12) {
-            setupRow(
-                title: preview.title,
-                detail: preview.detail,
-                systemImage: "desktopcomputer"
-            )
-            setupRow(
-                title: "Bridge contract",
-                detail: preview.contractDetail,
-                systemImage: "point.3.connected.trianglepath.dotted"
-            )
-            setupRow(
-                title: preview.receiptName,
-                detail: preview.receiptDetail,
-                systemImage: "doc.text.magnifyingglass"
-            )
-            readinessPanel
-            Button {
-                selectedRouteID = FoilDictationLoopPresenter.iPhoneAPIKeyRouteID
-            } label: {
-                Label(preview.fallbackTitle, systemImage: "iphone.gen3")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .buttonBorderShape(.roundedRectangle(radius: 8))
-            .accessibilityIdentifier("select-iphone-api-route-button")
-        }
-    }
-
-    private var iPhoneAPIKeyRouteDetails: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 10) {
-                ForEach(FoilDictationLoopPresenter.iPhoneAPIKeySetupPresentation()) { item in
-                    setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
-                }
-            }
-
-            Divider()
-
-            Text("Current status")
-                .font(.callout.weight(.semibold))
-
-            setupReadinessPanel
-            testedTargetsPanel
-
-            setupRow(
-                title: "Microphone",
-                detail: microphonePermissionSummary,
-                systemImage: "mic"
-            )
-            setupRow(
-                title: "Provider route",
-                detail: transcription.credentialSummary,
-                systemImage: transcription.hasConfiguredAPIKey ? "key.fill" : "key"
-            )
-            providerCredentialEditor
-            setupRow(
-                title: "Keyboard health",
-                detail: keyboardHealthSummary,
-                systemImage: keyboardHealth.fullAccessState == .enabled ? "checkmark.circle" : "exclamationmark.circle"
-            )
-            keyboardRecoveryChecklist
-            setupRow(
-                title: "Shared state",
-                detail: storageHealthSummary,
-                systemImage: "externaldrive"
-            )
-
-            readinessPanel
-
-            Button {
+        FoilRouteFirstOnboardingPanel(
+            selectedRouteID: $selectedRouteID,
+            setupReadiness: setupReadiness,
+            onboardingReadiness: onboardingReadiness,
+            microphonePermissionSummary: microphonePermissionSummary,
+            providerCredentialSummary: transcription.credentialSummary,
+            hasConfiguredAPIKey: transcription.hasConfiguredAPIKey,
+            keyboardFullAccessEnabled: keyboardHealth.fullAccessState == .enabled,
+            keyboardHealthSummary: keyboardHealthSummary,
+            storageHealthSummary: storageHealthSummary,
+            resetSharedState: {
                 bridge.reset()
                 refresh()
-            } label: {
-                Label("Reset shared state", systemImage: "arrow.counterclockwise")
+            },
+            providerCredentialEditor: {
+                providerCredentialEditor
             }
-            .buttonStyle(.bordered)
-            .accessibilityIdentifier("setup-reset-shared-state-button")
-        }
-    }
-
-    private var setupReadinessPanel: some View {
-        let presentation = setupReadiness
-        return VStack(alignment: .leading, spacing: 8) {
-            Label {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(presentation.title)
-                        .font(.callout.weight(.semibold))
-                    Text(presentation.detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(3)
-                        .minimumScaleFactor(0.8)
-                }
-            } icon: {
-                Image(systemName: presentation.systemImage)
-            }
-
-            Text(presentation.nextAction)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(presentation.tone.color)
-                .lineLimit(3)
-                .minimumScaleFactor(0.8)
-                .accessibilityIdentifier("setup-readiness-next-action")
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(presentation.tone.color.opacity(0.10), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(presentation.tone.color.opacity(0.28))
         )
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("setup-readiness-summary")
-    }
-
-    private var advancedRouteDetails: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForEach(FoilDictationLoopPresenter.advancedSupportPresentation()) { item in
-                setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
-            }
-            setupRow(
-                title: "Support tools",
-                detail: "Open Advanced / Support below for diagnostics, fake transcript staging, secure-field checks, and safe target notes.",
-                systemImage: "chevron.down.circle"
-            )
-            readinessPanel
-        }
-    }
-
-    private var readinessPanel: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            statusRow(onboardingReadiness.detail, systemImage: onboardingReadiness.systemImage)
-                .foregroundStyle(onboardingReadiness.isComplete ? .green : .primary)
-
-            if !onboardingReadiness.blockers.isEmpty {
-                ForEach(onboardingReadiness.blockers, id: \.self) { blocker in
-                    Label(blocker, systemImage: "circle")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-        .padding(10)
-        .background(.background.opacity(0.55), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .accessibilityIdentifier(onboardingReadiness.isComplete ? "onboarding-ready" : "onboarding-not-ready")
     }
 
     private var testedTargetsPanel: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Where to test")
-                .font(.callout.weight(.semibold))
-            ForEach(FoilDictationLoopPresenter.betaGuidancePresentation()) { item in
-                setupRow(title: item.title, detail: item.detail, systemImage: item.systemImage)
-            }
-        }
-        .padding(10)
-        .background(.background.opacity(0.55), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .accessibilityIdentifier("tested-target-guidance")
-    }
-
-    @ViewBuilder
-    private var diagnosticButtons: some View {
-        Button {
-            bridge.markListening()
-            refresh()
-        } label: {
-            Label("Listening", systemImage: "waveform")
-        }
-        .buttonStyle(.bordered)
-        .accessibilityIdentifier("mark-listening-button")
-
-        Button {
-            bridge.completeFakeTranscript()
-            refresh()
-        } label: {
-            Label("Complete", systemImage: "checkmark.circle")
-        }
-        .buttonStyle(.borderedProminent)
-        .accessibilityIdentifier("complete-fake-transcript-button")
-
-        Button {
-            bridge.reset()
-            refresh()
-        } label: {
-            Label("Reset", systemImage: "arrow.counterclockwise")
-        }
-        .buttonStyle(.bordered)
-        .accessibilityIdentifier("reset-keyboard-state-button")
+        FoilTestedTargetsPanel()
     }
 
     @ViewBuilder
     private var keyboardRecoveryChecklist: some View {
-        let steps = keyboardHealthPresentation.recoverySteps
-        if !steps.isEmpty {
-            VStack(alignment: .leading, spacing: 6) {
-                ForEach(steps, id: \.self) { step in
-                    Label(step, systemImage: "checkmark.circle")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .accessibilityIdentifier("keyboard-recovery-checklist")
-        }
+        FoilKeyboardRecoveryChecklist(steps: keyboardHealthPresentation.recoverySteps)
     }
 
     private func refresh() {
@@ -918,48 +473,6 @@ struct ContentView: View {
         }
     }
 
-    private func statusRow(_ text: String, systemImage: String) -> some View {
-        Label {
-            Text(text)
-                .lineLimit(3)
-                .minimumScaleFactor(0.8)
-        } icon: {
-            Image(systemName: systemImage)
-        }
-    }
-
-    private func setupRow(title: String, detail: String, systemImage: String) -> some View {
-        Label {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.callout.weight(.semibold))
-                Text(detail)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(3)
-                    .minimumScaleFactor(0.8)
-            }
-        } icon: {
-            Image(systemName: systemImage)
-        }
-    }
-}
-
-private extension FoilLoopTone {
-    var color: Color {
-        switch self {
-        case .ready:
-            .accentColor
-        case .live:
-            .red
-        case .working:
-            .blue
-        case .success:
-            .green
-        case .attention:
-            .orange
-        }
-    }
 }
 
 #Preview {

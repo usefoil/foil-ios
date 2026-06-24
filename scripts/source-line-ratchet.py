@@ -20,12 +20,7 @@ COUNT_GLOBS = (
     ".github/workflows/**/*.yaml",
 )
 
-ALLOWLIST_BASELINES = {
-    "FoiliOS/FoilIOSApp/ContentView.swift": 967,
-    "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift": 928,
-    "FoiliOS/Shared/FoilDictationLoopPresenter.swift": 830,
-    "scripts/ios-physical-harness.py": 699,
-}
+ALLOWLIST_BASELINES = {}
 
 
 @dataclass(frozen=True)
