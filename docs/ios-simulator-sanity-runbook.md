@@ -7,6 +7,20 @@ rehearsal. It is intentionally simulator-only.
 scripts/ios-simulator-sanity.sh
 ```
 
+GitHub Actions rollout and repo-hygiene gates are tracked in
+`docs/ci-workflow-development-plan.md`, including the migration path toward a
+required hard max-lines-per-file rule.
+
+The repo-hygiene job uses `scripts/source-whitespace-check.py` to scan tracked
+text files directly; this avoids the false confidence of `git diff --check` on
+a clean hosted checkout.
+
+The hosted workflow is named `iOS Simulator Sanity (non-physical)` and exposes
+two intended required checks once GitHub has created them:
+
+- `iOS Simulator Sanity (non-physical) / Hosted simulator sanity`
+- `iOS Simulator Sanity (non-physical) / Repo hygiene ratchet`
+
 The lane runs:
 
 - `xcodebuild -list` for project/scheme visibility;

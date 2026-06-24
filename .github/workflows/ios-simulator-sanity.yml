@@ -1,0 +1,174 @@
+name: iOS Simulator Sanity (non-physical)
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  XCODEGEN_VERSION: "2.45.4"
+  XCODEGEN_SHA256: "090ec29491aad50aec10631bf6e62253fed733c50f3aab0f5ffc86bc170bdbef"
+
+jobs:
+  hosted-simulator-sanity:
+    name: Hosted simulator sanity
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare hosted-CI text artifacts
+        run: mkdir -p ci-artifacts
+
+      - name: Show Xcode and simulator visibility
+        run: |
+          set -euo pipefail
+          {
+            xcodebuild -version
+            xcodebuild -showsdks
+            xcrun simctl list devices available
+          } | tee ci-artifacts/xcode-simulator-visibility.txt
+
+      - name: Select hosted simulator destination
+        run: |
+          set -euo pipefail
+          destination="$(
+            python3 <<'PY'
+          import json
+          import subprocess
+
+          payload = json.loads(
+              subprocess.check_output(
+                  ["xcrun", "simctl", "list", "devices", "available", "-j"],
+                  text=True,
+              )
+          )
+          preferred_names = ("iPhone 17", "iPhone 16", "iPhone 15")
+          iphones = [
+              device
+              for devices in payload.get("devices", {}).values()
+              for device in devices
+              if device.get("isAvailable") and str(device.get("name", "")).startswith("iPhone")
+          ]
+          for preferred in preferred_names:
+              for device in iphones:
+                  if device.get("name") == preferred:
+                      print(f"platform=iOS Simulator,id={device['udid']}")
+                      raise SystemExit(0)
+          if iphones:
+              print(f"platform=iOS Simulator,id={iphones[0]['udid']}")
+              raise SystemExit(0)
+          raise SystemExit("No available iPhone simulator found")
+          PY
+          )"
+          echo "IOS_SIMULATOR_DESTINATION=$destination" >> "$GITHUB_ENV"
+          echo "$destination" | tee ci-artifacts/selected-simulator-destination.txt
+
+      - name: Install pinned XcodeGen
+        run: |
+          set -euo pipefail
+          install_dir="$RUNNER_TEMP/xcodegen-${XCODEGEN_VERSION}"
+          zip_path="$RUNNER_TEMP/xcodegen-${XCODEGEN_VERSION}.zip"
+          curl -fsSL \
+            "https://github.com/yonaskolb/XcodeGen/releases/download/${XCODEGEN_VERSION}/xcodegen.zip" \
+            -o "$zip_path"
+          echo "${XCODEGEN_SHA256}  $zip_path" | shasum -a 256 -c -
+          unzip -q "$zip_path" -d "$install_dir"
+          echo "$install_dir/xcodegen/bin" >> "$GITHUB_PATH"
+          "$install_dir/xcodegen/bin/xcodegen" --version | tee ci-artifacts/xcodegen-version.txt
+
+      - name: Regenerate Xcode project
+        run: |
+          set -euo pipefail
+          cd FoiliOS
+          xcodegen generate --spec project.yml | tee ../ci-artifacts/xcodegen-generate.txt
+
+      - name: Check generated project drift
+        run: |
+          set -euo pipefail
+          if ! git diff --exit-code -- \
+            FoiliOS/FoilIOS.xcodeproj \
+            FoiliOS/FoilIOSApp/Generated \
+            FoiliOS/FoilKeyboard/Generated; then
+            git diff -- \
+              FoiliOS/FoilIOS.xcodeproj \
+              FoiliOS/FoilIOSApp/Generated \
+              FoiliOS/FoilKeyboard/Generated > ci-artifacts/generated-drift.diff
+            exit 1
+          fi
+
+      - name: Run simulator-only sanity script
+        run: |
+          set -euo pipefail
+          scripts/ios-simulator-sanity.sh | tee ci-artifacts/ios-simulator-sanity.txt
+
+      - name: Upload hosted simulator failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosted-simulator-sanity-text
+          path: |
+            ci-artifacts/xcode-simulator-visibility.txt
+            ci-artifacts/selected-simulator-destination.txt
+            ci-artifacts/xcodegen-version.txt
+            ci-artifacts/xcodegen-generate.txt
+            ci-artifacts/generated-drift.diff
+            ci-artifacts/ios-simulator-sanity.txt
+          if-no-files-found: ignore
+          retention-days: 7
+
+  repo-hygiene-ratchet:
+    name: Repo hygiene ratchet
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare hosted-CI text artifacts
+        run: mkdir -p ci-artifacts
+
+      - name: Check whitespace drift
+        run: |
+          set -euo pipefail
+          scripts/source-whitespace-check.py 2>&1 | tee ci-artifacts/source-whitespace-check.txt
+
+      - name: Check Python syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            scripts/ios-physical-harness.py \
+            scripts/ios-physical-wda-evidence.py \
+            scripts/source-whitespace-check.py \
+            scripts/source-line-ratchet.py
+
+      - name: Run physical harness self-test fixture only
+        run: |
+          set -euo pipefail
+          scripts/ios-physical-harness.py self-test | tee ci-artifacts/physical-harness-self-test.txt
+
+      - name: Run source line-count and max-lines ratchet
+        run: |
+          set -euo pipefail
+          scripts/source-line-ratchet.py | tee ci-artifacts/source-line-ratchet.txt
+          scripts/source-line-ratchet.py --json > ci-artifacts/source-line-ratchet.json
+
+      - name: Upload repo hygiene failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-hygiene-ratchet-text
+          path: |
+            ci-artifacts/source-whitespace-check.txt
+            ci-artifacts/physical-harness-self-test.txt
+            ci-artifacts/source-line-ratchet.txt
+            ci-artifacts/source-line-ratchet.json
+          if-no-files-found: ignore
+          retention-days: 7
