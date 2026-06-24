@@ -5,7 +5,7 @@ goal:
   slug: "foil-ios-hard-hygiene-gates"
   kind: existing_plan
   tranche: "Shrink temporary max-lines allowlist, preserve honest hosted CI, and promote hard hygiene gates only after evidence supports them."
-  status: active
+  status: done
   oracle:
     signal: "`scripts/source-line-ratchet.py` reports no allowlist baselines and no violations; required GitHub CI passes `Hosted simulator sanity` and `Repo hygiene ratchet` on main; physical-device proof remains receipt-based and separate."
     cadence: "after each Worker package and at final audit"
@@ -65,7 +65,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/foil-ios-hard-hygiene-gates/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-hard-hygiene-gates"
 
-active_task: T009
+active_task: null
 
 tasks:
   - id: T001
@@ -473,7 +473,7 @@ tasks:
   - id: T009
     type: pm
     assignee: PM
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Publish the verified hard-hygiene changes through PR and merge queue, preserving required CI proof."
     inputs:
@@ -490,7 +490,38 @@ tasks:
       - "PR URL."
       - "GitHub Actions proof or blocker."
       - "Merge-queue outcome if queued."
-    receipt: null
+    receipt:
+      result: done
+      branch: "codex/foil-ios-hard-hygiene-gates"
+      commits:
+        - "14069f1 Enforce hard Foil iOS hygiene gates"
+        - "688a907 Avoid CodeQL secret fixture false positive"
+      pr:
+        number: 61
+        url: "https://github.com/usefoil/foil-ios/pull/61"
+        merged_at: "2026-06-24T19:12:20Z"
+        merge_commit: "cab157969484eb3cd1e040961c6378e39e7410b6"
+      required_checks:
+        - context: "Hosted simulator sanity"
+          status: pass
+          run: "https://github.com/usefoil/foil-ios/actions/runs/28121943853/job/83275872131"
+        - context: "Repo hygiene ratchet"
+          status: pass
+          run: "https://github.com/usefoil/foil-ios/actions/runs/28121943853/job/83275872084"
+      merge_queue:
+        status: merged
+        run: "https://github.com/usefoil/foil-ios/actions/runs/28122840998"
+        head_sha: "cab157969484eb3cd1e040961c6378e39e7410b6"
+        jobs:
+          - "Repo hygiene ratchet: pass"
+          - "Hosted simulator sanity: pass"
+      codeql:
+        status: pass
+        evidence:
+          - "Analyze (python): pass"
+          - "Analyze (swift): pass"
+          - "CodeQL check-run: pass after fixture naming fix"
+      summary: "Published PR #61, marked it ready after hosted iOS checks passed, fixed the CodeQL fixture alert without weakening redaction proof, enqueued the PR through the merge queue, and confirmed `main` advanced to merge commit `cab157969484eb3cd1e040961c6378e39e7410b6`."
 
   - id: T011
     type: worker
@@ -532,7 +563,7 @@ tasks:
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Audit whether Foil iOS now has the requested hard hygiene gate posture."
     inputs:
@@ -552,25 +583,37 @@ tasks:
       - "Evidence mapped to oracle."
       - "Missing evidence."
       - "Next task if not complete."
-    receipt: null
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      evidence:
+        - "Hard max-lines gate: `scripts/source-line-ratchet.py --json` reports `allowlist_baselines: {}` and no violations; largest counted file is `FoiliOS/FoilIOSApp/ContentView.swift` at 480 lines."
+        - "Required PR checks on #61 passed: `Hosted simulator sanity` and `Repo hygiene ratchet`."
+        - "Merge queue proof passed at tip: run `28122840998` completed successfully for `gh-readonly-queue/main/pr-61...`, with both required jobs green."
+        - "At the code-merge audit, `main` had advanced to `cab157969484eb3cd1e040961c6378e39e7410b6`, matching the merge-group head SHA for PR #61."
+        - "Physical iPhone/TestFlight/WDA proof remains separate: hosted CI runs simulator sanity and fixture-only physical-harness self-test, and the workflow artifact allowlist remains text-only/sanitized."
+        - "Static-analysis analog decision recorded: SwiftLint/SwiftFormat/Periphery are deferred until configs and false positives are understood; the hard max-lines rule is enforced now."
+      strongest_failure_mode:
+        risk: "Hosted or merge-queue CI could pass a weaker check than the final `main` state, leaving the hard gate unproven on the merge result."
+        disproven_by: "Merge-group run `28122840998` passed `Repo hygiene ratchet` and `Hosted simulator sanity` on head SHA `cab157969484eb3cd1e040961c6378e39e7410b6`; `git ls-remote origin main` confirmed that code merge commit before this receipt-only board update."
+      summary: "Foil iOS now has the requested hard hygiene gate posture for this tranche: no max-lines allowlist remains, required hosted CI proves simulator-safe behavior and hygiene at merge-queue tip, and physical-device evidence is still receipt-based and not overclaimed by hosted CI."
 
 checks:
-  dirty_fingerprint: "goal control files changed for T001 receipt; implementation files unchanged"
+  dirty_fingerprint: "final GoalBuddy receipt branch updates only `docs/goals/foil-ios-hard-hygiene-gates/state.yaml`"
   last_verification:
     result: pass
-    task: T008
+    task: T999
     commands:
-      - cmd: "scripts/source-line-ratchet.py"
+      - cmd: "gh pr view 61 --repo usefoil/foil-ios --json mergedAt,closed,mergeCommit,statusCheckRollup"
+        status: pass
+      - cmd: "gh run view 28122840998 --repo usefoil/foil-ios --json conclusion,status,jobs,url,headSha,event"
+        status: pass
+      - cmd: "git ls-remote origin main"
         status: pass
       - cmd: "scripts/source-line-ratchet.py --json"
         status: pass
-      - cmd: "scripts/source-whitespace-check.py"
-        status: pass
-      - cmd: "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py scripts/source-whitespace-check.py scripts/source-line-ratchet.py"
-        status: pass
-      - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+      - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-hard-hygiene-gates/state.yaml"
         status: pass
       - cmd: "git diff --check"
-        status: pass
-      - cmd: "scripts/ios-simulator-sanity.sh"
         status: pass
