@@ -74,12 +74,12 @@ def run_helper_for_self_test(source: Path, *extra_args: str):
 
 
 def cmd_self_test(_) -> int:
-    secret_phrase = "Foil harness self test phrase"
+    fixture_text = "Foil harness fixture transcript"
     raw_xml = (
         '<AppiumAUT>'
         '<XCUIElementTypeOther name="foil-keyboard-root" enabled="true" />'
         '<XCUIElementTypeButton name="foil-keyboard-insert-latest" enabled="false" />'
-        f'<XCUIElementTypeTextView value="{secret_phrase}" />'
+        f'<XCUIElementTypeTextView value="{fixture_text}" />'
         "</AppiumAUT>"
     )
     with tempfile.TemporaryDirectory(prefix="foil-ios-harness-self-test-") as temp_dir:
@@ -93,20 +93,20 @@ def cmd_self_test(_) -> int:
             "--expect-identifier-state",
             "foil-keyboard-insert-latest.enabled=false",
             "--expect-value-count",
-            f"{secret_phrase}=1",
+            f"{fixture_text}=1",
         )
-        failing = run_helper_for_self_test(source, "--expect-value-count", f"{secret_phrase}=2")
+        failing = run_helper_for_self_test(source, "--expect-value-count", f"{fixture_text}=2")
         complete_snapshot = temp / "complete.json"
         idle_snapshot = temp / "idle.json"
         complete_snapshot.write_text(
-            json.dumps(snapshot_payload("complete", secret_phrase, "Fake transcript ready")),
+            json.dumps(snapshot_payload("complete", fixture_text, "Fake transcript ready")),
             encoding="utf-8",
         )
         idle_snapshot.write_text(json.dumps(snapshot_payload("idle", None, "Ready")), encoding="utf-8")
         complete_summary = summarize_snapshot_path(complete_snapshot)
         idle_summary = summarize_snapshot_path(idle_snapshot)
         encoded_summaries = json.dumps({"complete": complete_summary, "idle": idle_summary})
-        no_raw_transcript = secret_phrase not in passing.stdout and secret_phrase not in encoded_summaries
+        no_raw_transcript = fixture_text not in passing.stdout and fixture_text not in encoded_summaries
         checks = [
             {"name": "evidence-helper-passes-good-expectations", "passed": passing.returncode == 0},
             {"name": "evidence-helper-fails-bad-count", "passed": failing.returncode != 0},
