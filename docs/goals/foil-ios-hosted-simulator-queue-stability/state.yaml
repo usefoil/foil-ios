@@ -1,0 +1,297 @@
+version: 2
+
+goal:
+  title: "Foil iOS Hosted Simulator Queue Stability"
+  slug: "foil-ios-hosted-simulator-queue-stability"
+  kind: specific
+  tranche: "Make merge-queue hosted simulator proof reliable without weakening the simulator-only CI proof boundary."
+  status: active
+  oracle:
+    signal: "A queue-stability fix passes local verification, PR-level required checks, and merge-group `iOS Simulator Sanity (non-physical)` without repeated `phase=simulator-tests` timeout."
+    cadence: "after Scout evidence, after each Worker package, after PR checks, and at final audit"
+    final_proof: "PR and merge-group GitHub Actions evidence, plus local verification and sanitized timeout artifacts if a hosted flake recurs."
+  intake:
+    original_request: "ok do this"
+    interpreted_outcome: "Investigate and fix the merge-queue hosted simulator timeout that blocks PR #64 despite PR-level checks passing."
+    input_shape: specific
+    audience: "Foil iOS maintainers using GitHub merge queue"
+    authority: requested
+    proof_type: artifact
+    completion_proof: "A merged PR or explicit blocker receipt proves the queue-tip simulator lane is reliable or externally blocked without weakening coverage."
+    likely_misfire: "Bypassing, shrinking, or over-retrying simulator checks so merge queue turns green without honestly proving the simulator-safe contract."
+    blind_spots_considered:
+      - "pull_request and merge_group runner behavior may differ."
+      - "Retries can hide legitimate simulator regressions if not scoped and documented."
+      - "Splitting phases can improve diagnosis but may require branch-protection context changes."
+      - "Physical iPhone/TestFlight/WDA proof remains separate receipt-based evidence."
+    existing_plan_facts:
+      - "PR #63 merged phase-level simulator sanity diagnostics to `main` at `bcf510af90d084d81cc827d6aebd1511eebe7fce`."
+      - "PR #64 is open and PR-green but failed two merge-group attempts in `phase=simulator-tests` after 1200 seconds."
+      - "Failed merge-group run `28130739665` artifact shows `phase=simulator-tests status=timeout elapsed_seconds=1200 timeout_seconds=1200`."
+      - "Failed merge-group run `28132193287` artifact shows the same `phase=simulator-tests` timeout."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  preserve_and_validate_existing_plan: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/foil-ios-hosted-simulator-queue-stability/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-hosted-simulator-queue-stability"
+
+active_task: T004
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Map the merge-queue-only simulator timeout and identify the smallest safe queue-stability fix candidates."
+    inputs:
+      - "/tmp/foil-pr64-merge-artifacts/hosted-simulator-sanity-text/ios-simulator-sanity.txt"
+      - "/tmp/foil-pr64-merge2-artifacts/hosted-simulator-sanity-text/ios-simulator-sanity.txt"
+      - ".github/workflows/ios-simulator-sanity.yml"
+      - "scripts/ios-simulator-sanity.sh"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/ios-v0.50-simulator-sanity-regression"
+      - "docs/goals/foil-ios-ci-reliability-observability"
+    constraints:
+      - "Read-only."
+      - "Do not edit implementation or workflow files."
+      - "Prefer concrete line/file/log evidence."
+      - "Do not inspect private physical-device receipts beyond sanitized metadata already in repo."
+    expected_output:
+      - "Failure signature comparison across the two merge-group runs."
+      - "PR-level versus merge-group difference map."
+      - "Ranked safe fix candidates with risks."
+      - "Recommended Worker package with allowed_files, verify commands, and stop_if."
+    receipt:
+      result: done
+      summary: "Both PR #64 merge-group attempts failed after the app and test bundle built, during simulator app launch for tests. PR-level hosted simulator sanity passed on the same PR head in 4m38s; merge-group runs timed out at the script-owned 1200s boundary in `phase=simulator-tests` with `NSMachErrorDomain Code=-308` from `IDELaunchiPhoneSimulatorLauncher`."
+      evidence:
+        - "PR-level run `28129744051`: `Hosted simulator sanity` succeeded; `Run simulator-only sanity script` ran from 21:09:00Z to 21:13:20Z."
+        - "Merge-group run `28130739665`: `Repo hygiene ratchet` passed; `Hosted simulator sanity` failed; artifact line 921 shows `phase=simulator-tests status=timeout elapsed_seconds=1200 timeout_seconds=1200`."
+        - "Merge-group run `28130739665`: artifact lines 922-965 show `Failed to launch app ... NSMachErrorDomain Code=-308` and `IDERunOperationFailingWorker = IDELaunchiPhoneSimulatorLauncher`."
+        - "Merge-group run `28132193287`: same phase and timeout at artifact line 921, same `NSMachErrorDomain Code=-308` launcher failure at lines 922-965."
+        - "Both failed merge-group runs used destination `platform=iOS Simulator,id=87639670-FE4D-446D-9245-5324E0D50184` and showed duplicate arm64/x86_64 matching destination warnings."
+        - "Current workflow selects a simulator but leaves boot/reset to `xcodebuild test`; current script retries no phases and has no simulator cleanup between a killed launch attempt and any retry."
+      ranked_fix_candidates:
+        - "1. Reset/boot the selected simulator before the sanity script and add a logged retry only for `simulator-tests` timeout exit 124, with simulator reset before retry. This targets the observed CoreSimulator launch hang without retrying assertion/build failures."
+        - "2. Split build-for-testing and test-without-building into separate phases. This improves attribution but does not by itself recover a launch-service hang."
+        - "3. Reduce hosted test timeout only. This speeds failure artifacts but does not improve queue reliability."
+        - "4. Remove simulator tests from merge_group. Rejected: weakens required queue-tip proof."
+      recommended_worker:
+        objective: "Add hosted simulator reset/preboot plus scoped `simulator-tests` timeout retry with explicit logs and docs."
+        allowed_files:
+          - "scripts/ios-simulator-sanity.sh"
+          - ".github/workflows/ios-simulator-sanity.yml"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-hosted-simulator-queue-stability/state.yaml"
+        verify:
+          - "bash -n scripts/ios-simulator-sanity.sh"
+          - "IOS_SIMULATOR_SANITY_TEST_ATTEMPTS=2 IOS_SIMULATOR_SANITY_TEST_TIMEOUT_SECONDS=0 scripts/ios-simulator-sanity.sh"
+          - "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-whitespace-check.py"
+          - "git diff --check"
+      physical_boundary: "No physical iPhone/TestFlight/WDA proof is involved; all proposed artifacts remain hosted simulator text logs."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Choose the largest safe useful Worker slice for merge-queue hosted simulator stability."
+    inputs:
+      - "T001 receipt."
+      - "Current workflow/script/docs."
+      - "Known PR #64 merge-group artifacts."
+    constraints:
+      - "Read-only."
+      - "Reject any fix that weakens simulator-safe proof without explicitly replacing equivalent evidence."
+      - "Reject physical-device proof claims in hosted CI."
+      - "Prefer deterministic phase splitting or scoped retry over blanket rerun loops."
+    expected_output:
+      - "approved | blocked | needs_more_scout"
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The strongest evidence points to transient hosted CoreSimulator launch instability at queue tip, after successful build. A scoped retry for timeout exit 124 plus simulator reset/preboot preserves simulator coverage, does not retry test assertion failures, and keeps every retry visible in the sanitized text artifact."
+      worker:
+        objective: "Add hosted simulator reset/preboot plus scoped `simulator-tests` timeout retry with explicit logs and docs."
+        allowed_files:
+          - "scripts/ios-simulator-sanity.sh"
+          - ".github/workflows/ios-simulator-sanity.yml"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-hosted-simulator-queue-stability/state.yaml"
+        verify:
+          - "bash -n scripts/ios-simulator-sanity.sh"
+          - "IOS_SIMULATOR_SANITY_TEST_ATTEMPTS=2 IOS_SIMULATOR_SANITY_TEST_TIMEOUT_SECONDS=0 scripts/ios-simulator-sanity.sh"
+          - "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-whitespace-check.py"
+          - "git diff --check"
+        stop_if:
+          - "The change retries non-timeout simulator test failures."
+          - "The change removes simulator tests or unsigned generic iOS build coverage."
+          - "The change adds physical-device proof claims to hosted CI."
+          - "Local retry proof does not show a timeout attempt followed by an explicit retry decision."
+      rejected_options:
+        - "Skipping simulator tests on `merge_group` would make queue-tip CI less honest."
+        - "Only increasing the timeout would delay artifacts and still leave the launch hang unresolved."
+        - "Blanket workflow reruns would hide the phase-level evidence this tranche is meant to preserve."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Add hosted simulator reset/preboot plus scoped `simulator-tests` timeout retry with explicit logs and docs."
+    allowed_files:
+      - "scripts/ios-simulator-sanity.sh"
+      - ".github/workflows/ios-simulator-sanity.yml"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/foil-ios-hosted-simulator-queue-stability/state.yaml"
+    verify:
+      - "bash -n scripts/ios-simulator-sanity.sh"
+      - "IOS_SIMULATOR_SANITY_TEST_ATTEMPTS=2 IOS_SIMULATOR_SANITY_TEST_TIMEOUT_SECONDS=0 scripts/ios-simulator-sanity.sh"
+      - "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+      - "scripts/source-line-ratchet.py --json"
+      - "scripts/source-whitespace-check.py"
+      - "git diff --check"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "The change would remove or silently weaken simulator-test coverage."
+      - "The change would claim physical iPhone/TestFlight/WDA proof from hosted CI."
+      - "Local verification fails twice for the same reason."
+    receipt:
+      result: done
+      changed_files:
+        - "scripts/ios-simulator-sanity.sh"
+        - ".github/workflows/ios-simulator-sanity.yml"
+        - "docs/ios-simulator-sanity-runbook.md"
+        - "docs/goals/foil-ios-hosted-simulator-queue-stability/state.yaml"
+      changes:
+        - "Added `IOS_SIMULATOR_SANITY_TEST_ATTEMPTS` and timeout-only retry handling for `simulator-tests`."
+        - "Added selected-simulator reset/erase/boot support when `IOS_SIMULATOR_SANITY_RESET_BEFORE_TESTS=1` and destination contains an `id=` UDID."
+        - "Bounded simulator reset sub-steps with `IOS_SIMULATOR_SANITY_RESET_TIMEOUT_SECONDS` so hosted reset/boot cannot consume the whole job timeout silently."
+        - "Hosted workflow now enables reset before simulator tests, two test attempts, and a 600s per-attempt test timeout so both attempts can finish inside the 30-minute job timeout."
+        - "Runbook documents that retries apply only to script-owned timeout exit `124`, not build failures or test assertion failures."
+      commands:
+        - cmd: "bash -n scripts/ios-simulator-sanity.sh"
+          status: pass
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+          status: pass
+        - cmd: "IOS_SIMULATOR_SANITY_TEST_ATTEMPTS=2 IOS_SIMULATOR_SANITY_TEST_TIMEOUT_SECONDS=0 scripts/ios-simulator-sanity.sh > /tmp/foil-ios-test-retry-proof.txt 2>&1"
+          status: pass
+          evidence: "Expected failure exited 124 and logged attempt 1 timeout, `status=retry`, simulator reset skip for no local destination id, attempt 2 timeout, and final fail."
+        - cmd: "PATH=\"$tmpdir:$PATH\" IOS_SIMULATOR_DESTINATION='platform=iOS Simulator,id=FAKE-UDID' IOS_SIMULATOR_SANITY_RESET_BEFORE_TESTS=1 IOS_SIMULATOR_SANITY_RESET_TIMEOUT_SECONDS=1 scripts/ios-simulator-sanity.sh > /tmp/foil-ios-reset-timeout-proof.txt 2>&1"
+          status: pass
+          evidence: "Expected failure exited 124 and logged `simulator-reset-shutdown` timeout after 1s, then `simulator-reset-erase` timeout/fail, proving reset substeps are script-bounded."
+        - cmd: "scripts/source-line-ratchet.py --json"
+          status: pass
+          evidence: "`violations`: []; `scripts/ios-simulator-sanity.sh`: 181 lines; `.github/workflows/ios-simulator-sanity.yml`: 179 lines."
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "scripts/ios-simulator-sanity.sh"
+          status: pass
+          evidence: "Local normal path passed project/scheme visibility, simulator tests, unsigned generic iOS build, and final `passed` log."
+      strongest_failure_mode:
+        risk: "The retry wrapper could accidentally skip the retry, retry non-timeout test failures, or let an unbounded simulator reset/boot consume the hosted job timeout."
+        disproof: "The forced-timeout probe first exposed and then verified the retry control flow: only exit 124 triggered `status=retry`; a follow-up PR run exposed the unbounded reset risk, and the fake-`xcrun` proof now shows reset subcommands exit through script-owned timeout evidence instead of hanging."
+      summary: "Implemented a narrow hosted CoreSimulator launch-hang mitigation without reducing coverage: reset the selected simulator before hosted tests, retry only timeout exit 124 once, and keep all decisions visible in the sanitized text artifact."
+
+  - id: T004
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: medium
+    objective: "Publish the verified queue-stability fix and collect PR/merge-queue evidence."
+    inputs:
+      - "Done Worker receipt."
+      - "Final local verification output."
+      - "GitHub PR and merge-group status."
+    constraints:
+      - "Do not push if the worktree contains unrelated changes."
+      - "Use PR and merge queue; record queue-tip artifacts."
+      - "Do not mark complete if merge queue still repeatedly times out without a documented external blocker."
+    expected_output:
+      - "Branch, commit, PR URL."
+      - "PR-level check rollup."
+      - "Merge-group run URL and result."
+      - "Blocker if queue-tip remains red."
+    receipt: null
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Final audit for the hosted simulator queue-stability tranche."
+    inputs:
+      - "All done task receipts."
+      - "Local verification."
+      - "GitHub PR and merge-group evidence."
+      - "Current `origin/main` state."
+    constraints:
+      - "Do not implement."
+      - "Reject completion if only PR-level checks pass and merge queue still repeatedly times out."
+      - "Reject completion if proof boundary is weakened or overclaimed."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Strongest realistic failure mode and disproof."
+      - "Next task or blocker if not complete."
+    receipt: null
+
+checks:
+  dirty_fingerprint: "worker diff ready for publish"
+  last_verification:
+    result: pass
+    task: T003
+    commands:
+      - cmd: "bash -n scripts/ios-simulator-sanity.sh"
+        status: pass
+      - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+        status: pass
+      - cmd: "IOS_SIMULATOR_SANITY_TEST_ATTEMPTS=2 IOS_SIMULATOR_SANITY_TEST_TIMEOUT_SECONDS=0 scripts/ios-simulator-sanity.sh > /tmp/foil-ios-test-retry-proof.txt 2>&1"
+        status: pass
+      - cmd: "PATH=\"$tmpdir:$PATH\" IOS_SIMULATOR_DESTINATION='platform=iOS Simulator,id=FAKE-UDID' IOS_SIMULATOR_SANITY_RESET_BEFORE_TESTS=1 IOS_SIMULATOR_SANITY_RESET_TIMEOUT_SECONDS=1 scripts/ios-simulator-sanity.sh > /tmp/foil-ios-reset-timeout-proof.txt 2>&1"
+        status: pass
+      - cmd: "scripts/source-line-ratchet.py --json"
+        status: pass
+      - cmd: "scripts/source-whitespace-check.py"
+        status: pass
+      - cmd: "git diff --check"
+        status: pass
+      - cmd: "scripts/ios-simulator-sanity.sh"
+        status: pass

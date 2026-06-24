@@ -45,6 +45,25 @@ IOS_SIMULATOR_SANITY_TEST_TIMEOUT_SECONDS=1800 \
   scripts/ios-simulator-sanity.sh
 ```
 
+Hosted GitHub Actions resets and boots the selected simulator before the test
+phase with bounded `simctl` sub-steps, then retries `simulator-tests` once only
+if the first attempt exits with the script-owned timeout code `124`. The retry
+is intentionally narrow: build failures, test assertion failures,
+project/scheme visibility failures, simulator reset failures, and unsigned
+generic iOS build failures still fail immediately. The text artifact records
+`attempt-start`, `timeout`, `retry`, and `simulator-reset` lines when this path
+is used.
+
+Override the retry and reset behavior when reproducing hosted flakiness:
+
+```bash
+IOS_SIMULATOR_SANITY_RESET_BEFORE_TESTS=1 \
+IOS_SIMULATOR_SANITY_RESET_TIMEOUT_SECONDS=120 \
+IOS_SIMULATOR_SANITY_TEST_ATTEMPTS=2 \
+IOS_SIMULATOR_SANITY_TEST_TIMEOUT_SECONDS=600 \
+  scripts/ios-simulator-sanity.sh
+```
+
 Override the simulator destination when needed:
 
 ```bash
