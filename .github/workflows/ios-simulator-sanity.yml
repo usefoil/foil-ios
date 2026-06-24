@@ -145,6 +145,7 @@ jobs:
           set -euo pipefail
           python3 -m py_compile \
             scripts/ios-physical-harness.py \
+            scripts/ios_physical_harness/*.py \
             scripts/ios-physical-wda-evidence.py \
             scripts/source-whitespace-check.py \
             scripts/source-line-ratchet.py

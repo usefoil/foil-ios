@@ -1,0 +1,539 @@
+version: 2
+
+goal:
+  title: "Foil iOS Hard Hygiene Gates"
+  slug: "foil-ios-hard-hygiene-gates"
+  kind: existing_plan
+  tranche: "Shrink temporary max-lines allowlist, preserve honest hosted CI, and promote hard hygiene gates only after evidence supports them."
+  status: active
+  oracle:
+    signal: "`scripts/source-line-ratchet.py` reports no allowlist baselines and no violations; required GitHub CI passes `Hosted simulator sanity` and `Repo hygiene ratchet` on main; physical-device proof remains receipt-based and separate."
+    cadence: "after each Worker package and at final audit"
+    final_proof: "Final audit receipt maps file splits, verification commands, CI status, and privacy/physical-boundary checks to full_outcome_complete: true."
+  intake:
+    original_request: "Create and drive the next GoalBuddy board for Foil iOS hard hygiene gates."
+    interpreted_outcome: "Foil iOS enforces a hard max-lines-per-file gate without temporary oversized allowlist entries, with any extra Swift hygiene gates evaluated carefully before becoming required."
+    input_shape: existing_plan
+    audience: "Foil iOS maintainers and merge-queue contributors"
+    authority: approved
+    proof_type: test
+    completion_proof: "Required CI proves the hard max-lines rule and simulator sanity checks on main; final receipt proves no hosted physical-device overclaim."
+    likely_misfire: "Adding process, docs, or noisy lint gates while leaving the oversized allowlist in place, or requiring Periphery/SwiftLint before false positives are understood."
+    blind_spots_considered:
+      - "SwiftUI and presenter file splits can preserve compilation while subtly changing behavior."
+      - "Large tests may need fixture/helper extraction without weakening coverage."
+      - "The physical harness contains privacy-sensitive receipt logic and must not upload private artifacts."
+      - "Periphery can false-positive on SwiftUI, tests, extension entry points, and XcodeGen-generated projects."
+      - "Merge-queue runtime should stay acceptable after adding checks."
+    existing_plan_facts:
+      - "PR #60 merged `iOS Simulator Sanity (non-physical)` through the merge queue."
+      - "The active `main-protection` ruleset requires `Hosted simulator sanity` and `Repo hygiene ratchet`."
+      - "Board 1 introduced `scripts/source-line-ratchet.py` with MAX_LINES=500."
+      - "Temporary oversized baselines are `ContentView.swift`: 967, `FoilDictationLoopPresentationTests.swift`: 928, `FoilDictationLoopPresenter.swift`: 830, and `scripts/ios-physical-harness.py`: 699."
+      - "The intended end state is a hard max-lines-per-file rule, not a permanent allowlist."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  missing_input_or_credentials_do_not_stop_goal: true
+  exact_human_approval_can_terminal_wait: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/foil-ios-hard-hygiene-gates/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-hard-hygiene-gates"
+
+active_task: T009
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Map the four oversized allowlisted files, their responsibilities, dependencies, tests, and safest split boundaries."
+    inputs:
+      - "scripts/source-line-ratchet.py"
+      - "docs/ci-workflow-development-plan.md"
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "scripts/ios-physical-harness.py"
+      - "README.md"
+      - "docs/acceptance-evidence.md"
+      - "AGENTS.md"
+    constraints:
+      - "Read-only."
+      - "Do not edit implementation files."
+      - "Prefer concrete file-path and symbol evidence over generic refactor advice."
+      - "Call out privacy-sensitive physical-harness code separately."
+    expected_output:
+      - "Current line counts and allowlist baselines."
+      - "Responsibility map for each oversized file."
+      - "Recommended extraction boundaries and risk notes."
+      - "Verification commands for each proposed Worker package."
+      - "Any blockers or files that should not be split yet."
+    receipt:
+      result: done
+      note: "notes/T001-oversized-file-map.md"
+      summary: "Mapped the four oversized allowlisted files, current baselines, source inclusion model, safe split boundaries, risk notes, and verification commands. Recommended starting with a combined `FoilDictationLoopPresenter` plus presentation-test split because it can reduce two allowlist entries with strong existing tests and minimal private-access risk."
+      evidence:
+        - "`scripts/source-line-ratchet.py --json`: 22 counted files, MAX_LINES=500, four allowlist baselines, no current violations."
+        - "`FoiliOS/project.yml`: folder-based sources include `Shared` in app and keyboard targets and `FoilIOSTests` in test target."
+        - "`scripts/ios-simulator-sanity.sh`: passed after correcting the Scout wrapper."
+        - "`python3 -m py_compile scripts/ios-physical-harness.py scripts/ios-physical-wda-evidence.py`: passed."
+        - "`scripts/ios-physical-harness.py self-test`: passed and confirmed redaction fixture checks."
+      spawned_tasks:
+        - T002
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Choose the first largest safe file-splitting Worker package from T001 findings."
+    inputs:
+      - "T001 receipt"
+      - "Goal oracle"
+      - "Current CI workflow requirements"
+    constraints:
+      - "Do not implement."
+      - "Prioritize allowlist removal impact, behavioral safety, verification strength, and reversibility."
+      - "Reject packages that would require physical iPhone/TestFlight/WDA proof in hosted CI."
+    expected_output:
+      - "Decision: approved Worker package, split smaller, or block."
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if conditions."
+      - "Which allowlist baseline the package is expected to shrink or remove."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Approve a combined presenter/test split as the first Worker package. It targets two of four temporary allowlist baselines, has strong existing unit-test coverage, preserves `FoilDictationLoopPresenter.*` call sites through same-type extensions, avoids ContentView private access-control risk, and does not touch physical iPhone/TestFlight/WDA proof."
+      worker_task: T003
+      expected_allowlist_impact:
+        - "Reduce or remove `FoiliOS/Shared/FoilDictationLoopPresenter.swift` baseline."
+        - "Reduce or remove `FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift` baseline."
+      required_verification:
+        - "XcodeGen generate plus generated-project drift check."
+        - "Focused presenter tests."
+        - "Full `scripts/ios-simulator-sanity.sh`."
+        - "Source ratchet, whitespace, and diff checks."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Split `FoilDictationLoopPresenter.swift` and its presentation tests into domain files while preserving behavior and reducing/removing both allowlist baselines."
+    allowed_files:
+      - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+      - "FoiliOS/Shared/FoilDictationLoopPresentationModels.swift"
+      - "FoiliOS/Shared/FoilDictationLoopSetupPresenter.swift"
+      - "FoiliOS/Shared/FoilDictationLoopAppPresenter.swift"
+      - "FoiliOS/Shared/FoilDictationLoopKeyboardPresenter.swift"
+      - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilSetupReadinessPresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilSetupRoutePresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilOnboardingReadinessPresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilAppLoopPresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilKeyboardLoopPresentationTests.swift"
+      - "FoiliOS/FoilIOSTests/FoilHealthPresentationTests.swift"
+      - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+      - "scripts/source-line-ratchet.py"
+    verify:
+      - "cd FoiliOS && xcodegen generate --spec project.yml"
+      - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination \"platform=iOS Simulator,name=iPhone 17\" -only-testing:FoilIOSTests/FoilSetupReadinessPresentationTests -only-testing:FoilIOSTests/FoilSetupRoutePresentationTests -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests -only-testing:FoilIOSTests/FoilAppLoopPresentationTests -only-testing:FoilIOSTests/FoilKeyboardLoopPresentationTests -only-testing:FoilIOSTests/FoilHealthPresentationTests"
+      - "scripts/source-line-ratchet.py"
+      - "scripts/source-whitespace-check.py"
+      - "git diff --check"
+      - "scripts/ios-simulator-sanity.sh"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Extraction boundary would change public behavior."
+      - "Verification fails twice for the same reason."
+      - "Need physical iPhone/TestFlight/WDA evidence."
+    receipt:
+      result: done
+      changed_files:
+        - "FoiliOS/Shared/FoilDictationLoopPresenter.swift"
+        - "FoiliOS/Shared/FoilDictationLoopPresentationModels.swift"
+        - "FoiliOS/Shared/FoilDictationLoopSetupPresenter.swift"
+        - "FoiliOS/Shared/FoilDictationLoopAppPresenter.swift"
+        - "FoiliOS/Shared/FoilDictationLoopKeyboardPresenter.swift"
+        - "FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift"
+        - "FoiliOS/FoilIOSTests/FoilSetupReadinessPresentationTests.swift"
+        - "FoiliOS/FoilIOSTests/FoilSetupRoutePresentationTests.swift"
+        - "FoiliOS/FoilIOSTests/FoilOnboardingReadinessPresentationTests.swift"
+        - "FoiliOS/FoilIOSTests/FoilAppLoopPresentationTests.swift"
+        - "FoiliOS/FoilIOSTests/FoilKeyboardLoopPresentationTests.swift"
+        - "FoiliOS/FoilIOSTests/FoilHealthPresentationTests.swift"
+        - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+        - "scripts/source-line-ratchet.py"
+      commands:
+        - cmd: "cd FoiliOS && xcodegen generate --spec project.yml"
+          status: pass
+        - cmd: "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination \"platform=iOS Simulator,name=iPhone 17\" -only-testing:FoilIOSTests/FoilSetupReadinessPresentationTests -only-testing:FoilIOSTests/FoilSetupRoutePresentationTests -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests -only-testing:FoilIOSTests/FoilAppLoopPresentationTests -only-testing:FoilIOSTests/FoilKeyboardLoopPresentationTests -only-testing:FoilIOSTests/FoilHealthPresentationTests"
+          status: pass
+          evidence: "37 tests, 0 failures"
+        - cmd: "scripts/source-line-ratchet.py"
+          status: pass
+          evidence: "removed `FoilDictationLoopPresenter.swift` and `FoilDictationLoopPresentationTests.swift` allowlist baselines; remaining baselines are `ContentView.swift` and `scripts/ios-physical-harness.py`"
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "python3 -m py_compile scripts/source-line-ratchet.py"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "scripts/ios-simulator-sanity.sh"
+          status: pass
+          evidence: "full simulator-only regression lane passed"
+      summary: "Split the dictation loop presenter and presentation tests by domain while keeping `FoilDictationLoopPresenter.*` call sites intact through same-type extensions. Removed two temporary max-lines allowlist baselines; strongest checked failure mode was behavior/project drift after the split, disproved by focused presentation tests plus the full simulator sanity lane."
+
+  - id: T004
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Review the first split and choose the next largest safe allowlist-reduction package."
+    inputs:
+      - "T003 receipt"
+      - "Updated `scripts/source-line-ratchet.py` output."
+      - "Current diff and verification output."
+    constraints:
+      - "Do not implement."
+      - "Do not require perfect style cleanup before continuing useful allowlist reduction."
+      - "Reject continuation if behavior or privacy evidence is weak."
+    expected_output:
+      - "Decision and rationale."
+      - "Next Worker objective, allowed_files, verify, and stop_if."
+      - "Whether a phase review is needed before more file splitting."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Select the physical harness split next. It removes another temporary allowlist entry with low product-behavior risk because the CLI can stay stable while implementation moves into modules, and fixture-only self-test proof can preserve the privacy boundary. Defer `ContentView.swift` until after the harness is below threshold because UI/state extraction carries higher behavior risk."
+      worker_task: T005
+      expected_allowlist_impact:
+        - "Remove `scripts/ios-physical-harness.py` baseline."
+      required_verification:
+        - "Python bytecode compile for the wrapper and harness modules."
+        - "Fixture-only `scripts/ios-physical-harness.py self-test`."
+        - "Source ratchet, whitespace, and diff checks."
+
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Split `scripts/ios-physical-harness.py` into privacy-preserving modules while keeping the CLI stable and removing its max-lines allowlist baseline."
+    allowed_files:
+      - "scripts/ios-physical-harness.py"
+      - "scripts/ios_physical_harness/__init__.py"
+      - "scripts/ios_physical_harness/app_group.py"
+      - "scripts/ios_physical_harness/cli.py"
+      - "scripts/ios_physical_harness/common.py"
+      - "scripts/ios_physical_harness/constants.py"
+      - "scripts/ios_physical_harness/device_wda.py"
+      - "scripts/ios_physical_harness/receipt.py"
+      - "scripts/source-line-ratchet.py"
+    verify:
+      - "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py"
+      - "scripts/ios-physical-harness.py self-test"
+      - "scripts/source-line-ratchet.py"
+      - "scripts/source-whitespace-check.py"
+      - "git diff --check"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Verification fails twice for the same reason."
+      - "The split risks weakening tests or receipt redaction."
+    receipt:
+      result: done
+      changed_files:
+        - "scripts/ios-physical-harness.py"
+        - "scripts/ios_physical_harness/__init__.py"
+        - "scripts/ios_physical_harness/app_group.py"
+        - "scripts/ios_physical_harness/cli.py"
+        - "scripts/ios_physical_harness/common.py"
+        - "scripts/ios_physical_harness/constants.py"
+        - "scripts/ios_physical_harness/device_wda.py"
+        - "scripts/ios_physical_harness/receipt.py"
+        - "scripts/source-line-ratchet.py"
+      commands:
+        - cmd: "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py self-test"
+          status: pass
+          evidence: "fixture-only redaction checks passed; bad-count assertion failed closed; raw transcript omitted from summaries"
+        - cmd: "scripts/ios-physical-harness.py --help"
+          status: pass
+          evidence: "public subcommand surface preserved"
+        - cmd: "scripts/source-line-ratchet.py"
+          status: pass
+          evidence: "removed `scripts/ios-physical-harness.py` allowlist baseline; only `ContentView.swift` remains"
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Moved the physical harness implementation behind the existing `scripts/ios-physical-harness.py` wrapper into focused modules for common utilities, App Group operations, WDA/device commands, receipt generation, constants, and CLI wiring. The privacy receipt self-test still passes and the harness baseline is no longer needed."
+
+  - id: T006
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Review `ContentView.swift` and choose the final safe package to remove the last max-lines allowlist baseline."
+    inputs:
+      - "T005 receipt"
+      - "`scripts/source-line-ratchet.py --json` output showing only `ContentView.swift` remains allowlisted."
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/project.yml"
+    constraints:
+      - "Read-only."
+      - "Do not weaken private UI state, beta copy, provider-key handling, or simulator-safe proof."
+      - "Prefer file splits that keep SwiftUI behavior stable and are covered by simulator sanity."
+    expected_output:
+      - "Decision and rationale."
+      - "Next Worker objective, allowed_files, verify, and stop_if."
+      - "Whether a smaller Scout is needed before editing."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Use presentational component extraction for `ContentView.swift`, not cross-file `ContentView` extensions. Cross-file extensions would require widening private state/action access, while components can receive values, bindings, and closures and keep `ContentView` as the owner of private UI state."
+      worker_task: T010
+      expected_allowlist_impact:
+        - "Remove the final `FoiliOS/FoilIOSApp/ContentView.swift` baseline."
+      required_verification:
+        - "XcodeGen generate plus generated-project drift check."
+        - "Full simulator sanity lane."
+        - "Source ratchet, whitespace, and diff checks."
+
+  - id: T010
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Extract presentational SwiftUI components from `ContentView.swift` while preserving private state ownership and removing the final max-lines allowlist baseline."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/FoilIOSApp/FoilAdvancedSupportDisclosure.swift"
+      - "FoiliOS/FoilIOSApp/FoilContentRows.swift"
+      - "FoiliOS/FoilIOSApp/FoilDictationConsoleView.swift"
+      - "FoiliOS/FoilIOSApp/FoilOnboardingPanels.swift"
+      - "FoiliOS/FoilIOSApp/FoilTranscriptReviewPanel.swift"
+      - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+      - "scripts/source-line-ratchet.py"
+    verify:
+      - "cd FoiliOS && xcodegen generate --spec project.yml"
+      - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+      - "scripts/source-line-ratchet.py"
+      - "scripts/source-whitespace-check.py"
+      - "git diff --check"
+      - "scripts/ios-simulator-sanity.sh"
+    stop_if:
+      - "Extraction requires widening private `ContentView` state or action methods."
+      - "Componentization changes copy, identifiers, route ordering, or button enablement."
+      - "Verification fails twice for the same reason."
+    receipt:
+      result: done
+      changed_files:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/FoilIOSApp/FoilAdvancedSupportDisclosure.swift"
+        - "FoiliOS/FoilIOSApp/FoilContentRows.swift"
+        - "FoiliOS/FoilIOSApp/FoilDictationConsoleView.swift"
+        - "FoiliOS/FoilIOSApp/FoilOnboardingPanels.swift"
+        - "FoiliOS/FoilIOSApp/FoilTranscriptReviewPanel.swift"
+        - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+        - "scripts/source-line-ratchet.py"
+      commands:
+        - cmd: "cd FoiliOS && xcodegen generate --spec project.yml"
+          status: pass
+        - cmd: "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py"
+          status: pass
+          evidence: "allowlist is empty; largest counted file is `ContentView.swift` at 480 lines"
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "scripts/ios-simulator-sanity.sh"
+          status: pass
+          evidence: "project/scheme visibility, full simulator tests, and unsigned generic iOS build passed"
+      summary: "Extracted presentational SwiftUI components from `ContentView.swift` while preserving private state/action ownership in `ContentView`. Removed the final max-lines allowlist baseline and kept every counted source/script/workflow file under 500 lines."
+
+  - id: T007
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Evaluate whether SwiftLint, SwiftFormat, or Periphery should enter CI, and at what enforcement level."
+    inputs:
+      - "Current source layout after allowlist-reduction receipts."
+      - "docs/ci-workflow-development-plan.md"
+      - "Current workflow runtime and failure modes."
+    constraints:
+      - "Read-only."
+      - "Do not add tools or config."
+      - "Treat noisy or untrusted static analysis as deferred, not required."
+      - "Periphery must be judged against SwiftUI, tests, keyboard extension entry points, and XcodeGen."
+    expected_output:
+      - "Tool-by-tool recommendation: required now, non-required report only, defer, or reject."
+      - "Required configuration and verification commands for any approved tool."
+      - "False-positive risks and mitigation."
+      - "Merge-queue/runtime impact."
+    receipt:
+      result: done
+      decision: defer_required_static_analysis
+      full_outcome_complete: false
+      rationale: "Do not add SwiftLint, SwiftFormat, or Periphery as required gates in this tranche. The repo has no existing SwiftLint/SwiftFormat/Periphery/Mint/Brew/Package/Gemfile tooling surface, and Periphery needs a separate false-positive pass around SwiftUI, tests, XcodeGen, and keyboard-extension entry points before it can be trusted like Knip."
+      recommendations:
+        - "Required now: hard max-lines gate, whitespace scanner, Python syntax, physical-harness fixture self-test, XcodeGen drift, simulator sanity."
+        - "Defer SwiftLint/SwiftFormat until a repo-local config is chosen and violation baseline is understood."
+        - "Defer Periphery or run it report-only in a future PR before making it required."
+      evidence:
+        - "`rg --hidden --files | rg '(^|/)(\\.swiftlint|\\.swiftformat|swiftlint|swiftformat|periphery|Mintfile|Brewfile|Package\\.swift|Gemfile|\\.github/workflows/)'`: only `.github/workflows/ios-simulator-sanity.yml` matched."
+        - "`docs/ci-workflow-development-plan.md`: Future Static Analysis section already calls out Periphery false-positive risk."
+
+  - id: T008
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Promote max-lines enforcement to a hard no-allowlist rule once the oversized files have been reduced below the threshold."
+    allowed_files:
+      - "scripts/source-line-ratchet.py"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - ".github/workflows/ios-simulator-sanity.yml"
+    verify:
+      - "scripts/source-line-ratchet.py"
+      - "scripts/source-line-ratchet.py --json"
+      - "scripts/source-whitespace-check.py"
+      - "git diff --check"
+      - "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+      - "scripts/ios-simulator-sanity.sh"
+    stop_if:
+      - "Any allowlisted file still exceeds 500 lines."
+      - "Hard rule requires lowering coverage or removing meaningful code."
+      - "Workflow changes would add physical-device or private-artifact proof to hosted CI."
+    receipt:
+      result: done
+      changed_files:
+        - "scripts/source-line-ratchet.py"
+        - "docs/ci-workflow-development-plan.md"
+        - ".github/workflows/ios-simulator-sanity.yml"
+      commands:
+        - cmd: "scripts/source-line-ratchet.py"
+          status: pass
+          evidence: "empty allowlist, no violations"
+        - cmd: "scripts/source-line-ratchet.py --json"
+          status: pass
+          evidence: "`allowlist_baselines`: {}"
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py scripts/source-whitespace-check.py scripts/source-line-ratchet.py"
+          status: pass
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "scripts/ios-simulator-sanity.sh"
+          status: pass
+      summary: "Promoted the max-lines ratchet to a hard no-allowlist rule and updated hosted CI to byte-compile the new physical-harness module package explicitly. Updated the CI plan so it no longer describes the migration allowlist as current."
+
+  - id: T009
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: medium
+    objective: "Publish the verified hard-hygiene changes through PR and merge queue, preserving required CI proof."
+    inputs:
+      - "Done Worker receipts."
+      - "Final local verification output."
+      - "Current branch protection/ruleset contexts."
+    constraints:
+      - "Do not push if the worktree contains unrelated changes."
+      - "Do not change required checks without first confirming exact GitHub context names."
+      - "Default to draft PR until hosted checks pass."
+    expected_output:
+      - "Branch name."
+      - "Commit(s)."
+      - "PR URL."
+      - "GitHub Actions proof or blocker."
+      - "Merge-queue outcome if queued."
+    receipt: null
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Audit whether Foil iOS now has the requested hard hygiene gate posture."
+    inputs:
+      - "All done task receipts."
+      - "Final `scripts/source-line-ratchet.py --json` output."
+      - "GitHub required CI status on PR or main."
+      - "Current dirty diff."
+      - "Privacy and physical-proof boundary notes."
+    constraints:
+      - "Do not implement."
+      - "Reject completion if any temporary max-lines allowlist remains."
+      - "Reject completion if hosted CI overclaims physical iPhone/TestFlight/WDA proof."
+      - "Reject completion if required checks are unconfirmed or stale."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Evidence mapped to oracle."
+      - "Missing evidence."
+      - "Next task if not complete."
+    receipt: null
+
+checks:
+  dirty_fingerprint: "goal control files changed for T001 receipt; implementation files unchanged"
+  last_verification:
+    result: pass
+    task: T008
+    commands:
+      - cmd: "scripts/source-line-ratchet.py"
+        status: pass
+      - cmd: "scripts/source-line-ratchet.py --json"
+        status: pass
+      - cmd: "scripts/source-whitespace-check.py"
+        status: pass
+      - cmd: "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py scripts/source-whitespace-check.py scripts/source-line-ratchet.py"
+        status: pass
+      - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+        status: pass
+      - cmd: "git diff --check"
+        status: pass
+      - cmd: "scripts/ios-simulator-sanity.sh"
+        status: pass

@@ -45,23 +45,27 @@ The end state is non-negotiable: required CI should enforce a hard max-lines
 per file limit for source and script files. Existing oversized files are a
 temporary migration concern, not a permanent exception.
 
-Board 1 enforces this initial ratchet with `scripts/source-line-ratchet.py`.
+Board 1 enforces this ratchet with `scripts/source-line-ratchet.py`.
 It counts only `FoiliOS/**/*.swift`, `scripts/**/*.py`, `scripts/**/*.sh`,
 `.github/workflows/**/*.yml`, and `.github/workflows/**/*.yaml`. The current
-per-file threshold is 500 lines. The temporary oversized allowlist is pinned to
-implementation-time baselines so those files may shrink but cannot grow.
+per-file threshold is 500 lines. The temporary oversized allowlist has been
+removed; required CI now enforces the hard max-lines rule with no historical
+baselines.
 
 Board 1 also uses `scripts/source-whitespace-check.py` instead of relying on
 `git diff --check` in hosted CI. A clean GitHub Actions checkout has no local
 diff, so the scanner checks tracked text files directly for trailing spaces or
 tabs.
 
-The initial allowlist is:
+The initial migration allowlist was:
 
 - `FoiliOS/FoilIOSApp/ContentView.swift`: 967 lines
 - `FoiliOS/FoilIOSTests/FoilDictationLoopPresentationTests.swift`: 928 lines
 - `FoiliOS/Shared/FoilDictationLoopPresenter.swift`: 830 lines
 - `scripts/ios-physical-harness.py`: 699 lines
+
+That migration is now complete: `scripts/source-line-ratchet.py --json` reports
+an empty `allowlist_baselines` object and no violations.
 
 Failure artifacts are intentionally narrow: hosted-CI text logs, generated
 drift diffs, and sanitized JSON reports only. The workflow does not upload
