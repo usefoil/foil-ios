@@ -107,7 +107,7 @@ jobs:
       - name: Run simulator-only sanity script
         run: |
           set -euo pipefail
-          scripts/ios-simulator-sanity.sh | tee ci-artifacts/ios-simulator-sanity.txt
+          scripts/ios-simulator-sanity.sh 2>&1 | tee ci-artifacts/ios-simulator-sanity.txt
 
       - name: Upload hosted simulator failure artifacts
         if: failure()
