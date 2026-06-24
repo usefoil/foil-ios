@@ -1,0 +1,537 @@
+version: 2
+
+goal:
+  title: "Foil iOS CI Workflow Conveyor"
+  slug: "ios-ci-workflow-conveyor"
+  kind: existing_plan
+  tranche: "Board 1: hosted non-physical CI plus baseline repo hygiene, with conveyor follow-ups for max-lines, hard gates, and preview-iPhone runner work."
+  status: done
+  oracle:
+    signal: "Hosted CI and repo-hygiene baseline exists, is locally verified, preserves the simulator-only claim boundary, and names follow-up conveyor boards."
+    cadence: "after each Worker package and at final audit"
+    final_proof: "Final Judge/PM receipt maps Board 1 implementation, verification commands, branch-protection check-name guidance, and follow-up board queue to the user's requested conveyor."
+  intake:
+    original_request: "yes conveyor outline plus a fully detailed board 1"
+    interpreted_outcome: "Create a GoalBuddy conveyor board that drives Foil iOS hosted CI/hygiene implementation now and preserves later max-lines and preview-iPhone runner work."
+    input_shape: existing_plan
+    audience: "Foil iOS maintainers and future GoalBuddy/Codex runs"
+    authority: approved
+    proof_type: test
+    completion_proof: "Board 1 implemented and verified; exact required-check recommendations recorded; follow-up conveyor boards queued or blocked with receipts."
+    likely_misfire: "A workflow is added that passes but overclaims physical iPhone/TestFlight/WDA proof, skips generated drift, or treats max-lines as optional forever."
+    blind_spots_considered:
+      - "Hosted macOS runner Xcode/simulator availability can drift."
+      - "XcodeGen may be missing or version-sensitive on hosted runners."
+      - "Generated Info.plist and entitlement drift can be missed if only the Xcode project is diffed."
+      - "Current oversized Swift/Python files mean a hard max-lines gate cannot be enabled before ratcheting."
+      - "Future preview-iPhone runner must be trusted-only and locked."
+      - "Branch protection required-check names should be derived from the final workflow names."
+    existing_plan_facts:
+      - "Board 1 fully detailed now."
+      - "Conveyor follow-ups: max-lines ratchet cleanup, hard hygiene gates, trusted preview-iPhone runner."
+      - "Hosted CI proves only simulator-safe checks."
+      - "Hard max-lines-per-file rule is the required end state."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  missing_input_or_credentials_do_not_stop_goal: true
+  exact_human_approval_can_terminal_wait: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/ios-ci-workflow-conveyor/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal docs/goals/ios-ci-workflow-conveyor"
+
+conveyor:
+  current_board: "Board 1 - Hosted CI + Hygiene Baseline"
+  follow_up_boards:
+    - title: "Board 2 - Max-Lines Ratchet Cleanup"
+      outcome: "Split or shrink existing oversized Swift/Python files until the temporary max-lines allowlist can be removed."
+      starter_status: queued_for_later_prep
+    - title: "Board 3 - Hard Hygiene Gates"
+      outcome: "Promote max-lines to a hard required CI gate and evaluate SwiftLint, SwiftFormat, and Periphery as possible required checks."
+      starter_status: queued_for_later_prep
+    - title: "Board 4 - Trusted Preview iPhone Runner"
+      outcome: "Set up a trusted self-hosted Mac plus preview-iPhone lane with device locking, sanitized artifacts, and optional merge-group tip proof."
+      starter_status: queued_for_later_prep
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: low
+    objective: "Map the exact local CI/hygiene surface needed for Board 1 without editing files."
+    inputs:
+      - "README.md"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/acceptance-evidence.md"
+      - "scripts/ios-simulator-sanity.sh"
+      - "scripts/ios-physical-harness.py"
+      - "scripts/ios-physical-wda-evidence.py"
+      - "FoiliOS/project.yml"
+      - ".github"
+    constraints:
+      - "Read-only."
+      - "Do not edit implementation, workflow, script, or doc files."
+      - "Prefer concrete paths, commands, and current repo evidence."
+      - "Do not touch physical iPhone, WDA, TestFlight, or GitHub branch settings."
+    expected_output:
+      - "Exact hosted CI checks to implement."
+      - "Generated-file drift paths."
+      - "Line-count baseline and oversized-file candidates."
+      - "Artifact privacy allowlist recommendations."
+      - "Any unknowns that must be resolved before Worker implementation."
+    receipt:
+      result: done
+      summary: "Mapped Board 1 hosted CI and hygiene surface read-only. Required lane is simulator-only, with Xcode visibility, XcodeGen drift, whitespace, Python syntax, harness self-test, simulator test/build, and baseline line-count reporting. No workflow exists yet; `.github` currently has only the beta feedback issue template. Physical iPhone/WDA/TestFlight must remain excluded."
+      evidence:
+        - "docs/ci-workflow-development-plan.md requires `iOS Simulator Sanity (non-physical)`, Xcode/simulator visibility, XcodeGen drift detection, `git diff --check`, Python syntax, harness self-test, and `scripts/ios-simulator-sanity.sh`."
+        - "scripts/ios-simulator-sanity.sh runs `xcodebuild -list`, simulator tests for scheme `FoilIOS`, and unsigned generic iOS build with `CODE_SIGNING_ALLOWED=NO`."
+        - "Generated drift paths: `FoiliOS/FoilIOS.xcodeproj`, `FoiliOS/FoilIOSApp/Generated`, and `FoiliOS/FoilKeyboard/Generated`."
+        - "Largest source/script line-count candidates: `ContentView.swift` 967, `FoilDictationLoopPresentationTests.swift` 928, `FoilDictationLoopPresenter.swift` 830, `ios-physical-harness.py` 699, `FoilKeyboardBridge.swift` 445, `ios-physical-wda-evidence.py` 367."
+        - "`python3 -m py_compile scripts/ios-physical-harness.py scripts/ios-physical-wda-evidence.py` and `scripts/ios-physical-harness.py self-test` succeeded in Scout's read-only check."
+      facts:
+        - "Hosted CI checks to implement: Xcode/simulator destination visibility, XcodeGen regeneration, generated drift check, `git diff --check`, Python syntax, harness self-test, and simulator sanity."
+        - "Line-count CI should exclude or separately classify `docs/goals/**/state.yaml` so board history does not dominate source hygiene."
+        - "Artifact policy should allow only simulator/build/hygiene text logs and sanitized helper JSON, and forbid keys, raw WDA trees, phone screenshots, transcript bodies, recordings, IPA/archive artifacts, and broad temp globs."
+      ambiguity_requiring_judge:
+        - "Choose the exact line-count threshold and whether Board 1 is report-only, ratcheting fail for new files, or both."
+        - "Choose XcodeGen install/pinning method for hosted CI."
+        - "Choose workflow triggers: pull_request, push to main, merge_group, workflow_dispatch, or a subset."
+        - "Confirm generated drift fails on any diff in Xcode project plus Generated plist/entitlement paths."
+        - "Confirm artifact upload policy."
+      commands:
+        - "sed/read requested inputs"
+        - "find .github -maxdepth 3 -type f -print | sort"
+        - "find FoiliOS -path '*/Generated/*' -type f -print | sort"
+        - "line-count audit command over Swift/Python/shell/YAML files"
+        - "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios-physical-wda-evidence.py"
+        - "scripts/ios-physical-harness.py self-test"
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Validate the Board 1 implementation package and choose the largest safe Worker slice."
+    inputs:
+      - "T001 receipt"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+    constraints:
+      - "Read-only."
+      - "Do not implement."
+      - "Reject any design that overclaims physical device proof."
+      - "Reject any design that makes the preview-iPhone lane required before trusted runner isolation exists."
+    expected_output:
+      - "Decision: approve implementation package, split package, or block."
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if conditions."
+      - "Recommended GitHub required-check names to confirm after implementation."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Approve one vertical Board 1 Worker slice: hosted simulator CI plus generated-drift and hygiene ratchet. The design stays simulator-only, excludes physical iPhone/TestFlight/WDA proof, and keeps preview-iPhone out of required hosted CI. Use a 500-line ratchet with existing oversized files pinned to current baselines so historical debt cannot grow while new oversized files fail."
+      evidence:
+        - "Worker objective: implement `iOS Simulator Sanity (non-physical)` hosted CI and source hygiene baseline."
+        - "Line-count policy: count `FoiliOS/**/*.swift`, `scripts/**/*.py`, `scripts/**/*.sh`, `.github/workflows/**/*.yml`, `.github/workflows/**/*.yaml`; threshold 500 total lines; fail non-allowlisted files over 500; fail allowlisted files above baseline; always print largest files."
+        - "XcodeGen policy: pin an explicit XcodeGen version in workflow, print `xcodegen --version`, and fail on generated drift."
+        - "Workflow triggers: `pull_request`, `push` to `main`, `merge_group`, and `workflow_dispatch`."
+        - "Generated drift policy: fail on any diff under `FoiliOS/FoilIOS.xcodeproj`, `FoiliOS/FoilIOSApp/Generated`, or `FoiliOS/FoilKeyboard/Generated` after XcodeGen."
+        - "Artifact policy: upload only allowlisted hosted-CI text artifacts or sanitized JSON reports, preferably on failure with short retention; forbid broad temp globs, keys, raw WDA/accessibility trees, phone screenshots, recordings, `.ipa`, and `.xcarchive`."
+        - "Recommended required checks to confirm after first GitHub run: the hosted workflow jobs `Hosted simulator sanity` and `Repo hygiene ratchet`."
+      missing_evidence:
+        - "Exact GitHub required-check names must be confirmed from the first Actions run before branch protection is changed."
+      required_board_updates:
+        - "Update T003 objective, allowed_files, verify, and stop_if to match the approved vertical slice."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Implement the Board 1 hosted non-physical CI and repo-hygiene baseline selected by T002 Judge."
+    allowed_files:
+      - ".github/workflows/**"
+      - "scripts/**"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "FoiliOS/FoilIOS.xcodeproj/**"
+      - "FoiliOS/FoilIOSApp/Generated/**"
+      - "FoiliOS/FoilKeyboard/Generated/**"
+    verify:
+      - "git diff --check"
+      - "bash -n scripts/ios-simulator-sanity.sh"
+      - "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios-physical-wda-evidence.py"
+      - "scripts/ios-physical-harness.py self-test"
+      - "cd FoiliOS && xcodegen generate --spec project.yml"
+      - "git diff --exit-code -- FoiliOS/FoilIOS.xcodeproj FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+      - "scripts/ios-simulator-sanity.sh"
+      - "Run the new line-count/max-lines ratchet check"
+    stop_if:
+      - "Need to change product source files under FoiliOS outside generated project outputs."
+      - "Need GitHub branch protection settings."
+      - "Need physical iPhone, WDA, TestFlight, provider keys, App Store Connect keys, signing credentials, microphone/live provider behavior, Full Access, or host-app keyboard insertion."
+      - "Hosted workflow cannot be made simulator-only without misleading check names."
+      - "Pinned XcodeGen install cannot be made deterministic enough for CI without changing files outside allowed_files."
+      - "Verification fails twice for the same unexplained reason."
+    receipt:
+      result: done
+      changed_files:
+        - ".github/workflows/ios-simulator-sanity.yml"
+        - "scripts/source-line-ratchet.py"
+        - "docs/ci-workflow-development-plan.md"
+        - "docs/ios-simulator-sanity-runbook.md"
+      commands:
+        - cmd: "git diff --check"
+          status: pass
+          notes: "Passed after implementation and after YAML heredoc fix."
+        - cmd: "bash -n scripts/ios-simulator-sanity.sh"
+          status: pass
+        - cmd: "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios-physical-wda-evidence.py scripts/source-line-ratchet.py"
+          status: pass
+          notes: "Removed generated `scripts/__pycache__` afterward."
+        - cmd: "scripts/ios-physical-harness.py self-test"
+          status: pass
+          notes: "Fixture-only redaction self-test reported `passed: true`."
+        - cmd: "cd FoiliOS && xcodegen generate --spec project.yml"
+          status: pass
+        - cmd: "git diff --exit-code -- FoiliOS/FoilIOS.xcodeproj FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          status: pass
+          notes: "No generated drift."
+        - cmd: "scripts/ios-simulator-sanity.sh"
+          status: pass
+          notes: "Simulator tests and unsigned generic iOS build passed."
+        - cmd: "scripts/source-line-ratchet.py"
+          status: pass
+          notes: "Threshold 500; four historical allowlisted files at baselines; no violations."
+        - cmd: "curl -fsSL https://github.com/yonaskolb/XcodeGen/releases/download/2.45.4/xcodegen.zip && shasum -a 256"
+          status: pass
+          notes: "Downloaded XcodeGen 2.45.4 zip hash matched workflow SHA."
+        - cmd: "unzip -l /tmp/xcodegen-2.45.4.zip | head"
+          status: pass
+          notes: "Archive contains `xcodegen/bin/xcodegen`, matching workflow install path."
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+          status: pass
+          notes: "Initial dynamic-destination heredoc indentation failed YAML parse; fixed and reran successfully."
+        - cmd: "Extract workflow `run:` blocks and run `bash -n` on each"
+          status: pass
+          notes: "All workflow shell blocks passed syntax check."
+        - cmd: "Dynamic simulator-selection Python snippet"
+          status: pass
+          notes: "Selected a local available iPhone simulator destination by id."
+        - cmd: "Forbidden-scope scan over workflow"
+          status: pass
+          notes: "No forbidden physical/TestFlight/WDA/provider/artifact scope terms found."
+      summary: "Added the hosted `iOS Simulator Sanity (non-physical)` workflow with two jobs, pinned XcodeGen 2.45.4 SHA verification, generated drift detection, dynamic hosted simulator selection, narrow failure artifacts, and a 500-line source max-lines ratchet. Updated docs with intended check names, proof boundary, allowlist baselines, and artifact policy."
+      remaining_blockers:
+        - "Exact required-check names still need confirmation from the first GitHub Actions run before branch protection is updated."
+      verification_attempts: 2
+      stopped_because: null
+
+  - id: T004
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit the implemented hosted CI/hygiene baseline for honesty, merge-queue readiness, and max-lines migration strength."
+    inputs:
+      - "T003 receipt"
+      - "Current diff"
+      - "Workflow files"
+      - "Verification output"
+    constraints:
+      - "Read-only."
+      - "Do not implement."
+      - "Treat passing local checks as claims, not proof."
+      - "Try to disprove the strongest realistic failure mode before approving."
+    expected_output:
+      - "Decision: accept, require fix, or block."
+      - "Exact evidence for or against hosted CI honesty."
+      - "Exact evidence for or against generated-file drift coverage."
+      - "Exact evidence for or against max-lines ratchet path."
+      - "Required check names or reason they are not yet knowable."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Approved. Direct inspection and cheap reproduction support the hosted-CI claim boundary, merge-queue trigger shape, generated-drift paths, narrow artifact policy, and 500-line ratchet behavior. The strongest realistic failure mode was an honesty/ratchet gap hidden by local happy-path checks; scans found sensitive terms only in explicit exclusions, and synthetic ratchet probes failed new oversized files and allowlisted growth."
+      evidence:
+        - "Workflow uses `pull_request`, `push` to `main`, `merge_group`, and `workflow_dispatch`; jobs are named `Hosted simulator sanity` and `Repo hygiene ratchet`."
+        - "Docs list intended required checks and say branch protection should wait until the first Actions run confirms exact names."
+        - "Workflow regenerates with pinned XcodeGen 2.45.4 and diffs `FoiliOS/FoilIOS.xcodeproj`, `FoiliOS/FoilIOSApp/Generated`, and `FoiliOS/FoilKeyboard/Generated`."
+        - "`scripts/source-line-ratchet.py` sets `MAX_LINES = 500`, counts Swift/scripts/workflow globs, pins four oversized baselines, and Judge's synthetic probes failed new oversized files and allowlisted growth above baseline."
+        - "`scripts/source-line-ratchet.py` passed on current files with 21 counted files and no violations."
+        - "Privacy/overclaim scan found physical iPhone/TestFlight/WDA/provider/microphone/Full Access/host-app terms only in explicit non-proof or forbidden-artifact language; workflow uploads only named text/JSON failure artifacts with 7-day retention."
+        - "YAML parse and workflow `run:` block shell syntax checks passed."
+      missing_evidence:
+        - "Exact GitHub required-check context names remain unconfirmed until the first hosted Actions run completes."
+      required_board_updates:
+        - "Mark T005 not required because T004 accepted the implementation without required fixes."
+        - "Advance T006 PM handoff and carry first-GitHub-run check-name confirmation as the remaining branch-protection caveat."
+
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: blocked
+    reasoning_hint: medium
+    objective: "Apply any bounded fixes required by T004 before Board 1 can close."
+    allowed_files:
+      - ".github/workflows/**"
+      - "scripts/**"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/ios-ci-workflow-conveyor/**"
+    verify:
+      - "git diff --check"
+      - "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios-physical-wda-evidence.py"
+      - "scripts/ios-physical-harness.py self-test"
+      - "cd FoiliOS && xcodegen generate --spec project.yml"
+      - "git diff --exit-code -- FoiliOS/FoilIOS.xcodeproj FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+      - "scripts/ios-simulator-sanity.sh"
+      - "Any new line-count or max-lines ratchet script/check added by this task"
+    stop_if:
+      - "T004 accepted the implementation without required fixes."
+      - "Need files outside allowed_files."
+      - "Need GitHub settings, credentials, physical device, WDA, or TestFlight."
+      - "Verification fails twice for the same unexplained reason."
+    receipt:
+      result: not_required
+      summary: "T004 accepted the T003 implementation without required fixes, so the bounded fix Worker is not needed for Board 1."
+      evidence:
+        - "T004 decision: approved."
+      blocked_reason: "Superseded by approval; no implementation fix required."
+
+  - id: T006
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: default
+    objective: "Record the branch-protection handoff and prepare follow-up conveyor board starter commands."
+    inputs:
+      - "Accepted workflow/check names from T004/T005"
+      - "docs/ci-workflow-development-plan.md"
+      - "Conveyor follow-up list"
+    constraints:
+      - "Edit only GoalBuddy control files unless the active PM task explicitly records a docs-only handoff."
+      - "Do not change GitHub branch protection settings without explicit user approval and suitable access."
+      - "Do not create follow-up boards unless the current state has enough starter detail or the user asks to create them now."
+    expected_output:
+      - "Required-check names or exact blocker."
+      - "Starter command for Board 2 max-lines cleanup."
+      - "Starter command for Board 3 hard hygiene gates."
+      - "Starter command for Board 4 trusted preview-iPhone runner."
+      - "Receipt explaining what remains outside Board 1."
+    receipt:
+      result: done
+      summary: "Recorded branch-protection handoff and follow-up conveyor starters. The intended jobs are `Hosted simulator sanity` and `Repo hygiene ratchet`, with exact GitHub context names to be confirmed from the first Actions run before branch protection is updated."
+      required_check_handoff:
+        status: "pending_first_actions_run_confirmation"
+        intended_checks:
+          - "Hosted simulator sanity"
+          - "Repo hygiene ratchet"
+        do_not_change_branch_protection_until:
+          - "The workflow has run on GitHub at least once."
+          - "The exact check context names are visible in the PR or merge queue UI/API."
+      follow_up_board_starters:
+        - title: "Board 2 - Max-Lines Ratchet Cleanup"
+          command: "/goal-prep Create a Foil iOS max-lines ratchet cleanup board. Use docs/goals/ios-ci-workflow-conveyor and scripts/source-line-ratchet.py as context. Outcome: split or shrink the existing oversized allowlisted files until the allowlist can be removed or materially reduced, preserving behavior with simulator-safe verification."
+        - title: "Board 3 - Hard Hygiene Gates"
+          command: "/goal-prep Create a Foil iOS hard hygiene gates board. Use docs/ci-workflow-development-plan.md and the completed CI workflow as context. Outcome: promote max-lines to a hard required gate with no temporary allowlist if possible, and evaluate SwiftLint, SwiftFormat, and Periphery as possible required checks."
+        - title: "Board 4 - Trusted Preview iPhone Runner"
+          command: "/goal-prep Create a trusted Foil iOS preview-iPhone runner board. Use docs/ios-physical-automation-runbook.md and docs/goals/ios-ci-workflow-conveyor as context. Outcome: design and verify a trusted self-hosted Mac plus preview-iPhone lane with runner isolation, device locking, sanitized artifact allowlists, and optional merge-group tip proof."
+      outside_board_1:
+        - "Actual GitHub branch protection changes."
+        - "First hosted Actions run status inspection."
+        - "Follow-up implementation boards for max-lines cleanup, hard hygiene gates, and trusted preview-iPhone runner."
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: blocked
+    reasoning_hint: high
+    objective: "Audit whether Board 1 is complete and the conveyor outline is ready."
+    inputs:
+      - "All done task receipts"
+      - "Last verification"
+      - "Current dirty diff"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/goals/ios-ci-workflow-conveyor/goal.md"
+      - "docs/goals/ios-ci-workflow-conveyor/state.yaml"
+    constraints:
+      - "Read-only."
+      - "Reject completion if required Worker work is queued, active, or missing a blocking receipt."
+      - "Reject completion if hosted CI overclaims physical proof."
+      - "Reject completion if max-lines hard enforcement is not represented as an explicit follow-up or implemented gate."
+      - "Reject completion if branch-protection check-name handoff is missing."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Strongest realistic failure mode tested"
+      - "Evidence"
+      - "Residual risk and follow-up board commands"
+    receipt:
+      result: blocked
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "Board 1 is close, but the hosted repo-hygiene baseline has a material gap: the workflow checks whitespace with `git diff --check` immediately after checkout, which can pass on a clean CI worktree without checking PR/push changes. Completion would overstate the hygiene gate. Branch-protection handoff, max-lines follow-ups, and non-physical claim boundaries are otherwise represented."
+      evidence:
+        - "Task status audit: T001-T004 and T006 are done; T005 has a not_required receipt; only T999 was active."
+        - "Workflow ran `git diff --check` immediately after checkout, with no PR/base range or full file whitespace scan."
+        - "`scripts/source-line-ratchet.py --json` reported max_lines 500, 21 counted files, four pinned allowlist baselines, and no current violations."
+        - "Docs/state record intended branch-protection checks and first Actions-run confirmation before changing branch protection."
+        - "Docs/state queue Board 2 max-lines cleanup, Board 3 hard hygiene gates, and Board 4 trusted preview-iPhone runner."
+      blocked_tasks:
+        - "Missing Worker task: fix the hosted whitespace check so it evaluates committed PR/push/merge_group content, or replace it with an explicit tracked-file whitespace scan, then verify with a failing synthetic fixture or equivalent proof."
+      missing_evidence:
+        - "No proof that hosted CI would fail when a PR introduces committed trailing whitespace or other `git diff --check` violations."
+      required_board_updates:
+        - "Add and run a bounded Worker fix for `.github/workflows/ios-simulator-sanity.yml` and any helper script/doc updates needed to make whitespace hygiene effective on hosted CI."
+        - "After the fix, rerun final audit with evidence for the strongest failure mode: a committed-change whitespace violation is detected by the same command/path used in CI."
+
+  - id: T007
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Fix the hosted whitespace hygiene check so committed trailing whitespace is detected in CI."
+    allowed_files:
+      - ".github/workflows/**"
+      - "scripts/**"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/ios-ci-workflow-conveyor/**"
+    verify:
+      - "git diff --check"
+      - "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios-physical-wda-evidence.py scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+      - "Run the effective whitespace check on the current tree and prove it passes."
+      - "Prove the effective whitespace check fails on a synthetic tracked-file fixture with trailing whitespace."
+      - "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+      - "Extract workflow `run:` blocks and run `bash -n` on each"
+      - "scripts/source-line-ratchet.py"
+    stop_if:
+      - "Need product source changes."
+      - "Need GitHub branch protection settings."
+      - "Need physical iPhone, WDA, TestFlight, provider keys, App Store Connect keys, signing credentials, microphone/live provider behavior, Full Access, or host-app keyboard insertion."
+      - "Cannot prove a synthetic committed/tracked whitespace violation fails."
+    receipt:
+      result: done
+      changed_files:
+        - ".github/workflows/ios-simulator-sanity.yml"
+        - "scripts/source-whitespace-check.py"
+        - "docs/ci-workflow-development-plan.md"
+        - "docs/ios-simulator-sanity-runbook.md"
+        - "docs/goals/ios-ci-workflow-conveyor/state.yaml"
+      commands:
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+          notes: "Current tracked text files have no trailing whitespace violations."
+        - cmd: "Temporary git fixture with tracked `fixture.txt` containing trailing whitespace, then `scripts/source-whitespace-check.py`"
+          status: pass
+          notes: "Scanner failed as expected and reported `fixture.txt:2`; wrapper returned success only because the failure was expected."
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios-physical-wda-evidence.py scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          status: pass
+          notes: "Removed generated `scripts/__pycache__` afterward."
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+          status: pass
+        - cmd: "Extract workflow `run:` blocks and run `bash -n` on each"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py"
+          status: pass
+          notes: "22 counted files; four over-500 historical baselines; no violations."
+        - cmd: "scripts/ios-physical-harness.py self-test"
+          status: pass
+      summary: "Replaced the ineffective clean-checkout `git diff --check` workflow step with `scripts/source-whitespace-check.py`, which scans committed tracked text files directly. Verified the current repo passes and a synthetic tracked fixture with trailing whitespace fails under the same scanner."
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+
+  - id: T998
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Re-audit Board 1 after the whitespace hygiene fix."
+    inputs:
+      - "T007 receipt"
+      - "All done task receipts"
+      - "Current dirty diff"
+      - ".github/workflows/ios-simulator-sanity.yml"
+      - "scripts/source-line-ratchet.py"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/goals/ios-ci-workflow-conveyor/state.yaml"
+    constraints:
+      - "Read-only."
+      - "Reject completion if committed whitespace hygiene is not effectively checked."
+      - "Reject completion if hosted CI overclaims physical proof."
+      - "Reject completion if branch-protection check-name handoff is missing."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Strongest realistic failure mode tested"
+      - "Evidence"
+      - "Residual risk and follow-up board commands"
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      rationale: "Complete. T007 resolves T999's blocker: hosted CI now runs a tracked-file whitespace scanner, not clean-checkout `git diff --check`. Direct inspection, current commands, and T007 synthetic fixture evidence support the fix. Hosted proof boundaries and branch-protection handoff are explicit; remaining GitHub check-name confirmation is correctly treated as post-first-run handoff, not Board 1 implementation work."
+      evidence:
+        - "Receipt audit: T001-T004 and T006-T007 are done; T005 is not_required; T999's only blocker was ineffective whitespace checking; T998 re-audited the fix."
+        - "Strongest realistic failure mode tested: hosted CI still misses committed trailing whitespace. Workflow runs `scripts/source-whitespace-check.py`; workflow search found no active `git diff --check` step."
+        - "`scripts/source-whitespace-check.py` enumerates `git ls-files`, detects trailing spaces/tabs in text files, and returns failure when violations exist."
+        - "`scripts/source-whitespace-check.py` passed on currently tracked files with `Trailing whitespace violations: none`."
+        - "T007 receipt records a synthetic tracked `fixture.txt` with trailing whitespace failed under the same scanner and reported `fixture.txt:2`."
+        - "Workflow YAML parse passed."
+        - "`scripts/source-line-ratchet.py --json` reported max_lines 500, 22 counted files, four historical allowlist baselines, and no violations."
+        - "Hosted CI overclaim check: docs say this lane does not prove physical iPhone install, TestFlight, microphone/provider live behavior, Full Access, WDA, or host-app keyboard insertion; workflow physical references are syntax/self-test fixture only."
+        - "Branch-protection handoff exists: docs and T006 name intended jobs `Hosted simulator sanity` and `Repo hygiene ratchet`, with first Actions-run confirmation required before settings changes."
+      residual_risk:
+        - "Exact GitHub check context names remain unconfirmed until the first hosted Actions run."
+      required_followups:
+        - "Do not change branch protection until the first GitHub Actions run confirms exact check context names."
+        - "Use T006 starters for Board 2 max-lines cleanup, Board 3 hard hygiene gates, and Board 4 trusted preview-iPhone runner."
+
+checks:
+  dirty_fingerprint: unknown
+  last_verification:
+    result: pass
+    task: T998
+    commands:
+      - "node .../check-goal-state.mjs docs/goals/ios-ci-workflow-conveyor/state.yaml"
+      - "git diff --check"
+      - "scripts/source-whitespace-check.py"
+      - "synthetic tracked trailing-whitespace fixture failed as expected"
+      - "scripts/source-line-ratchet.py"
