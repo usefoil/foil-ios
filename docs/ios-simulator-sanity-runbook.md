@@ -29,6 +29,22 @@ The lane runs:
 - unsigned generic iOS compile to ensure the app and keyboard extension build
   for device SDK without requiring signing.
 
+The script prints phase-level diagnostics before and after each internal
+command:
+
+- `project-scheme-visibility`
+- `simulator-tests`
+- `unsigned-generic-ios-build`
+
+Each phase has a script-owned timeout so hosted CI can upload the existing text
+artifact before the overall GitHub job timeout cancels the runner. Override
+timeouts when debugging unusually slow runners:
+
+```bash
+IOS_SIMULATOR_SANITY_TEST_TIMEOUT_SECONDS=1800 \
+  scripts/ios-simulator-sanity.sh
+```
+
 Override the simulator destination when needed:
 
 ```bash

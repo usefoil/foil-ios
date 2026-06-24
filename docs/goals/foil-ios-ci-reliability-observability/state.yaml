@@ -1,0 +1,252 @@
+version: 2
+
+goal:
+  title: "Foil iOS CI Reliability Observability"
+  slug: "foil-ios-ci-reliability-observability"
+  kind: existing_plan
+  tranche: "Make hosted simulator sanity failures phase-diagnosable while preserving honest simulator-only CI proof."
+  status: active
+  oracle:
+    signal: "`scripts/ios-simulator-sanity.sh` emits bounded phase-level diagnostics; required hosted CI still passes `Hosted simulator sanity` and `Repo hygiene ratchet`; physical-device proof remains separate."
+    cadence: "after Worker implementation and final audit"
+    final_proof: "Final receipt maps local verification, GitHub PR/merge-queue evidence, timeout observability, and privacy-boundary checks to full_outcome_complete: true."
+  intake:
+    original_request: "Implement Board 2.1 for CI reliability observability."
+    interpreted_outcome: "The hosted simulator sanity lane remains required and simulator-only, but timeout/hang failures show the phase and command needed for triage."
+    input_shape: existing_plan
+    audience: "Foil iOS maintainers and merge-queue contributors"
+    authority: approved
+    proof_type: test
+    completion_proof: "Local simulator sanity and hygiene checks pass; GitHub required CI passes on PR/merge queue; final audit proves no physical-device overclaim."
+    likely_misfire: "Changing CI timeout numbers or adding docs without making a future simulator hang more diagnosable."
+    blind_spots_considered:
+      - "A timeout may happen inside xcodebuild without a clear phase marker."
+      - "Excessive logging can hide the useful failure phase."
+      - "Artifacts must remain text-only and sanitized."
+      - "The lane must not claim physical iPhone/TestFlight/WDA coverage."
+      - "Swift hygiene tools are intentionally deferred from this first slice."
+    existing_plan_facts:
+      - "PR #62 first hosted simulator run timed out in `Run simulator-only sanity script` after `30m23s`."
+      - "PR #62 hosted simulator rerun passed in `4m0s`."
+      - "PR #62 merge-group run `28125684476` passed `Hosted simulator sanity` and `Repo hygiene ratchet` at queue tip."
+      - "`Repo hygiene ratchet` includes whitespace, Python syntax, physical harness fixture self-test, and the hard max-lines ratchet."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/foil-ios-ci-reliability-observability/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-ci-reliability-observability"
+
+active_task: T004
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Map the current simulator sanity script, hosted workflow, PR #62 timeout evidence, and safest observability changes."
+    inputs:
+      - "scripts/ios-simulator-sanity.sh"
+      - ".github/workflows/ios-simulator-sanity.yml"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/ci-workflow-development-plan.md"
+      - "PR #62 timeout and rerun receipts"
+    constraints:
+      - "Read-only."
+      - "Do not edit implementation or workflow files."
+      - "Prefer concrete commands, phases, and artifact evidence."
+      - "Call out any hosted-CI physical proof overclaim risk."
+    expected_output:
+      - "Current command/phase map."
+      - "Where PR #62 timed out and what evidence was missing."
+      - "Recommended bounded phase logging/timeouts."
+      - "Exact Worker allowed_files and verification commands."
+    receipt:
+      result: done
+      summary: "Mapped the current hosted simulator lane and PR #62 timeout. The script currently has three unlabelled `xcodebuild` commands; PR #62 attempt 1 only proved the broad GitHub step was canceled, not whether `xcodebuild -list`, simulator tests, or unsigned generic iOS build was stuck. The safest Worker slice is phase-level script logging plus script-owned per-phase timeouts, with workflow capture of stderr into the existing sanitized text artifact."
+      current_phase_map:
+        - "`xcodebuild -list -project FoilIOS.xcodeproj` for project/scheme visibility."
+        - "`xcodebuild test ... -destination $IOS_SIMULATOR_DESTINATION` for simulator tests."
+        - "`xcodebuild build ... -destination generic/platform=iOS CODE_SIGNING_ALLOWED=NO` for unsigned device-SDK build."
+      timeout_evidence:
+        - "PR #62 attempt 1: `Hosted simulator sanity` canceled after `30m23s` in workflow step `Run simulator-only sanity script`."
+        - "PR #62 attempt 2: same workflow passed in `4m0s`."
+        - "Merge-group run `28125684476`: queue-tip workflow passed in `5m0s`."
+      evidence:
+        - "`scripts/ios-simulator-sanity.sh`: three raw `xcodebuild` commands without phase wrappers or script-owned timeouts."
+        - "`.github/workflows/ios-simulator-sanity.yml`: workflow captures only stdout from the simulator sanity script into `ci-artifacts/ios-simulator-sanity.txt`."
+        - "`gh run view 28123633881 --attempt 1`: canceled in `Run simulator-only sanity script` after `30m23s`."
+        - "`gh run view 28123633881`: rerun passed on attempt 2."
+        - "`gh run view 28125684476`: merge-group run passed at queue tip."
+      recommended_worker:
+        allowed_files:
+          - "scripts/ios-simulator-sanity.sh"
+          - ".github/workflows/ios-simulator-sanity.yml"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/goals/foil-ios-ci-reliability-observability/state.yaml"
+        changes:
+          - "Add script phase start/pass/fail/timeout lines with elapsed seconds and command text."
+          - "Add macOS-compatible per-phase timeout handling inside the script, overridable by env vars."
+          - "Pipe stderr to the existing `ci-artifacts/ios-simulator-sanity.txt` artifact."
+          - "Document phase names and timeout env vars without adding physical-device claims."
+      physical_boundary: "No hosted-CI physical iPhone/TestFlight/WDA proof is needed or appropriate for this slice."
+
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Implement phase-level simulator sanity diagnostics selected from T001."
+    allowed_files:
+      - "scripts/ios-simulator-sanity.sh"
+      - ".github/workflows/ios-simulator-sanity.yml"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/goals/foil-ios-ci-reliability-observability/state.yaml"
+    verify:
+      - "bash -n scripts/ios-simulator-sanity.sh"
+      - "scripts/ios-simulator-sanity.sh"
+      - "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+      - "scripts/source-line-ratchet.py --json"
+      - "scripts/source-whitespace-check.py"
+      - "git diff --check"
+    stop_if:
+      - "The change weakens project/scheme visibility, simulator tests, or unsigned generic iOS build coverage."
+      - "The change adds physical iPhone/TestFlight/WDA proof claims to hosted CI."
+      - "Artifacts would include private phone content, raw WDA trees, recordings, IPA/archive artifacts, or secrets."
+      - "Verification fails twice for the same reason."
+    receipt:
+      result: done
+      changed_files:
+        - "scripts/ios-simulator-sanity.sh"
+        - ".github/workflows/ios-simulator-sanity.yml"
+        - "docs/ios-simulator-sanity-runbook.md"
+        - "docs/ci-workflow-development-plan.md"
+        - "docs/goals/foil-ios-ci-reliability-observability/state.yaml"
+      commands:
+        - cmd: "bash -n scripts/ios-simulator-sanity.sh"
+          status: pass
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --json"
+          status: pass
+          evidence: "`allowlist_baselines`: {}; `violations`: []"
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "scripts/ios-simulator-sanity.sh"
+          status: pass
+          evidence: "project-scheme visibility, simulator tests, and unsigned generic iOS build all passed with phase start/pass diagnostics"
+        - cmd: "IOS_SIMULATOR_SANITY_LIST_TIMEOUT_SECONDS=0 scripts/ios-simulator-sanity.sh"
+          status: pass
+          evidence: "expected failure exited 124 and printed `phase=project-scheme-visibility status=timeout`"
+      summary: "Added phase-level diagnostics and macOS-compatible script-owned per-phase timeouts to `scripts/ios-simulator-sanity.sh`. The workflow now captures stderr and stdout into the existing sanitized text artifact. Runbook and CI plan docs now name the three phases and timeout override variables without adding physical-device proof claims."
+
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit whether the simulator sanity observability slice is complete and safe to publish."
+    inputs:
+      - "T001 and T002 receipts."
+      - "Current diff."
+      - "Verification output."
+      - "Privacy and hosted-CI proof boundary."
+    constraints:
+      - "Read-only."
+      - "Reject completion if hosted CI overclaims physical iPhone/TestFlight/WDA proof."
+      - "Reject completion if timeout diagnostics do not identify phase and command."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Evidence mapped to oracle."
+      - "Strongest realistic failure mode and disproof."
+      - "Next task if not complete."
+    receipt:
+      result: done
+      decision: safe_to_publish
+      full_outcome_complete: false
+      evidence:
+        - "`scripts/ios-simulator-sanity.sh` now emits `phase=<name> status=start|pass|fail|timeout` lines for `project-scheme-visibility`, `simulator-tests`, and `unsigned-generic-ios-build`."
+        - "Controlled timeout probe with `IOS_SIMULATOR_SANITY_LIST_TIMEOUT_SECONDS=0` exited 124 and emitted both `status=timeout` and `status=fail exit_code=124` for `project-scheme-visibility`."
+        - "Fresh `scripts/ios-simulator-sanity.sh` passed locally after the failure-path fix."
+        - "Workflow change only captures stderr plus stdout into the existing `ci-artifacts/ios-simulator-sanity.txt` text artifact."
+        - "Docs preserve the non-physical proof boundary and do not claim physical iPhone/TestFlight/WDA coverage."
+        - "Hard max-lines ratchet still reports an empty allowlist and no violations."
+      strongest_failure_mode:
+        risk: "A future hosted `xcodebuild` hang could still be killed by the outer GitHub job timeout before useful evidence is uploaded."
+        disproven_for_this_slice: "The script-owned timeout probe exits 124 with a named phase before the outer job timeout path is involved, and the workflow captures that output into the existing text artifact."
+      summary: "The implementation is safe to publish. The tranche is not complete until PR and merge-queue hosted CI prove the change on GitHub."
+
+  - id: T004
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: medium
+    objective: "Publish the verified CI reliability observability slice through PR and merge queue."
+    inputs:
+      - "Done Worker/Judge receipts."
+      - "Final local verification output."
+      - "Current branch protection contexts."
+    constraints:
+      - "Do not push if the worktree contains unrelated changes."
+      - "Open as draft until required hosted checks pass."
+      - "Use merge queue for final integration."
+    expected_output:
+      - "Branch name."
+      - "Commit(s)."
+      - "PR URL."
+      - "GitHub Actions proof or blocker."
+      - "Merge-queue outcome if queued."
+    receipt: null
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Final audit for the CI reliability observability tranche."
+    inputs:
+      - "All done task receipts."
+      - "GitHub required CI status."
+      - "Current main state."
+      - "Privacy/proof boundary notes."
+    constraints:
+      - "Do not implement."
+      - "Do not call the tranche complete without PR/merge-queue or explicit user-approved stop evidence."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Missing evidence if not complete."
+    receipt: null
+
+checks:
+  dirty_fingerprint: "initial board creation"
+  last_verification:
+    result: pending
+    task: T001
+    commands: []

@@ -28,6 +28,12 @@ syntax, redaction fixture behavior, and unsigned device-SDK compilation. It
 does not prove physical iPhone install, TestFlight, microphone/provider live
 behavior, Full Access, WebDriverAgent, or host-app keyboard insertion.
 
+The simulator sanity script owns phase-level diagnostics for
+`project-scheme-visibility`, `simulator-tests`, and
+`unsigned-generic-ios-build`. Its per-phase timeouts are shorter than the
+hosted job timeout so a stuck `xcodebuild` phase can fail with a named phase and
+upload the existing sanitized text artifact.
+
 ## Hygiene Ratchet
 
 Foil iOS does not currently have the direct equivalent of TypeScript linting,
