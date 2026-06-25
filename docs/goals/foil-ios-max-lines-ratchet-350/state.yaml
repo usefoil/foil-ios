@@ -1,0 +1,333 @@
+version: 2
+
+goal:
+  title: "Foil iOS Max Lines Ratchet to 350"
+  slug: "foil-ios-max-lines-ratchet-350"
+  kind: specific
+  tranche: "Map and decide the next safe hard source max-lines ratchet after the 400-line gate."
+  status: active
+  oracle:
+    signal: "The 350-line source ratchet is implemented with an empty allowlist, verified locally, and landed through the protected PR and merge queue."
+    cadence: "after Scout evidence, after Judge decision, after Worker verification, after PR checks, and after merge-queue proof"
+    final_proof: "GoalBuddy checker passes, `scripts/source-line-ratchet.py --json` reports `max_lines` 350 with no violations, and the implementation PR lands through the merge queue."
+  intake:
+    original_request: "ok do this"
+    interpreted_outcome: "Create Board 4, use Scout/Judge to select the next safe cap, implement the approved 350-line source ratchet, and land it through protected CI."
+    input_shape: specific
+    audience: "Foil iOS maintainers tightening hard repo hygiene gates after the 400-line ratchet landed."
+    authority: requested
+    proof_type: artifact
+    completion_proof: "A merged PR proving the 350-line source ratchet with empty allowlist, local simulator-safe verification, hosted checks, and merge-queue evidence."
+    likely_misfire: "Skipping Scout/Judge and lowering directly to 350, causing unsafe broad refactors or allowlist pressure."
+    blind_spots_considered:
+      - "`ContentView.swift` is exactly 400 lines after Board 3, so the next cap requires a real extraction."
+      - "Scripts are counted too; `scripts/ios-physical-wda-evidence.py` may block 350 even though it is outside SwiftUI app code."
+      - "Presenter files near 350 may need domain-sensitive splits."
+      - "Simulator-safe CI proof remains separate from physical iPhone/TestFlight/WDA receipts."
+    existing_plan_facts:
+      - "Board 3 landed `MAX_LINES = 400` with empty allowlist and merge-queue proof."
+      - "Next tranche should be Scout/Judge first."
+      - "Judge should decide whether to use 375 as an intermediate or proceed directly to 350."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  preserve_and_validate_existing_plan: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/foil-ios-max-lines-ratchet-350/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-max-lines-ratchet-350"
+
+active_task: T004
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Map current counted files against 350 and 375 candidate caps, identify safe extraction points, and recommend the largest safe next implementation slice."
+    inputs:
+      - "scripts/source-line-ratchet.py --json"
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "scripts/ios-physical-wda-evidence.py"
+      - "FoiliOS/Shared/FoilDictationLoopSetupPresenter.swift"
+      - "FoiliOS/FoilIOSApp/FoilOnboardingPanels.swift"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/acceptance-evidence.md"
+      - "Board 3 receipts."
+    constraints:
+      - "Read-only."
+      - "Do not edit implementation files."
+      - "Do not inspect private physical device artifacts."
+      - "Prefer concrete line counts, symbols, tests, and file-path evidence."
+    expected_output:
+      - "Files blocking 350 and 375."
+      - "Risk map for each blocker."
+      - "Recommended next cap: 375 or 350."
+      - "Exact Worker package with allowed_files, verify, and stop_if."
+    receipt:
+      result: done
+      note: "notes/T001-scout.md"
+      summary: "350 Scout found two blockers: `FoiliOS/FoilIOSApp/ContentView.swift` at 400 lines and `scripts/ios-physical-wda-evidence.py` at 367 lines. A 375 cap would only block on `ContentView.swift`. Scout recommends going directly to 350 with two bounded extractions: ContentView presentation-support helpers and WDA evidence pure XML/source helpers."
+      evidence:
+        - "`scripts/source-line-ratchet.py --json`: `max_lines` 400, empty allowlist, no violations, 48 counted files."
+        - "`ContentView.swift` lines 222-375 contain derived presentation helpers suitable for value-passing static helper extraction."
+        - "`scripts/ios-physical-wda-evidence.py` lines 20-80 contain pure hash/XML/source helper functions suitable for extraction into a sibling module."
+        - "`docs/ci-workflow-development-plan.md` keeps the hard max-lines end state non-negotiable and preserves hosted simulator-only proof boundaries."
+      recommended_cap: 350
+      recommended_worker:
+        objective: "Extract `ContentView` presentation-support helpers and WDA XML/source helper functions into new files, lower the hard max-lines cap to 350 with no allowlist, update docs, regenerate Xcode, and verify the stricter gate."
+        allowed_files:
+          - "FoiliOS/FoilIOSApp/ContentView.swift"
+          - "FoiliOS/FoilIOSApp/FoilContentPresentationSupport.swift"
+          - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+          - "scripts/ios-physical-wda-evidence.py"
+          - "scripts/ios_physical_wda_evidence_core.py"
+          - "scripts/source-line-ratchet.py"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-max-lines-ratchet-350/state.yaml"
+        verify:
+          - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py scripts/ios-physical-wda-evidence.py scripts/ios_physical_wda_evidence_core.py"
+          - "scripts/source-line-ratchet.py --self-test"
+          - "scripts/source-whitespace-check.py --self-test"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-whitespace-check.py"
+          - "sterile synthetic WDA fixture through scripts/ios-physical-wda-evidence.py"
+          - "cd FoiliOS && xcodegen generate --spec project.yml"
+          - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          - "focused simulator tests for app presentation, health, setup readiness, and onboarding readiness"
+          - "scripts/ios-simulator-sanity.sh"
+          - "git diff --check"
+          - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-350/state.yaml"
+        stop_if:
+          - "The cap change needs an allowlist."
+          - "The ContentView extraction requires broadening state access or moving state ownership."
+          - "The WDA helper extraction changes receipt schema or emits private raw content."
+          - "The new Swift file is not included by XcodeGen."
+          - "Verification fails twice for the same reason."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Choose whether to ratchet next to 350 or 375 and approve the largest safe useful Worker package."
+    inputs:
+      - "T001 Scout receipt."
+    constraints:
+      - "Read-only."
+      - "Reject any plan that needs a line-count allowlist."
+      - "Reject any plan that weakens hosted simulator-safe CI or overclaims physical-device proof."
+      - "Prefer the largest bounded slice with strong verification."
+    expected_output:
+      - "approved | blocked | needs_more_scout"
+      - "Recommended next cap."
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if conditions."
+      - "Rejected options and why."
+    receipt:
+      result: done
+      decision: approved
+      recommended_cap: 350
+      full_outcome_complete: false
+      rationale: "Scout found exactly two blockers for 350 and only one blocker for 375. The 375 step would leave immediate known debt, while direct 350 can be done as two bounded mechanical extractions with strong verification: value-passing presentation support for `ContentView`, and pure XML/source helpers for the WDA receipt script. This does not require an allowlist, does not weaken hosted CI, and preserves physical proof boundaries."
+      worker:
+        objective: "Extract `ContentView` presentation-support helpers and WDA XML/source helper functions into new files, lower the hard max-lines cap to 350 with no allowlist, update docs, regenerate Xcode, and verify the stricter gate."
+        allowed_files:
+          - "FoiliOS/FoilIOSApp/ContentView.swift"
+          - "FoiliOS/FoilIOSApp/FoilContentPresentationSupport.swift"
+          - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+          - "scripts/ios-physical-wda-evidence.py"
+          - "scripts/ios_physical_wda_evidence_core.py"
+          - "scripts/source-line-ratchet.py"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-max-lines-ratchet-350/state.yaml"
+        verify:
+          - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py scripts/ios-physical-wda-evidence.py scripts/ios_physical_wda_evidence_core.py"
+          - "scripts/source-line-ratchet.py --self-test"
+          - "scripts/source-whitespace-check.py --self-test"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-whitespace-check.py"
+          - "sterile synthetic WDA fixture through scripts/ios-physical-wda-evidence.py"
+          - "cd FoiliOS && xcodegen generate --spec project.yml"
+          - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilHealthPresentationTests"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilSetupReadinessPresentationTests"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests"
+          - "scripts/ios-simulator-sanity.sh"
+          - "git diff --check"
+          - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-350/state.yaml"
+        stop_if:
+          - "The cap change needs an allowlist."
+          - "The ContentView extraction requires broadening state access or moving state ownership."
+          - "The WDA helper extraction changes receipt schema or emits private raw content."
+          - "The new Swift file is not included by XcodeGen."
+          - "Verification fails twice for the same reason."
+      rejected_options:
+        - "Ratchet only to 375: safe but leaves `scripts/ios-physical-wda-evidence.py` as immediate known debt."
+        - "Directly move `ContentView` private state into cross-file extensions: risks broadening state access and is unnecessary."
+        - "Allowlist blockers: contradicts the hard-gate tranche."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Execute the Worker package selected by Judge for the next source max-lines ratchet."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/FoilIOSApp/FoilContentPresentationSupport.swift"
+      - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+      - "scripts/ios-physical-wda-evidence.py"
+      - "scripts/ios_physical_wda_evidence_core.py"
+      - "scripts/source-line-ratchet.py"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/foil-ios-max-lines-ratchet-350/state.yaml"
+    verify:
+      - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py scripts/ios-physical-wda-evidence.py scripts/ios_physical_wda_evidence_core.py"
+      - "scripts/source-line-ratchet.py --self-test"
+      - "scripts/source-whitespace-check.py --self-test"
+      - "scripts/source-line-ratchet.py --json"
+      - "scripts/source-whitespace-check.py"
+      - "sterile synthetic WDA fixture through scripts/ios-physical-wda-evidence.py"
+      - "cd FoiliOS && xcodegen generate --spec project.yml"
+      - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilHealthPresentationTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilSetupReadinessPresentationTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests"
+      - "scripts/ios-simulator-sanity.sh"
+      - "git diff --check"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-350/state.yaml"
+    stop_if:
+      - "Need files outside Judge-approved `allowed_files`."
+      - "The cap change needs an allowlist."
+      - "Behavior or proof boundary becomes ambiguous."
+      - "Verification fails twice for the same reason."
+    receipt:
+      result: done
+      changed_files:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/FoilIOSApp/FoilContentPresentationSupport.swift"
+        - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+        - "scripts/ios-physical-wda-evidence.py"
+        - "scripts/ios_physical_wda_evidence_core.py"
+        - "scripts/source-line-ratchet.py"
+        - "docs/ci-workflow-development-plan.md"
+        - "docs/ios-simulator-sanity-runbook.md"
+        - "docs/goals/foil-ios-max-lines-ratchet-350/state.yaml"
+      summary: "Extracted `ContentView` derived presentation helpers into `FoilContentPresentationSupport`, extracted pure WDA source/XML helpers into `scripts/ios_physical_wda_evidence_core.py`, lowered the hard source cap to 350 with no allowlist, updated docs, and regenerated the Xcode project."
+      strongest_failure_mode: "The stricter gate could pass while helper extraction subtly changes user-facing recovery/setup text, omits the new Swift file from the Xcode project, or changes the sanitized WDA receipt behavior/privacy boundary."
+      disproof:
+        - "`scripts/source-line-ratchet.py --json`: `max_lines` 350, empty allowlist, 50 counted files, no violations; largest counted file is `FoiliOS/FoilIOSApp/ContentView.swift` at exactly 350 lines."
+        - "`cd FoiliOS && xcodegen generate --spec project.yml` completed and `git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated` passed."
+        - "Focused simulator tests passed for `FoilAppLoopPresentationTests`, `FoilHealthPresentationTests`, `FoilSetupReadinessPresentationTests`, and `FoilOnboardingReadinessPresentationTests`."
+        - "A sterile synthetic WDA source fixture passed through `scripts/ios-physical-wda-evidence.py` and produced valid JSON without raw private device content."
+        - "`scripts/ios-simulator-sanity.sh` completed successfully, including project/scheme visibility, simulator tests, and unsigned generic iOS build."
+      commands:
+        - cmd: "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py scripts/ios-physical-wda-evidence.py scripts/ios_physical_wda_evidence_core.py"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --self-test"
+          status: pass
+        - cmd: "scripts/source-whitespace-check.py --self-test"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --json"
+          status: pass
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "sterile synthetic WDA fixture through scripts/ios-physical-wda-evidence.py"
+          status: pass
+        - cmd: "cd FoiliOS && xcodegen generate --spec project.yml"
+          status: pass
+        - cmd: "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilHealthPresentationTests"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilSetupReadinessPresentationTests"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests"
+          status: pass
+        - cmd: "scripts/ios-simulator-sanity.sh"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+
+  - id: T004
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: medium
+    objective: "Publish the verified 350-line ratchet through a protected PR, watch hosted checks, enqueue it, and record merge-queue evidence."
+    inputs:
+      - "T003 Worker receipt."
+      - "Current branch changes."
+      - "GitHub branch protection and merge queue."
+    constraints:
+      - "Do not claim completion on local checks alone."
+      - "Preserve simulator-safe CI as CI proof and physical iPhone/TestFlight/WDA as receipt-based evidence only."
+      - "Do not add private physical-device artifacts, raw WDA trees, provider keys, archives, or IPAs."
+    expected_output:
+      - "Implementation commit and PR."
+      - "Hosted CI results."
+      - "Merge-queue result or explicit blocker."
+      - "Next board state for final audit."
+    receipt: null
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Audit whether the 350-line source ratchet satisfies the original outcome and has merge-queue proof."
+    inputs:
+      - "All done task receipts."
+      - "GoalBuddy checker result."
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the implementation PR has not landed through the merge queue."
+      - "Reject completion if `scripts/source-line-ratchet.py --json` does not report 350, empty allowlist, and no violations."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Strongest realistic failure mode and disproof."
+      - "Next task or blocker if not complete."
+    receipt: null
+
+checks:
+  dirty_fingerprint: "implementation verified locally; publishing task active"
+  last_verification:
+    result: pass
+    task: T003
+    commands:
+      - "scripts/source-line-ratchet.py --json"
+      - "git diff --check"
