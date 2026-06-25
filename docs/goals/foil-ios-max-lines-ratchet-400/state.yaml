@@ -5,7 +5,7 @@ goal:
   slug: "foil-ios-max-lines-ratchet-400"
   kind: specific
   tranche: "Lower the hard max-lines gate from 450 to 400 by safely refactoring the current blockers."
-  status: active
+  status: done
   oracle:
     signal: "A merge-queued PR lands with `scripts/source-line-ratchet.py --json` reporting `max_lines` 400, empty allowlist, no violations, and required simulator-safe CI contexts passing."
     cadence: "after Scout evidence, after Judge selection, after Worker verification, after PR checks, after merge-group evidence, and at final audit"
@@ -59,7 +59,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/foil-ios-max-lines-ratchet-400/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-max-lines-ratchet-400"
 
-active_task: T006
+active_task: null
 
 tasks:
   - id: T001
@@ -340,7 +340,7 @@ tasks:
   - id: T006
     type: pm
     assignee: PM
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Push the CI recovery commit, rerun PR checks, enqueue the PR, and collect merge-queue evidence."
     inputs:
@@ -355,12 +355,35 @@ tasks:
       - "PR-level check rollup."
       - "Merge-group run URL and result."
       - "`origin/main` merge commit if landed."
-    receipt: null
+    receipt:
+      result: done
+      summary: "Pushed recovery commit, collected PR-level check proof, enqueued PR #71, watched merge-group run 28181180600 pass, and confirmed merge to `origin/main`."
+      branch: "codex/foil-ios-max-lines-ratchet-400"
+      commits:
+        - "1659448 Ratchet Foil iOS source lines to 400"
+        - "73b670c Tolerate hosted simulator bootstatus timeout"
+      pr: "https://github.com/usefoil/foil-ios/pull/71"
+      pr_checks:
+        - "Hosted simulator sanity: pass, https://github.com/usefoil/foil-ios/actions/runs/28179882443/job/83466311638"
+        - "Repo hygiene ratchet: pass, https://github.com/usefoil/foil-ios/actions/runs/28179882443/job/83466311635"
+        - "Analyze (actions): pass, https://github.com/usefoil/foil-ios/actions/runs/28179877056/job/83466298327"
+        - "Analyze (python): pass, https://github.com/usefoil/foil-ios/actions/runs/28179877056/job/83466298452"
+        - "Analyze (swift): pass, https://github.com/usefoil/foil-ios/actions/runs/28179877056/job/83466298340"
+        - "CodeQL: pass, https://github.com/usefoil/foil-ios/runs/83466429350"
+      merge_queue:
+        run: "https://github.com/usefoil/foil-ios/actions/runs/28181180600"
+        conclusion: success
+        hosted_simulator_sanity: "pass in 6m29s"
+        repo_hygiene_ratchet: "pass in 8s"
+      merged:
+        at: "2026-06-25T15:33:30Z"
+        commit: "0e6945955e13516a748819a77f258aa74eedb9b7"
+        origin_main: "0e6945955e13516a748819a77f258aa74eedb9b7"
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Final audit for the 400-line ratchet tranche."
     inputs:
@@ -379,13 +402,25 @@ tasks:
       - "full_outcome_complete: true | false"
       - "Strongest realistic failure mode and disproof."
       - "Next task or blocker if not complete."
-    receipt: null
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      strongest_realistic_failure_mode: "The branch could merge while `main` still lacks an enforced 400-line gate, uses an allowlist, has counted-file violations, or only has PR-level proof instead of merge-queue proof."
+      disproof:
+        - "PR #71 merged via merge queue at `2026-06-25T15:33:30Z`."
+        - "`origin/main` points at merge commit `0e6945955e13516a748819a77f258aa74eedb9b7`."
+        - "Merge-group run 28181180600 passed `Hosted simulator sanity` and `Repo hygiene ratchet`."
+        - "PR-level checks passed CodeQL, hosted simulator sanity, and repo hygiene before enqueue."
+        - "Local `scripts/source-line-ratchet.py --json` on the implemented tree reported `max_lines` 400, empty allowlist, and no violations."
+      residual_boundary: "This tranche remains simulator-safe CI proof only; it does not claim physical iPhone, TestFlight, WDA, host-app insertion, or private app proof."
 
 checks:
-  dirty_fingerprint: "T003 implementation complete; publish/evidence step active"
+  dirty_fingerprint: "goal complete on origin/main"
   last_verification:
     result: pass
-    task: T005
+    task: T999
     commands:
       - "scripts/source-line-ratchet.py --json: max_lines 400, empty allowlist, no violations"
       - "IOS_SIMULATOR_SANITY_RESET_BEFORE_TESTS=1 scripts/ios-simulator-sanity.sh: reset-enabled project visibility, simulator tests, and unsigned generic iOS build passed"
+      - "PR #71 checks passed, merge-group run 28181180600 passed, origin/main is 0e6945955e13516a748819a77f258aa74eedb9b7"
