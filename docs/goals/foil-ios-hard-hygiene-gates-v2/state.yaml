@@ -5,7 +5,7 @@ goal:
   slug: "foil-ios-hard-hygiene-gates-v2"
   kind: specific
   tranche: "Make hygiene gates explicit, hard, and merge-queue-aligned."
-  status: active
+  status: done
   oracle:
     signal: "A merge-queued PR lands with explicit hard hygiene gates, documented max-lines policy, verified local checks, and required-check evidence that matches branch protection."
     cadence: "after Scout evidence, after Judge selection, after Worker verification, after PR checks, and at final audit"
@@ -61,7 +61,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/foil-ios-hard-hygiene-gates-v2/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-hard-hygiene-gates-v2"
 
-active_task: T004
+active_task: null
 
 tasks:
   - id: T001
@@ -250,7 +250,7 @@ tasks:
   - id: T004
     type: pm
     assignee: PM
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Publish the verified hardening slice and collect PR/merge-queue evidence."
     inputs:
@@ -266,12 +266,43 @@ tasks:
       - "PR-level check rollup."
       - "Merge-group run URL and result."
       - "Any required branch-protection update or external settings follow-up."
-    receipt: null
+    receipt:
+      result: done
+      branch: "codex/foil-ios-hard-hygiene-gates-v2"
+      commit: "35d551d81f83c3066128176a70878b70a6cf708a"
+      pr:
+        number: 67
+        url: "https://github.com/usefoil/foil-ios/pull/67"
+        state: merged
+        merged_at: "2026-06-25T02:36:06Z"
+        merge_commit: "d622e2bc96bd1595bc413e2d0d05762408eea75a"
+      pr_checks:
+        - "CodeQL / Analyze (actions): success, run 28142325833 job 83342120571."
+        - "CodeQL / Analyze (python): success, run 28142325833 job 83342120536."
+        - "CodeQL / Analyze (swift): success, run 28142325833 job 83342120647."
+        - "iOS Simulator Sanity (non-physical) / Hosted simulator sanity: success, run 28142326553 job 83342121044."
+        - "iOS Simulator Sanity (non-physical) / Repo hygiene ratchet: success, run 28142326553 job 83342121024."
+      merge_queue:
+        run: 28142905581
+        url: "https://github.com/usefoil/foil-ios/actions/runs/28142905581"
+        head_branch: "gh-readonly-queue/main/pr-67-9b4869ce9b1dc9c3ba45adae85cde55a55f76bbc"
+        head_sha: "d622e2bc96bd1595bc413e2d0d05762408eea75a"
+        result: success
+        jobs:
+          - "Repo hygiene ratchet: success, started 2026-06-25T02:30:19Z, completed 2026-06-25T02:30:26Z."
+          - "Hosted simulator sanity: success, started 2026-06-25T02:30:19Z, completed 2026-06-25T02:35:33Z."
+      required_contexts:
+        source: "Repository ruleset `main-protection` id 18074403."
+        enforcement: active
+        required:
+          - "Hosted simulator sanity"
+          - "Repo hygiene ratchet"
+      summary: "Published the hard hygiene gate slice through PR #67, observed PR checks, watched the merge-group run pass both required contexts, and confirmed the PR merged to `main` at `d622e2bc96bd1595bc413e2d0d05762408eea75a`."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Final audit for the hard hygiene gates v2 tranche."
     inputs:
@@ -289,13 +320,31 @@ tasks:
       - "full_outcome_complete: true | false"
       - "Strongest realistic failure mode and disproof."
       - "Next task or blocker if not complete."
-    receipt: null
+    receipt:
+      result: done
+      decision: complete
+      verdict: complete
+      full_outcome_complete: true
+      summary: "The v2 tranche is complete: Foil iOS now has deterministic fixture self-tests for the hard line-count and whitespace hygiene gates, those self-tests run inside the required `Repo hygiene ratchet` CI context, the active ruleset-required contexts are documented, and the implementation landed through the merge queue."
+      proof:
+        - "`origin/main` is at merge commit `d622e2bc96bd1595bc413e2d0d05762408eea75a` from PR #67."
+        - "Merge-group run `28142905581` succeeded for `Hosted simulator sanity` and `Repo hygiene ratchet`."
+        - "Ruleset `main-protection` remains active and strictly requires `Hosted simulator sanity` plus `Repo hygiene ratchet` on the default branch."
+        - "`scripts/source-line-ratchet.py --json` on the closeout branch reports `max_lines` 500, empty allowlist, and no violations."
+        - "`scripts/source-line-ratchet.py --self-test` and `scripts/source-whitespace-check.py --self-test` pass and intentionally exercise fail-closed fixture cases."
+      strongest_failure_mode:
+        risk: "The repo could claim hard hygiene gates while `main` either lacks the workflow wiring, lacks required-check enforcement, or silently allows over-limit/whitespace violations."
+        disproof: "PR #67 merged through the queue at `d622e2b`; the merge-group run passed both required contexts; the active ruleset requires those exact contexts; and local closeout verification re-ran the fixture self-tests plus real line-count/whitespace scans."
+      boundary:
+        - "This tranche proves simulator-safe hosted CI and repo hygiene gates only."
+        - "Physical iPhone/TestFlight/WDA proof remains separate receipt-based evidence unless a trusted self-hosted Mac plus device lane is explicitly added."
+      next_task: null
 
 checks:
-  dirty_fingerprint: "worker diff ready for publish"
+  dirty_fingerprint: "closeout receipt update"
   last_verification:
     result: pass
-    task: T003
+    task: T999
     commands:
       - cmd: "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
         status: pass
@@ -314,4 +363,10 @@ checks:
       - cmd: "git diff --check"
         status: pass
       - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-hard-hygiene-gates-v2/state.yaml"
+        status: pass
+      - cmd: "gh run view 28142905581 --repo usefoil/foil-ios --json status,conclusion,jobs,url,headBranch,headSha,createdAt,updatedAt"
+        status: pass
+      - cmd: "gh pr view 67 --repo usefoil/foil-ios --json state,mergedAt,mergeCommit"
+        status: pass
+      - cmd: "gh api repos/usefoil/foil-ios/rulesets/18074403"
         status: pass
