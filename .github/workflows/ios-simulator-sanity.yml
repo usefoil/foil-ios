@@ -105,6 +105,11 @@ jobs:
           fi
 
       - name: Run simulator-only sanity script
+        env:
+          IOS_SIMULATOR_SANITY_RESET_BEFORE_TESTS: "1"
+          IOS_SIMULATOR_SANITY_RESET_TIMEOUT_SECONDS: "120"
+          IOS_SIMULATOR_SANITY_TEST_ATTEMPTS: "2"
+          IOS_SIMULATOR_SANITY_TEST_TIMEOUT_SECONDS: "600"
         run: |
           set -euo pipefail
           scripts/ios-simulator-sanity.sh 2>&1 | tee ci-artifacts/ios-simulator-sanity.txt
