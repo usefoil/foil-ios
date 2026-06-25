@@ -56,7 +56,14 @@ reset_selected_simulator() {
   run_phase "simulator-reset-shutdown" "$RESET_TIMEOUT_SECONDS" xcrun simctl shutdown "$udid" || true
   run_phase "simulator-reset-erase" "$RESET_TIMEOUT_SECONDS" xcrun simctl erase "$udid"
   run_phase "simulator-reset-boot" "$RESET_TIMEOUT_SECONDS" xcrun simctl boot "$udid"
-  run_phase "simulator-reset-bootstatus" "$RESET_TIMEOUT_SECONDS" xcrun simctl bootstatus "$udid" -b
+  local bootstatus_status=0
+  run_phase "simulator-reset-bootstatus" "$RESET_TIMEOUT_SECONDS" xcrun simctl bootstatus "$udid" -b || bootstatus_status=$?
+  if [[ "$bootstatus_status" -ne 0 ]]; then
+    if [[ "$bootstatus_status" -ne 124 ]]; then
+      return "$bootstatus_status"
+    fi
+    log "phase=simulator-reset-bootstatus status=warn reason=timeout-continuing-to-xcodebuild udid=$udid"
+  fi
   log "phase=simulator-reset status=pass trigger=$reason udid=$udid"
 }
 

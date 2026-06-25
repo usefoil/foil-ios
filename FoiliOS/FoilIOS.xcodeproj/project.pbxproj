@@ -13,6 +13,7 @@
 		0BBFCD60BD149E3F6CB6DA66 /* TranscriptionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621DDB56882D26AAEC465CB0 /* TranscriptionController.swift */; };
 		14069A11EB912D2D611731D8 /* FoilSetupReadinessPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72446688DF9EA9563AC5B07A /* FoilSetupReadinessPresentationTests.swift */; };
 		1D2B410EDA42F09012974E5C /* FoilProviderFailurePresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517B99BD6F16C11BEB5B6507 /* FoilProviderFailurePresentationTests.swift */; };
+		1ECD1857F35F5F870F278CD8 /* ContentViewPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8151110A5BBA22679F90B0 /* ContentViewPreview.swift */; };
 		218D1538A0D6557D5FB3B9B0 /* FoilDictationConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22B0D12DBCF692CEC110C764 /* FoilDictationConsoleView.swift */; };
 		2CDF09B597678B083CCCF602 /* FoilKeyboardBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC574AC144BA7F61AAA6B60E /* FoilKeyboardBridge.swift */; };
 		30450BDE0FABCC501287034F /* FoilDictationLoopSetupPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C119BA898AD6CD7C311041EA /* FoilDictationLoopSetupPresenter.swift */; };
@@ -22,6 +23,7 @@
 		4AAE3B322F4DAB161951B0DC /* FoilDictationLoopPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243E8B108679282C050F860F /* FoilDictationLoopPresentationTests.swift */; };
 		4AC314D95DEBA3047166C0F8 /* FoilTranscriptionClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3583EEDEF91366197D5835CE /* FoilTranscriptionClientTests.swift */; };
 		4BDAF84D0AD345CAD6BDC7CD /* FoilDictationLoopKeyboardPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158AE50CF5C09E560A6C13A2 /* FoilDictationLoopKeyboardPresenter.swift */; };
+		5091D66313CDA9AB0F46E986 /* FoilKeyboardBridgeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EEC3F482742F0397DDED270 /* FoilKeyboardBridgeModels.swift */; };
 		589C455BA82755598BC53393 /* FoilIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C18A113AB57751309B185D /* FoilIOSApp.swift */; };
 		624A853276103525C81EDD1F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8ED6E6F949226BA93558B2 /* ContentView.swift */; };
 		6D9A57B023B74FAC7F4EDC91 /* FoilKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5EE790723AA98A22C747B75F /* FoilKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -37,7 +39,9 @@
 		A45D5112259C81FF8B809D7A /* FoilTranscriptQualityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268ED96A1069398E9D573385 /* FoilTranscriptQualityTests.swift */; };
 		A60AD427484709AEBFCB6EBF /* FoilTranscriptReviewPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915020B5593337A0839E0332 /* FoilTranscriptReviewPanel.swift */; };
 		A78ADCBA8BD6F9DF880AB45C /* FoilDictationLoopAppPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0EA7F4171E7F7D187B0CB0 /* FoilDictationLoopAppPresenter.swift */; };
+		AE87C44C0B1CEB1982243284 /* FoilContentCommandRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52848B5FBF30423E92DD3CB6 /* FoilContentCommandRouter.swift */; };
 		C360AA8B6DF57D039F3506CE /* FoilRecoverySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4789D040E444FD1FF8FFE86 /* FoilRecoverySection.swift */; };
+		C47170AC0B354D358E34B071 /* FoilKeyboardBridgeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EEC3F482742F0397DDED270 /* FoilKeyboardBridgeModels.swift */; };
 		C76E1E5E9E23E1D937E48677 /* FoilSetupRoutePresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4258D5D2DEF6617356605D1 /* FoilSetupRoutePresentationTests.swift */; };
 		CDF2025B3CC90DEF9172B171 /* FoilCredentialStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E66C051F406E089F849D00 /* FoilCredentialStore.swift */; };
 		CEF221C874A713CB0AF6B31F /* FoilKeyboardBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80A5EC71E0768BC7DCDB9C6 /* FoilKeyboardBridgeTests.swift */; };
@@ -83,6 +87,7 @@
 
 /* Begin PBXFileReference section */
 		05AB1E43AB37AAF5071F28CE /* FoilHealthPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilHealthPresentationTests.swift; sourceTree = "<group>"; };
+		0EEC3F482742F0397DDED270 /* FoilKeyboardBridgeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilKeyboardBridgeModels.swift; sourceTree = "<group>"; };
 		158AE50CF5C09E560A6C13A2 /* FoilDictationLoopKeyboardPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilDictationLoopKeyboardPresenter.swift; sourceTree = "<group>"; };
 		1C101F2BCE2DE49E0CF59FE9 /* FoilDictationLoopPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilDictationLoopPresenter.swift; sourceTree = "<group>"; };
 		1CF921C0034784102049E070 /* FoilTranscriptionClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilTranscriptionClient.swift; sourceTree = "<group>"; };
@@ -92,6 +97,7 @@
 		3583EEDEF91366197D5835CE /* FoilTranscriptionClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilTranscriptionClientTests.swift; sourceTree = "<group>"; };
 		3F3C555C02FDEC00DF04C2A5 /* FoilOnboardingPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilOnboardingPanels.swift; sourceTree = "<group>"; };
 		517B99BD6F16C11BEB5B6507 /* FoilProviderFailurePresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilProviderFailurePresentationTests.swift; sourceTree = "<group>"; };
+		52848B5FBF30423E92DD3CB6 /* FoilContentCommandRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilContentCommandRouter.swift; sourceTree = "<group>"; };
 		58C4258EB9EC3B85F4B3132E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		59E66C051F406E089F849D00 /* FoilCredentialStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilCredentialStore.swift; sourceTree = "<group>"; };
 		5EE790723AA98A22C747B75F /* FoilKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = FoilKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -117,6 +123,7 @@
 		C4789D040E444FD1FF8FFE86 /* FoilRecoverySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilRecoverySection.swift; sourceTree = "<group>"; };
 		C49D88CD1A599656C067DEE9 /* FoilDictationLoopPresentationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilDictationLoopPresentationModels.swift; sourceTree = "<group>"; };
 		C636A5C86BDAB9F681A9D76E /* FoilAdvancedSupportDisclosure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilAdvancedSupportDisclosure.swift; sourceTree = "<group>"; };
+		DB8151110A5BBA22679F90B0 /* ContentViewPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewPreview.swift; sourceTree = "<group>"; };
 		E80A5EC71E0768BC7DCDB9C6 /* FoilKeyboardBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilKeyboardBridgeTests.swift; sourceTree = "<group>"; };
 		E9B8323C662C1A6E965FF9D6 /* FoilKeyboardLoopPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilKeyboardLoopPresentationTests.swift; sourceTree = "<group>"; };
 		F4258D5D2DEF6617356605D1 /* FoilSetupRoutePresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilSetupRoutePresentationTests.swift; sourceTree = "<group>"; };
@@ -172,6 +179,7 @@
 				C119BA898AD6CD7C311041EA /* FoilDictationLoopSetupPresenter.swift */,
 				904D81DB3B8F85BDD2BCA0C1 /* FoilIOSConstants.swift */,
 				AC574AC144BA7F61AAA6B60E /* FoilKeyboardBridge.swift */,
+				0EEC3F482742F0397DDED270 /* FoilKeyboardBridgeModels.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -182,7 +190,9 @@
 				AF36E3CB6AD18179415EC467 /* Assets.xcassets */,
 				77F32B52839F43D4C35AEE48 /* AudioCaptureController.swift */,
 				6B8ED6E6F949226BA93558B2 /* ContentView.swift */,
+				DB8151110A5BBA22679F90B0 /* ContentViewPreview.swift */,
 				C636A5C86BDAB9F681A9D76E /* FoilAdvancedSupportDisclosure.swift */,
+				52848B5FBF30423E92DD3CB6 /* FoilContentCommandRouter.swift */,
 				83964545F4D98BE890E4B79D /* FoilContentRows.swift */,
 				59E66C051F406E089F849D00 /* FoilCredentialStore.swift */,
 				22B0D12DBCF692CEC110C764 /* FoilDictationConsoleView.swift */,
@@ -347,7 +357,9 @@
 			files = (
 				810360C691C678DD768EA07A /* AudioCaptureController.swift in Sources */,
 				624A853276103525C81EDD1F /* ContentView.swift in Sources */,
+				1ECD1857F35F5F870F278CD8 /* ContentViewPreview.swift in Sources */,
 				FB039D024A16D984248BA205 /* FoilAdvancedSupportDisclosure.swift in Sources */,
+				AE87C44C0B1CEB1982243284 /* FoilContentCommandRouter.swift in Sources */,
 				43FEF9B62D005DAA23E2AED0 /* FoilContentRows.swift in Sources */,
 				CDF2025B3CC90DEF9172B171 /* FoilCredentialStore.swift in Sources */,
 				218D1538A0D6557D5FB3B9B0 /* FoilDictationConsoleView.swift in Sources */,
@@ -359,6 +371,7 @@
 				589C455BA82755598BC53393 /* FoilIOSApp.swift in Sources */,
 				D22B502FB8F13DD32544442E /* FoilIOSConstants.swift in Sources */,
 				2CDF09B597678B083CCCF602 /* FoilKeyboardBridge.swift in Sources */,
+				5091D66313CDA9AB0F46E986 /* FoilKeyboardBridgeModels.swift in Sources */,
 				778C9617E267AD04F337E2F3 /* FoilOnboardingPanels.swift in Sources */,
 				C360AA8B6DF57D039F3506CE /* FoilRecoverySection.swift in Sources */,
 				D44A413BDDCA7DE55C3E5A54 /* FoilTranscriptQuality.swift in Sources */,
@@ -397,6 +410,7 @@
 				6DC9150C65CE3D64C6ACF566 /* FoilDictationLoopSetupPresenter.swift in Sources */,
 				8E076C9B35A2D3310945E36B /* FoilIOSConstants.swift in Sources */,
 				05B62FBA1BC372A85B1B3E8A /* FoilKeyboardBridge.swift in Sources */,
+				C47170AC0B354D358E34B071 /* FoilKeyboardBridgeModels.swift in Sources */,
 				959656866E87C04F486DEE6A /* KeyboardViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

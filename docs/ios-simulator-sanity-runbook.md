@@ -10,7 +10,7 @@ scripts/ios-simulator-sanity.sh
 GitHub Actions rollout and repo-hygiene gates are tracked in
 `docs/ci-workflow-development-plan.md`, including the migration path toward a
 required hard max-lines-per-file rule. The current hard source/script/workflow
-ceiling is 450 lines per counted file with no historical allowlist.
+ceiling is 400 lines per counted file with no historical allowlist.
 
 The repo-hygiene job uses `scripts/source-whitespace-check.py` to scan tracked
 text files directly; this avoids the false confidence of `git diff --check` on

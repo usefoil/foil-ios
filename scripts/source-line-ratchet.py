@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-MAX_LINES = 450
+MAX_LINES = 400
 LARGEST_DEFAULT = 20
 
 COUNT_GLOBS = (
@@ -84,23 +84,23 @@ def self_test() -> int:
         "clean-files-pass",
         violations_for(
             [
-                CountedFile(path="FoiliOS/App/Clean.swift", lines=450),
+                CountedFile(path="FoiliOS/App/Clean.swift", lines=400),
                 CountedFile(path="scripts/clean.py", lines=12),
             ],
-            450,
+            400,
             {},
         )
         == [],
     )
 
     over_limit = violations_for(
-        [CountedFile(path="FoiliOS/App/Oversized.swift", lines=451)],
-        450,
+        [CountedFile(path="FoiliOS/App/Oversized.swift", lines=401)],
+        400,
         {},
     )
     record(
         "over-limit-file-fails",
-        over_limit == ["FoiliOS/App/Oversized.swift: 451 lines exceeds 450"],
+        over_limit == ["FoiliOS/App/Oversized.swift: 401 lines exceeds 400"],
         over_limit,
     )
 
@@ -108,7 +108,7 @@ def self_test() -> int:
         "allowlisted-file-at-baseline-passes",
         violations_for(
             [CountedFile(path="FoiliOS/App/Legacy.swift", lines=650)],
-            450,
+            400,
             {"FoiliOS/App/Legacy.swift": 650},
         )
         == [],
@@ -116,7 +116,7 @@ def self_test() -> int:
 
     over_baseline = violations_for(
         [CountedFile(path="FoiliOS/App/Legacy.swift", lines=651)],
-        450,
+        400,
         {"FoiliOS/App/Legacy.swift": 650},
     )
     record(
@@ -128,7 +128,7 @@ def self_test() -> int:
 
     missing_allowlist = violations_for(
         [CountedFile(path="FoiliOS/App/Other.swift", lines=10)],
-        450,
+        400,
         {"FoiliOS/App/Missing.swift": 650},
     )
     record(
