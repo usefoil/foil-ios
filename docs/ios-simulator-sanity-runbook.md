@@ -15,12 +15,16 @@ The repo-hygiene job uses `scripts/source-whitespace-check.py` to scan tracked
 text files directly; this avoids the false confidence of `git diff --check` on
 a clean hosted checkout.
 
-The hosted workflow is named `iOS Simulator Sanity (non-physical)`. After the
-first GitHub Actions run, the required-status-check API contexts were confirmed
-as the job names:
+The hosted workflow is named `iOS Simulator Sanity (non-physical)`. Required
+status checks are enforced by the repository ruleset `main-protection`, not
+classic branch protection. The required job contexts are:
 
 - `Hosted simulator sanity`
 - `Repo hygiene ratchet`
+
+`Repo hygiene ratchet` runs fixture self-tests for the source whitespace scanner
+and max-lines ratchet before scanning the real checkout, so those required gates
+prove both their own fail-closed behavior and the current repo contents.
 
 The lane runs:
 
