@@ -1,0 +1,338 @@
+version: 2
+
+goal:
+  title: "Foil iOS Max Lines Ratchet to 450"
+  slug: "foil-ios-max-lines-ratchet-450"
+  kind: specific
+  tranche: "Lower the hard max-lines gate from 500 to 450 by safely refactoring the only blocking file."
+  status: active
+  oracle:
+    signal: "A merge-queued PR lands with `scripts/source-line-ratchet.py --json` reporting `max_lines` 450, empty allowlist, no violations, and required simulator-safe CI contexts passing."
+    cadence: "after Scout evidence, after Judge selection, after Worker verification, after PR checks, after merge-group evidence, and at final audit"
+    final_proof: "Local verification, PR-level checks, merge-group result, and `origin/main` containing the stricter 450-line gate without allowlist or violations."
+  intake:
+    original_request: "gret do this"
+    interpreted_outcome: "Create and execute Board 2: safely ratchet Foil iOS's hard source max-lines rule from 500 down to 450."
+    input_shape: specific
+    audience: "Foil iOS maintainers using hard repo hygiene gates and merge queue protection"
+    authority: requested
+    proof_type: artifact
+    completion_proof: "A merged PR proves the hard 450-line gate on `main` with no allowlist and no violations."
+    likely_misfire: "Lowering docs or constants without enforcing the gate, adding an allowlist to dodge the refactor, or changing SwiftUI app-shell behavior while only checking line counts."
+    blind_spots_considered:
+      - "`ContentView.swift` is the only file above 450 but is user-facing app shell code."
+      - "A safe split must preserve environment wiring, onboarding, provider configuration, keyboard setup, and presentation behavior."
+      - "The previous CI proof is simulator-safe only; physical iPhone/TestFlight/WDA evidence remains separate."
+      - "SwiftUI refactors can compile while subtly changing presentation state, so targeted tests should be identified before edits."
+    existing_plan_facts:
+      - "Previous v2 board landed fixture self-tests for the line ratchet and whitespace scanner."
+      - "Current `main` has `max_lines` 500, empty allowlist, and no violations."
+      - "`FoiliOS/FoilIOSApp/ContentView.swift` is currently 480 lines and is the only known blocker for a 450-line cap."
+      - "`FoiliOS/Shared/FoilKeyboardBridge.swift` is 445 lines and would be below a 450-line cap."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  preserve_and_validate_existing_plan: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/foil-ios-max-lines-ratchet-450/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-max-lines-ratchet-450"
+
+active_task: T004
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Map the current 450-line blockers, `ContentView.swift` structure, relevant tests, and the safest implementation slice."
+    inputs:
+      - "scripts/source-line-ratchet.py --json"
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/FoilIOSTests/"
+      - "Project.yml"
+      - "docs/acceptance-evidence.md"
+      - "Previous hard hygiene gates v2 receipts."
+    constraints:
+      - "Read-only."
+      - "Do not edit implementation files."
+      - "Prefer concrete symbols, line counts, tests, and file-path evidence."
+      - "Do not inspect or record private physical-device receipts."
+    expected_output:
+      - "Current blockers for a 450-line cap."
+      - "`ContentView.swift` structure and likely safe extraction seams."
+      - "Relevant tests and verification commands."
+      - "Recommended Worker package with allowed_files, verify, and stop_if."
+    receipt:
+      result: done
+      note: "notes/T001-scout.md"
+      summary: "450-line Scout found exactly one blocker: `ContentView.swift` at 480 lines. Recommended extracting the recovery panel into `FoilRecoverySection`, lowering `MAX_LINES` to 450, updating docs, and verifying with line/whitespace self-tests plus focused Swift tests."
+      evidence:
+        - "`scripts/source-line-ratchet.py --json`: `max_lines` 500, empty allowlist, no violations, largest file `FoiliOS/FoilIOSApp/ContentView.swift` at 480 lines."
+        - "`FoiliOS/Shared/FoilKeyboardBridge.swift` is 445 lines and would remain under a 450 cap."
+        - "`FoiliOS/project.yml` uses folder sources for `FoilIOSApp`, so a new app Swift file should be picked up by XcodeGen."
+        - "`docs/acceptance-evidence.md` recommends focused Swift tests and stronger evidence for visible app UI changes."
+      recommended_worker:
+        objective: "Extract the recovery panel from `ContentView` into `FoilRecoverySection`, lower the hard line-count cap to 450, update docs, and verify the stricter gate locally."
+        allowed_files:
+          - "FoiliOS/FoilIOSApp/ContentView.swift"
+          - "FoiliOS/FoilIOSApp/FoilRecoverySection.swift"
+          - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+          - "scripts/source-line-ratchet.py"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-max-lines-ratchet-450/state.yaml"
+        verify:
+          - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          - "scripts/source-line-ratchet.py --self-test"
+          - "scripts/source-whitespace-check.py --self-test"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-whitespace-check.py"
+          - "cd FoiliOS && xcodegen generate --spec project.yml"
+          - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests"
+          - "git diff --check"
+          - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-450/state.yaml"
+        stop_if:
+          - "The extraction requires changing presenter semantics or broadening `ContentView` internals instead of passing explicit values and closures."
+          - "The cap change needs an allowlist."
+          - "The new Swift file cannot be included in the app target locally."
+          - "Targeted Swift tests fail twice for the same reason."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Choose whether and how to lower the hard cap to 450 based on Scout evidence."
+    inputs:
+      - "T001 Scout receipt."
+    constraints:
+      - "Read-only."
+      - "Reject any slice that uses an allowlist to avoid the intended ratchet."
+      - "Reject any slice that weakens CI or overclaims physical-device proof."
+      - "Pick the largest safe useful Worker package with explicit allowed files and verification."
+    expected_output:
+      - "approved | blocked | needs_more_scout"
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if conditions."
+      - "Rejected options and why."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Scout evidence shows exactly one blocker for a 450-line cap: `ContentView.swift` at 480 lines. Extracting the recovery panel into a child view is the largest safe useful slice because it avoids allowlists, avoids presenter semantics, preserves explicit state/action wiring, and should make `ContentView.swift` pass the stricter gate."
+      worker:
+        objective: "Extract the recovery panel from `ContentView` into `FoilRecoverySection`, lower the hard line-count cap to 450, update docs, and verify the stricter gate locally."
+        allowed_files:
+          - "FoiliOS/FoilIOSApp/ContentView.swift"
+          - "FoiliOS/FoilIOSApp/FoilRecoverySection.swift"
+          - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+          - "scripts/source-line-ratchet.py"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-max-lines-ratchet-450/state.yaml"
+        verify:
+          - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          - "scripts/source-line-ratchet.py --self-test"
+          - "scripts/source-whitespace-check.py --self-test"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-whitespace-check.py"
+          - "cd FoiliOS && xcodegen generate --spec project.yml"
+          - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests"
+          - "git diff --check"
+          - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-450/state.yaml"
+        stop_if:
+          - "The extraction requires changing presenter semantics or broadening `ContentView` internals instead of passing explicit values and closures."
+          - "The cap change needs an allowlist."
+          - "The new Swift file cannot be included in the app target locally."
+          - "Targeted Swift tests fail twice for the same reason."
+      rejected_options:
+        - "Lowering only docs or workflow text: would not enforce the cap."
+        - "Adding an allowlist for `ContentView.swift`: contradicts the tranche objective."
+        - "Cross-file `ContentView` extension: likely requires broadening private state access and is less contained than a child view."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Extract the recovery panel from `ContentView` into `FoilRecoverySection`, lower the hard line-count cap to 450, update docs, and verify the stricter gate locally."
+    allowed_files:
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/FoilIOSApp/FoilRecoverySection.swift"
+      - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+      - "scripts/source-line-ratchet.py"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/foil-ios-max-lines-ratchet-450/state.yaml"
+    verify:
+      - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+      - "scripts/source-line-ratchet.py --self-test"
+      - "scripts/source-whitespace-check.py --self-test"
+      - "scripts/source-line-ratchet.py --json"
+      - "scripts/source-whitespace-check.py"
+      - "cd FoiliOS && xcodegen generate --spec project.yml"
+      - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests"
+      - "git diff --check"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-450/state.yaml"
+    stop_if:
+      - "Need files outside Judge-approved `allowed_files`."
+      - "The implementation would require an allowlist or weaken the hard gate."
+      - "SwiftUI behavior becomes ambiguous."
+      - "Verification fails twice for the same reason."
+    receipt:
+      result: done
+      summary: "Extracted the recovery panel from `ContentView` into `FoilRecoverySection`, lowered the hard source/script/workflow max-lines cap from 500 to 450, regenerated the Xcode project, and updated CI/runbook docs to name the stricter gate."
+      changed_files:
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/FoilIOSApp/FoilRecoverySection.swift"
+        - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+        - "scripts/source-line-ratchet.py"
+        - "docs/ci-workflow-development-plan.md"
+        - "docs/ios-simulator-sanity-runbook.md"
+        - "docs/goals/foil-ios-max-lines-ratchet-450/state.yaml"
+      evidence:
+        - "`scripts/source-line-ratchet.py --json`: `max_lines` 450, empty `allowlist_baselines`, zero `violations`, 45 counted files; largest files are `FoiliOS/Shared/FoilKeyboardBridge.swift` at 445 and `FoiliOS/FoilIOSApp/ContentView.swift` at 443."
+        - "`FoiliOS/FoilIOSApp/FoilRecoverySection.swift` is 60 lines and is present in `FoiliOS/FoilIOS.xcodeproj/project.pbxproj` after `xcodegen generate --spec project.yml`."
+        - "`scripts/source-line-ratchet.py --self-test` passed, including the over-limit fixture `451 lines exceeds 450`."
+        - "`xcodebuild test ... -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests CODE_SIGNING_ALLOWED=NO` passed 4 tests with 0 failures."
+        - "`xcodebuild test ... -only-testing:FoilIOSTests/FoilAppLoopPresentationTests CODE_SIGNING_ALLOWED=NO` initially hit an early simulator bootstrap crash; the immediate rerun passed 10 tests with 0 failures."
+      verification:
+        - command: "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          result: pass
+        - command: "scripts/source-line-ratchet.py --self-test"
+          result: pass
+        - command: "scripts/source-whitespace-check.py --self-test"
+          result: pass
+        - command: "scripts/source-line-ratchet.py --json"
+          result: pass
+        - command: "scripts/source-whitespace-check.py"
+          result: pass
+        - command: "cd FoiliOS && xcodegen generate --spec project.yml"
+          result: pass
+        - command: "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          result: pass
+        - command: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests CODE_SIGNING_ALLOWED=NO"
+          result: pass
+        - command: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests CODE_SIGNING_ALLOWED=NO"
+          result: "transient first run failed before test bootstrap; immediate rerun passed"
+        - command: "git diff --check"
+          result: pass
+      commands:
+        - cmd: "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --self-test"
+          status: pass
+        - cmd: "scripts/source-whitespace-check.py --self-test"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --json"
+          status: pass
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "cd FoiliOS && xcodegen generate --spec project.yml"
+          status: pass
+        - cmd: "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests CODE_SIGNING_ALLOWED=NO"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests CODE_SIGNING_ALLOWED=NO"
+          status: pass
+          note: "First run exited before test bootstrap with signal kill; immediate rerun passed 10 tests with 0 failures."
+        - cmd: "git diff --check"
+          status: pass
+      strongest_failure_mode:
+        risk: "The line-count gate could pass while the recovery UI extraction is not compiled into the app target or subtly changes app-shell presentation behavior."
+        disproof: "XcodeGen regenerated `project.pbxproj` with `FoilRecoverySection.swift` in the FoilIOS sources, both focused simulator presentation test suites passed after the extraction, and the real repo ratchet scan reports no files over the enforced 450-line cap."
+
+  - id: T004
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: medium
+    objective: "Publish the verified 450-line ratchet slice and collect PR/merge-queue evidence."
+    inputs:
+      - "Done Worker receipt."
+      - "Local verification output."
+      - "GitHub PR checks and merge-group result."
+    constraints:
+      - "Do not push if the worktree contains unrelated changes."
+      - "Use PR and merge queue."
+      - "Do not mark complete if only local checks pass."
+    expected_output:
+      - "Branch, commit, PR URL."
+      - "PR-level check rollup."
+      - "Merge-group run URL and result."
+      - "`origin/main` merge commit if landed."
+    receipt: null
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Final audit for the 450-line ratchet tranche."
+    inputs:
+      - "All done task receipts."
+      - "Local verification."
+      - "GitHub PR and merge-group evidence."
+      - "Current `origin/main` state."
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the 450-line cap is not enforced on `main`."
+      - "Reject completion if any counted file violates the cap or an allowlist is used to bypass it."
+      - "Reject completion if required-check evidence is missing."
+      - "Reject completion if hosted CI proof boundaries are overclaimed."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Strongest realistic failure mode and disproof."
+      - "Next task or blocker if not complete."
+    receipt: null
+
+checks:
+  dirty_fingerprint: "T003 implementation ready for PR publication"
+  last_verification:
+    result: pass
+    task: T003
+    commands:
+      - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+      - "scripts/source-line-ratchet.py --self-test"
+      - "scripts/source-whitespace-check.py --self-test"
+      - "scripts/source-line-ratchet.py --json"
+      - "scripts/source-whitespace-check.py"
+      - "cd FoiliOS && xcodegen generate --spec project.yml"
+      - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests CODE_SIGNING_ALLOWED=NO"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests CODE_SIGNING_ALLOWED=NO"
+      - "git diff --check"
