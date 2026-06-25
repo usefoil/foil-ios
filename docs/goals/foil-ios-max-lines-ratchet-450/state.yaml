@@ -5,7 +5,7 @@ goal:
   slug: "foil-ios-max-lines-ratchet-450"
   kind: specific
   tranche: "Lower the hard max-lines gate from 500 to 450 by safely refactoring the only blocking file."
-  status: active
+  status: done
   oracle:
     signal: "A merge-queued PR lands with `scripts/source-line-ratchet.py --json` reporting `max_lines` 450, empty allowlist, no violations, and required simulator-safe CI contexts passing."
     cadence: "after Scout evidence, after Judge selection, after Worker verification, after PR checks, after merge-group evidence, and at final audit"
@@ -60,7 +60,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/foil-ios-max-lines-ratchet-450/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-max-lines-ratchet-450"
 
-active_task: T004
+active_task: null
 
 tasks:
   - id: T001
@@ -278,7 +278,7 @@ tasks:
   - id: T004
     type: pm
     assignee: PM
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Publish the verified 450-line ratchet slice and collect PR/merge-queue evidence."
     inputs:
@@ -294,12 +294,38 @@ tasks:
       - "PR-level check rollup."
       - "Merge-group run URL and result."
       - "`origin/main` merge commit if landed."
-    receipt: null
+    receipt:
+      result: done
+      branch: "codex/foil-ios-max-lines-ratchet-450"
+      commit: "75d9dc0e8705e9eddefd2296f67d411dae0d4e7e"
+      pr:
+        number: 69
+        url: "https://github.com/usefoil/foil-ios/pull/69"
+        state: merged
+        merged_at: "2026-06-25T13:27:50Z"
+        merge_commit: "a2c6e32919d28e05fe6e5e6a6efd444e557ba72d"
+      pr_checks:
+        - "CodeQL / Analyze (actions): success, run 28172006256 job 83438410993."
+        - "CodeQL / Analyze (python): success, run 28172006256 job 83438411059."
+        - "CodeQL / Analyze (swift): success, run 28172006256 job 83438410835."
+        - "iOS Simulator Sanity (non-physical) / Hosted simulator sanity: success, run 28172006148 job 83438393200."
+        - "iOS Simulator Sanity (non-physical) / Repo hygiene ratchet: success, run 28172006148 job 83438393087."
+      merge_queue:
+        entry: "MQE_lQDOSz2SH87qkR1NzgADVBHOAillUA"
+        run: 28173119843
+        url: "https://github.com/usefoil/foil-ios/actions/runs/28173119843"
+        head_branch: "gh-readonly-queue/main/pr-69-40cc81aa9a2c4cfbac3a6f6bfe8916a71696470e"
+        head_sha: "a2c6e32919d28e05fe6e5e6a6efd444e557ba72d"
+        result: success
+        jobs:
+          - "Repo hygiene ratchet: success, started 2026-06-25T13:20:29Z, completed 2026-06-25T13:20:39Z."
+          - "Hosted simulator sanity: success, started 2026-06-25T13:20:30Z, completed 2026-06-25T13:27:17Z."
+      summary: "Published the 450-line ratchet through PR #69, observed PR-level checks, enqueued via GraphQL with the exact head SHA, watched the merge-group run pass both required contexts, and confirmed the PR merged to `main` at `a2c6e32919d28e05fe6e5e6a6efd444e557ba72d`."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Final audit for the 450-line ratchet tranche."
     inputs:
@@ -318,21 +344,41 @@ tasks:
       - "full_outcome_complete: true | false"
       - "Strongest realistic failure mode and disproof."
       - "Next task or blocker if not complete."
-    receipt: null
+    receipt:
+      result: done
+      decision: complete
+      verdict: complete
+      full_outcome_complete: true
+      summary: "The 450-line ratchet tranche is complete: `main` enforces `MAX_LINES = 450` with no allowlist, the only previous blocker was refactored under the cap, required PR and merge-group simulator-safe checks passed, and the implementation landed through the merge queue."
+      proof:
+        - "`origin/main` and local `HEAD` are both `a2c6e32919d28e05fe6e5e6a6efd444e557ba72d` after PR #69 merged."
+        - "`scripts/source-line-ratchet.py --json` on the merged tree reports `max_lines` 450, empty `allowlist_baselines`, zero `violations`, and 45 counted files."
+        - "Largest counted files on the merged tree are `FoiliOS/Shared/FoilKeyboardBridge.swift` at 445 lines and `FoiliOS/FoilIOSApp/ContentView.swift` at 443 lines."
+        - "PR-head run `28172006148` passed `Hosted simulator sanity` and `Repo hygiene ratchet`; CodeQL actions, python, and swift checks also passed."
+        - "Merge-group run `28173119843` passed `Hosted simulator sanity` and `Repo hygiene ratchet` on queue branch `gh-readonly-queue/main/pr-69-40cc81aa9a2c4cfbac3a6f6bfe8916a71696470e`."
+      strongest_failure_mode:
+        risk: "The repo could appear to have landed the stricter ratchet while `main` still permits over-450 source files, relies on an allowlist, or only passed PR-head checks rather than merge-queue checks."
+        disproof: "The closeout branch is based on `origin/main` at merge commit `a2c6e329`; the merged tree's ratchet JSON reports `max_lines` 450, empty allowlist, and no violations; and the merge-group run `28173119843` passed both required simulator-safe contexts."
+      boundary:
+        - "This tranche proves simulator-safe hosted CI and source-hygiene enforcement only."
+        - "Physical iPhone/TestFlight/WDA evidence remains separate receipt-based proof."
+      next_task: null
 
 checks:
-  dirty_fingerprint: "T003 implementation ready for PR publication"
+  dirty_fingerprint: "closeout receipt update"
   last_verification:
     result: pass
-    task: T003
+    task: T999
     commands:
-      - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
-      - "scripts/source-line-ratchet.py --self-test"
-      - "scripts/source-whitespace-check.py --self-test"
-      - "scripts/source-line-ratchet.py --json"
-      - "scripts/source-whitespace-check.py"
-      - "cd FoiliOS && xcodegen generate --spec project.yml"
-      - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
-      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests CODE_SIGNING_ALLOWED=NO"
-      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests CODE_SIGNING_ALLOWED=NO"
-      - "git diff --check"
+      - cmd: "scripts/source-line-ratchet.py --json"
+        status: pass
+      - cmd: "gh pr view 69 --json state,mergedAt,mergeCommit,url,statusCheckRollup"
+        status: pass
+      - cmd: "gh run view 28173119843 --json status,conclusion,jobs,url,headBranch,headSha,createdAt,updatedAt"
+        status: pass
+      - cmd: "git rev-parse origin/main HEAD"
+        status: pass
+      - cmd: "git diff --check"
+        status: pass
+      - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-450/state.yaml"
+        status: pass
