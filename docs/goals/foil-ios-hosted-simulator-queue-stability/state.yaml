@@ -5,7 +5,7 @@ goal:
   slug: "foil-ios-hosted-simulator-queue-stability"
   kind: specific
   tranche: "Make merge-queue hosted simulator proof reliable without weakening the simulator-only CI proof boundary."
-  status: active
+  status: done
   oracle:
     signal: "A queue-stability fix passes local verification, PR-level required checks, and merge-group `iOS Simulator Sanity (non-physical)` without repeated `phase=simulator-tests` timeout."
     cadence: "after Scout evidence, after each Worker package, after PR checks, and at final audit"
@@ -60,7 +60,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/foil-ios-hosted-simulator-queue-stability/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-hosted-simulator-queue-stability"
 
-active_task: T004
+active_task: null
 
 tasks:
   - id: T001
@@ -233,7 +233,7 @@ tasks:
   - id: T004
     type: pm
     assignee: PM
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Publish the verified queue-stability fix and collect PR/merge-queue evidence."
     inputs:
@@ -249,12 +249,36 @@ tasks:
       - "PR-level check rollup."
       - "Merge-group run URL and result."
       - "Blocker if queue-tip remains red."
-    receipt: null
+    receipt:
+      result: done
+      branch: "codex/foil-ios-hosted-simulator-queue-stability"
+      commit: "9794a49080631808fb4476cccbedf45eaddb884f"
+      pull_request:
+        number: 65
+        url: "https://github.com/usefoil/foil-ios/pull/65"
+        merged_at: "2026-06-25T00:24:56Z"
+        merge_commit: "3f664de4bd4387c47aa06330fe431c5948ab93aa"
+      pr_level_checks:
+        - "CodeQL / Analyze (actions): success"
+        - "CodeQL / Analyze (python): success"
+        - "CodeQL / Analyze (swift): success"
+        - "iOS Simulator Sanity (non-physical) / Repo hygiene ratchet: success"
+        - "iOS Simulator Sanity (non-physical) / Hosted simulator sanity: success"
+      merge_group:
+        run: 28138247184
+        url: "https://github.com/usefoil/foil-ios/actions/runs/28138247184"
+        head_branch: "gh-readonly-queue/main/pr-65-bcf510af90d084d81cc827d6aebd1511eebe7fce"
+        head_sha: "3f664de4bd4387c47aa06330fe431c5948ab93aa"
+        result: success
+        jobs:
+          - "Repo hygiene ratchet: success"
+          - "Hosted simulator sanity: success"
+      summary: "Published and merged the queue-stability fix through the merge queue. The queue-tip hosted simulator run that failed twice for PR #64 passed for PR #65 without weakening simulator-safe coverage or claiming physical-device proof."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Final audit for the hosted simulator queue-stability tranche."
     inputs:
@@ -271,10 +295,26 @@ tasks:
       - "full_outcome_complete: true | false"
       - "Strongest realistic failure mode and disproof."
       - "Next task or blocker if not complete."
-    receipt: null
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      audited_at: "2026-06-25T00:25:04Z"
+      evidence:
+        - "Local normal sanity passed project/scheme visibility, simulator tests, unsigned generic iOS build, and final `passed` log."
+        - "Forced simulator-test timeout proof exited 124 after logging attempt 1 timeout, explicit `status=retry`, simulator reset decision, attempt 2 timeout, and final fail."
+        - "Fake-`xcrun` reset proof exited 124 after logging bounded `simulator-reset-shutdown` and `simulator-reset-erase` timeouts, proving reset substeps cannot silently consume the whole job timeout."
+        - "PR #65 PR-level checks all passed on commit `9794a49080631808fb4476cccbedf45eaddb884f`."
+        - "Merge-group run `28138247184` passed `Repo hygiene ratchet` and `Hosted simulator sanity` at queue tip."
+        - "PR #65 merged to `main` at `2026-06-25T00:24:56Z` with merge commit `3f664de4bd4387c47aa06330fe431c5948ab93aa`."
+      strongest_failure_mode:
+        risk: "The CI change could make the queue pass by hiding simulator failures, or a reset/boot hang could still consume the hosted job timeout before script-owned evidence is emitted."
+        disproof: "Retries remain scoped to `simulator-tests` exit 124 only; reset substeps are independently timeout-bounded; PR-level and merge-group hosted simulator runs both passed while preserving project/scheme visibility, simulator tests, unsigned generic iOS build, repo hygiene, and the physical-device proof boundary."
+      proof_boundary: "Hosted GitHub Actions evidence remains simulator-only. Physical iPhone, TestFlight, keyboard insertion, and WDA proof remain separate sanitized receipt lanes."
+      next: "Use the same merge-queue evidence path to reland receipt-only PR #64 or recreate its board-closeout changes on top of `main`."
 
 checks:
-  dirty_fingerprint: "worker diff ready for publish"
+  dirty_fingerprint: "complete at merge commit 3f664de4bd4387c47aa06330fe431c5948ab93aa"
   last_verification:
     result: pass
     task: T003
