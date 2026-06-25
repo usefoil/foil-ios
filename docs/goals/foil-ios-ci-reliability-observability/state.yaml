@@ -5,7 +5,7 @@ goal:
   slug: "foil-ios-ci-reliability-observability"
   kind: existing_plan
   tranche: "Make hosted simulator sanity failures phase-diagnosable while preserving honest simulator-only CI proof."
-  status: active
+  status: done
   oracle:
     signal: "`scripts/ios-simulator-sanity.sh` emits bounded phase-level diagnostics; required hosted CI still passes `Hosted simulator sanity` and `Repo hygiene ratchet`; physical-device proof remains separate."
     cadence: "after Worker implementation and final audit"
@@ -57,7 +57,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/foil-ios-ci-reliability-observability/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-ci-reliability-observability"
 
-active_task: T004
+active_task: null
 
 tasks:
   - id: T001
@@ -205,7 +205,7 @@ tasks:
   - id: T004
     type: pm
     assignee: PM
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Publish the verified CI reliability observability slice through PR and merge queue."
     inputs:
@@ -222,12 +222,51 @@ tasks:
       - "PR URL."
       - "GitHub Actions proof or blocker."
       - "Merge-queue outcome if queued."
-    receipt: null
+    receipt:
+      result: done
+      branch: "codex/foil-ios-ci-reliability-observability"
+      commit: "256f2d3 Add simulator sanity phase diagnostics"
+      pr:
+        number: 63
+        url: "https://github.com/usefoil/foil-ios/pull/63"
+        merged_at: "2026-06-24T21:05:00Z"
+        merge_commit: "bcf510af90d084d81cc827d6aebd1511eebe7fce"
+      pr_checks:
+        - context: "Repo hygiene ratchet"
+          status: pass
+          evidence: "passed on initial PR run in 7s"
+        - context: "Hosted simulator sanity"
+          status: pass
+          evidence: "initial run failed with named `simulator-tests` timeout artifact; rerun passed in 4m38s"
+        - context: "Analyze (actions)"
+          status: pass
+        - context: "Analyze (python)"
+          status: pass
+        - context: "Analyze (swift)"
+          status: pass
+        - context: "CodeQL"
+          status: pass
+      merge_queue:
+        status: merged
+        run: "https://github.com/usefoil/foil-ios/actions/runs/28129130558"
+        head_sha: "bcf510af90d084d81cc827d6aebd1511eebe7fce"
+        jobs:
+          - "Repo hygiene ratchet: pass"
+          - "Hosted simulator sanity: pass"
+      diagnostic_artifact_proof:
+        failed_pr_run: "https://github.com/usefoil/foil-ios/actions/runs/28127609133"
+        artifact: "hosted-simulator-sanity-text"
+        evidence:
+          - "`ios-simulator-sanity.txt` line 26: `phase=simulator-tests status=start timeout_seconds=1200`."
+          - "`ios-simulator-sanity.txt` line 920: `phase=simulator-tests status=timeout elapsed_seconds=1200 timeout_seconds=1200`."
+          - "`ios-simulator-sanity.txt` line 1032: `phase=simulator-tests status=fail exit_code=124`."
+          - "Artifact uploaded before outer workflow timeout; hosted job completed in 21m3s instead of being canceled at 30m."
+      summary: "Published PR #63, observed one hosted simulator runtime flake that proved the new phase artifact path, reran to green, enqueued through the merge queue, and confirmed `main` advanced to `bcf510af90d084d81cc827d6aebd1511eebe7fce`."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Final audit for the CI reliability observability tranche."
     inputs:
@@ -242,11 +281,46 @@ tasks:
       - "complete | not_complete"
       - "full_outcome_complete: true | false"
       - "Missing evidence if not complete."
-    receipt: null
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      evidence:
+        - "The simulator sanity script now emits phase-level start/pass/fail/timeout diagnostics for `project-scheme-visibility`, `simulator-tests`, and `unsigned-generic-ios-build`."
+        - "Controlled local timeout proof exited 124 and emitted the named `project-scheme-visibility` timeout and fail lines."
+        - "Hosted PR #63 initially failed in `simulator-tests`, uploaded `hosted-simulator-sanity-text`, and preserved the named timeout/fail lines in `ios-simulator-sanity.txt`."
+        - "PR #63 rerun passed `Hosted simulator sanity`; merge-group run `28129130558` passed `Hosted simulator sanity` and `Repo hygiene ratchet` at queue tip."
+        - "CodeQL Actions, Python, Swift, and aggregate checks passed on PR #63."
+        - "`git ls-remote origin main` confirmed `main` advanced to merge commit `bcf510af90d084d81cc827d6aebd1511eebe7fce`."
+        - "Docs and workflow continue to describe this as simulator-only/non-physical proof; no physical iPhone/TestFlight/WDA claim was added."
+      strongest_failure_mode:
+        risk: "The change could make hosted simulator flakiness worse or merely move the timeout without improving evidence."
+        disproven_by: "The first PR run reproduced a hosted simulator failure and uploaded a text artifact with the exact internal phase and timeout (`simulator-tests`, 1200s), while the rerun and merge-group run passed. This proves both diagnostic value and no persistent breakage."
+      summary: "Board 2.1 is complete: Foil iOS CI now has phase-level simulator sanity observability, bounded script-owned timeout evidence, green required PR and merge-queue checks, and the physical proof boundary remains intact."
 
 checks:
-  dirty_fingerprint: "initial board creation"
+  dirty_fingerprint: "final receipt-only update after PR #63 merge"
   last_verification:
-    result: pending
-    task: T001
-    commands: []
+    result: pass
+    task: T999
+    commands:
+      - cmd: "bash -n scripts/ios-simulator-sanity.sh"
+        status: pass
+      - cmd: "scripts/ios-simulator-sanity.sh"
+        status: pass
+      - cmd: "IOS_SIMULATOR_SANITY_LIST_TIMEOUT_SECONDS=0 scripts/ios-simulator-sanity.sh"
+        status: pass
+      - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"yaml parse ok\"' .github/workflows/ios-simulator-sanity.yml"
+        status: pass
+      - cmd: "scripts/source-line-ratchet.py --json"
+        status: pass
+      - cmd: "scripts/source-whitespace-check.py"
+        status: pass
+      - cmd: "git diff --check"
+        status: pass
+      - cmd: "gh run view 28129130558 --repo usefoil/foil-ios --json conclusion,status,jobs,url,headSha,event"
+        status: pass
+      - cmd: "gh pr view 63 --repo usefoil/foil-ios --json state,closed,mergedAt,mergeCommit,statusCheckRollup,url"
+        status: pass
+      - cmd: "git ls-remote origin main"
+        status: pass
