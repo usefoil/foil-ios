@@ -9,8 +9,10 @@ CI can fail when a PR introduces trailing spaces or tabs.
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -48,9 +50,83 @@ def trailing_whitespace_locations(path: Path) -> list[int]:
     return locations
 
 
+def scan_files(root: Path, files: list[str]) -> list[tuple[str, int]]:
+    violations: list[tuple[str, int]] = []
+    for relative in files:
+        if relative.startswith(EXCLUDED_PREFIXES):
+            continue
+        path = root / relative
+        if not path.is_file():
+            continue
+        for line_number in trailing_whitespace_locations(path):
+            violations.append((relative, line_number))
+    return violations
+
+
+def self_test() -> int:
+    checks = []
+
+    def record(
+        name: str, passed: bool, locations: list[tuple[str, int]] | None = None
+    ) -> None:
+        checks.append(
+            {
+                "name": name,
+                "passed": passed,
+                "locations": [
+                    {"path": path, "line": line} for path, line in (locations or [])
+                ],
+            }
+        )
+
+    with tempfile.TemporaryDirectory(prefix="foil-whitespace-self-test-") as temp_dir:
+        root = Path(temp_dir)
+        (root / "clean.txt").write_text("alpha\nbeta\n", encoding="utf-8")
+        (root / "trailing-space.txt").write_text("alpha \nbeta\n", encoding="utf-8")
+        (root / "trailing-tab.txt").write_text("alpha\nbeta\t\n", encoding="utf-8")
+        (root / "crlf.txt").write_bytes(b"alpha\r\nbeta \r\n")
+        (root / "binary.bin").write_bytes(b"alpha \0 beta \n")
+
+        clean = scan_files(root, ["clean.txt", "binary.bin"])
+        record("clean-text-and-binary-pass", clean == [], clean)
+
+        trailing = scan_files(
+            root, ["trailing-space.txt", "trailing-tab.txt", "crlf.txt"]
+        )
+        record(
+            "trailing-space-tab-and-crlf-fail",
+            trailing
+            == [
+                ("trailing-space.txt", 1),
+                ("trailing-tab.txt", 2),
+                ("crlf.txt", 2),
+            ],
+            trailing,
+        )
+
+    passed = all(check["passed"] for check in checks)
+    print(
+        json.dumps(
+            {
+                "schema": "foil.sourceWhitespaceCheck.selfTest.v1",
+                "passed": passed,
+                "checks": checks,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0 if passed else 1
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Fail when tracked text files contain trailing whitespace."
+    )
+    parser.add_argument(
+        "--self-test",
+        action="store_true",
+        help="Run fixture-only fail-closed checks for trailing whitespace detection.",
     )
     parser.add_argument(
         "--max-report",
@@ -60,17 +136,11 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    root = Path.cwd()
-    violations: list[tuple[str, int]] = []
+    if args.self_test:
+        return self_test()
 
-    for relative in tracked_files():
-        if relative.startswith(EXCLUDED_PREFIXES):
-            continue
-        path = root / relative
-        if not path.is_file():
-            continue
-        for line_number in trailing_whitespace_locations(path):
-            violations.append((relative, line_number))
+    root = Path.cwd()
+    violations = scan_files(root, tracked_files())
 
     if violations:
         print("Trailing whitespace violations:")

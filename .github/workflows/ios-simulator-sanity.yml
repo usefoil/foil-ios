@@ -155,6 +155,12 @@ jobs:
             scripts/source-whitespace-check.py \
             scripts/source-line-ratchet.py
 
+      - name: Run hygiene script self-tests
+        run: |
+          set -euo pipefail
+          scripts/source-whitespace-check.py --self-test | tee ci-artifacts/source-whitespace-self-test.json
+          scripts/source-line-ratchet.py --self-test | tee ci-artifacts/source-line-ratchet-self-test.json
+
       - name: Run physical harness self-test fixture only
         run: |
           set -euo pipefail
@@ -173,6 +179,8 @@ jobs:
           name: repo-hygiene-ratchet-text
           path: |
             ci-artifacts/source-whitespace-check.txt
+            ci-artifacts/source-whitespace-self-test.json
+            ci-artifacts/source-line-ratchet-self-test.json
             ci-artifacts/physical-harness-self-test.txt
             ci-artifacts/source-line-ratchet.txt
             ci-artifacts/source-line-ratchet.json

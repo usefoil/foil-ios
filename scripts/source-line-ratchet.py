@@ -50,27 +50,117 @@ def counted_files(root: Path) -> list[CountedFile]:
 
 
 def violations(files: list[CountedFile]) -> list[str]:
+    return violations_for(files, MAX_LINES, ALLOWLIST_BASELINES)
+
+
+def violations_for(
+    files: list[CountedFile], max_lines: int, allowlist_baselines: dict[str, int]
+) -> list[str]:
     failures: list[str] = []
     seen = {item.path for item in files}
-    for path, baseline in ALLOWLIST_BASELINES.items():
+    for path, baseline in allowlist_baselines.items():
         if path not in seen:
             failures.append(f"{path}: allowlisted baseline {baseline}, but file is missing")
 
     for item in files:
-        baseline = ALLOWLIST_BASELINES.get(item.path)
+        baseline = allowlist_baselines.get(item.path)
         if baseline is not None:
             if item.lines > baseline:
                 failures.append(
                     f"{item.path}: {item.lines} lines exceeds allowlisted baseline {baseline}"
                 )
-        elif item.lines > MAX_LINES:
-            failures.append(f"{item.path}: {item.lines} lines exceeds {MAX_LINES}")
+        elif item.lines > max_lines:
+            failures.append(f"{item.path}: {item.lines} lines exceeds {max_lines}")
     return failures
+
+
+def self_test() -> int:
+    checks = []
+
+    def record(name: str, passed: bool, details: list[str] | None = None) -> None:
+        checks.append({"name": name, "passed": passed, "details": details or []})
+
+    record(
+        "clean-files-pass",
+        violations_for(
+            [
+                CountedFile(path="FoiliOS/App/Clean.swift", lines=500),
+                CountedFile(path="scripts/clean.py", lines=12),
+            ],
+            500,
+            {},
+        )
+        == [],
+    )
+
+    over_limit = violations_for(
+        [CountedFile(path="FoiliOS/App/Oversized.swift", lines=501)],
+        500,
+        {},
+    )
+    record(
+        "over-limit-file-fails",
+        over_limit == ["FoiliOS/App/Oversized.swift: 501 lines exceeds 500"],
+        over_limit,
+    )
+
+    record(
+        "allowlisted-file-at-baseline-passes",
+        violations_for(
+            [CountedFile(path="FoiliOS/App/Legacy.swift", lines=650)],
+            500,
+            {"FoiliOS/App/Legacy.swift": 650},
+        )
+        == [],
+    )
+
+    over_baseline = violations_for(
+        [CountedFile(path="FoiliOS/App/Legacy.swift", lines=651)],
+        500,
+        {"FoiliOS/App/Legacy.swift": 650},
+    )
+    record(
+        "allowlisted-file-over-baseline-fails",
+        over_baseline
+        == ["FoiliOS/App/Legacy.swift: 651 lines exceeds allowlisted baseline 650"],
+        over_baseline,
+    )
+
+    missing_allowlist = violations_for(
+        [CountedFile(path="FoiliOS/App/Other.swift", lines=10)],
+        500,
+        {"FoiliOS/App/Missing.swift": 650},
+    )
+    record(
+        "missing-allowlisted-file-fails",
+        missing_allowlist
+        == ["FoiliOS/App/Missing.swift: allowlisted baseline 650, but file is missing"],
+        missing_allowlist,
+    )
+
+    passed = all(check["passed"] for check in checks)
+    print(
+        json.dumps(
+            {
+                "schema": "foil.sourceLineRatchet.selfTest.v1",
+                "passed": passed,
+                "checks": checks,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0 if passed else 1
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Enforce Foil iOS source/script/workflow max-lines ratchet."
+    )
+    parser.add_argument(
+        "--self-test",
+        action="store_true",
+        help="Run fixture-only fail-closed checks for the ratchet logic.",
     )
     parser.add_argument(
         "--json",
@@ -84,6 +174,9 @@ def main() -> int:
         help=f"Number of largest files to print. Default: {LARGEST_DEFAULT}.",
     )
     args = parser.parse_args()
+
+    if args.self_test:
+        return self_test()
 
     root = repo_root()
     files = counted_files(root)

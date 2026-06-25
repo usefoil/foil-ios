@@ -1,0 +1,317 @@
+version: 2
+
+goal:
+  title: "Foil iOS Hard Hygiene Gates v2"
+  slug: "foil-ios-hard-hygiene-gates-v2"
+  kind: specific
+  tranche: "Make hygiene gates explicit, hard, and merge-queue-aligned."
+  status: active
+  oracle:
+    signal: "A merge-queued PR lands with explicit hard hygiene gates, documented max-lines policy, verified local checks, and required-check evidence that matches branch protection."
+    cadence: "after Scout evidence, after Judge selection, after Worker verification, after PR checks, and at final audit"
+    final_proof: "Local verification, PR-level GitHub checks, merge-group evidence, and any branch-protection context evidence available through GitHub APIs or documented operator receipts."
+  intake:
+    original_request: "continue"
+    interpreted_outcome: "Prepare and then execute a hygiene hardening tranche now that Foil iOS CI is stable through the merge queue."
+    input_shape: specific
+    audience: "Foil iOS maintainers using GitHub branch protection and merge queue"
+    authority: requested
+    proof_type: artifact
+    completion_proof: "A merged PR proves hard hygiene gates and documents the branch-protection/required-context contract."
+    likely_misfire: "Adding soft documentation or a non-required script while oversized files or stale required contexts can still pass."
+    blind_spots_considered:
+      - "Branch protection may require external settings evidence beyond repo files."
+      - "Current Swift file sizes may make an immediate low cap impractical without unrelated refactors."
+      - "A max-lines gate can be hard at the current ceiling while staged reductions are tracked separately."
+      - "Hosted CI remains simulator-only and must not claim physical-device proof."
+    existing_plan_facts:
+      - "PR #65 stabilized hosted simulator queue runs."
+      - "PR #66 closed the hosted simulator stability board."
+      - "PR #64 relanded receipt-only CI observability through the fixed merge queue."
+      - "Existing hygiene scripts include `scripts/source-line-ratchet.py` and `scripts/source-whitespace-check.py`."
+      - "The user explicitly wants a hard max-lines-per-file rule enforced eventually."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  preserve_and_validate_existing_plan: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/foil-ios-hard-hygiene-gates-v2/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-hard-hygiene-gates-v2"
+
+active_task: T004
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Map current hygiene gates, branch-protection context requirements, and max-lines enforcement gaps."
+    inputs:
+      - ".github/workflows/"
+      - "scripts/source-line-ratchet.py"
+      - "scripts/source-whitespace-check.py"
+      - "docs/"
+      - "README.md"
+      - "GitHub PR #64/#65/#66 check and merge-group evidence"
+      - "GitHub branch protection and required-check context evidence available through `gh` APIs"
+    constraints:
+      - "Read-only."
+      - "Prefer concrete file, command, and GitHub API evidence."
+      - "Do not inspect or record private device receipts beyond sanitized repo metadata."
+      - "Do not propose weakening existing simulator-safe or CodeQL coverage."
+    expected_output:
+      - "Current hard/soft hygiene gate inventory."
+      - "Required GitHub check context map and any settings evidence gaps."
+      - "Current max-lines ceiling, largest counted files, and whether the rule already fails hard."
+      - "Recommended hardening candidates ranked by impact, risk, and verification strength."
+      - "Recommended Worker package with `allowed_files`, `verify`, and `stop_if`."
+    receipt:
+      result: done
+      note: "notes/T001-hygiene-gate-map.md"
+      summary: "Mapped current hard hygiene gates, repository ruleset enforcement, max-lines state, and gaps. The 500-line max-lines gate is already hard with an empty allowlist and no violations; current ruleset `main-protection` requires only `Hosted simulator sanity` and `Repo hygiene ratchet`. Recommended adding fixture self-tests for the two hygiene scripts and documenting the ruleset-required contexts."
+      evidence:
+        - "`gh api repos/usefoil/foil-ios/branches/main/protection`: classic branch protection returns 404 `Branch not protected`."
+        - "`gh api repos/usefoil/foil-ios/rulesets/18074403`: active repository ruleset `main-protection` requires merge queue, pull requests, strict required checks `Hosted simulator sanity` and `Repo hygiene ratchet`."
+        - "`scripts/source-line-ratchet.py --json`: `max_lines` 500, `allowlist_baselines` {}, `violations` [], largest file `ContentView.swift` at 480 lines."
+        - "`scripts/source-whitespace-check.py`: pass."
+        - "`python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py scripts/source-whitespace-check.py scripts/source-line-ratchet.py`: pass."
+        - "`scripts/ios-physical-harness.py self-test`: pass, with fixture-only redaction checks."
+        - "Merge-group run `28140251354` and main push run `28140430889` passed `Hosted simulator sanity` and `Repo hygiene ratchet` on current `main`."
+      recommended_worker:
+        objective: "Add deterministic fixture self-tests for the source line ratchet and whitespace scanner, wire them into required repo hygiene CI, and document the active ruleset-required contexts plus hard 500-line policy."
+        allowed_files:
+          - "scripts/source-line-ratchet.py"
+          - "scripts/source-whitespace-check.py"
+          - ".github/workflows/ios-simulator-sanity.yml"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-hard-hygiene-gates-v2/state.yaml"
+        verify:
+          - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          - "scripts/source-line-ratchet.py --self-test"
+          - "scripts/source-whitespace-check.py --self-test"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-whitespace-check.py"
+          - "scripts/ios-physical-harness.py self-test"
+          - "git diff --check"
+          - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-hard-hygiene-gates-v2/state.yaml"
+      spawned_tasks:
+        - T002
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Choose the largest safe first hardening slice from Scout evidence."
+    inputs:
+      - "T001 Scout receipt."
+      - "Current repo hygiene workflow/script/docs evidence."
+      - "Branch-protection or required-context evidence gathered by Scout."
+    constraints:
+      - "Read-only."
+      - "Reject any slice that weakens existing CI coverage."
+      - "Reject any immediate max-lines cap that requires unrelated refactors unless the Worker package explicitly scopes them."
+      - "Prefer hard gates with clear local and GitHub verification."
+    expected_output:
+      - "approved | blocked | needs_more_scout"
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if conditions."
+      - "Rejected options and why."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Scout evidence proves the hard 500-line gate is already live with no allowlist, so another file split is not the right first v2 slice. The largest safe useful hardening slice is to add fixture self-tests for the hygiene scripts themselves, run them in the required `Repo hygiene ratchet` job, and document the current repository ruleset contract. This strengthens fail-closed behavior without weakening hosted simulator coverage or requiring unrelated refactors."
+      worker:
+        objective: "Add deterministic fixture self-tests for the source line ratchet and whitespace scanner, wire them into required repo hygiene CI, and document the active ruleset-required contexts plus hard 500-line policy."
+        allowed_files:
+          - "scripts/source-line-ratchet.py"
+          - "scripts/source-whitespace-check.py"
+          - ".github/workflows/ios-simulator-sanity.yml"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-hard-hygiene-gates-v2/state.yaml"
+        verify:
+          - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          - "scripts/source-line-ratchet.py --self-test"
+          - "scripts/source-whitespace-check.py --self-test"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-whitespace-check.py"
+          - "scripts/ios-physical-harness.py self-test"
+          - "git diff --check"
+          - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-hard-hygiene-gates-v2/state.yaml"
+        stop_if:
+          - "Need files outside allowed_files."
+          - "Self-tests require broad dependencies or network access."
+          - "The change weakens the 500-line ceiling, empties required checks, or changes simulator-safe coverage."
+          - "Local verification fails twice for the same reason."
+      rejected_options:
+        - "Immediate lower-than-500 line cap: current largest file is 480, so a lower cap would require unrelated refactors and belongs in a staged follow-up."
+        - "Making CodeQL required in repo rulesets from code: repository settings are external to this branch; document the evidence and leave settings changes as an operator action unless a GitHub settings tool is explicitly approved."
+        - "Adding SwiftLint/SwiftFormat/Periphery now: previous plan defers them until configuration is trustworthy; Scout found no new evidence to promote them safely."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Add deterministic fixture self-tests for the source line ratchet and whitespace scanner, wire them into required repo hygiene CI, and document the active ruleset-required contexts plus hard 500-line policy."
+    allowed_files:
+      - "scripts/source-line-ratchet.py"
+      - "scripts/source-whitespace-check.py"
+      - ".github/workflows/ios-simulator-sanity.yml"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/foil-ios-hard-hygiene-gates-v2/state.yaml"
+    verify:
+      - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+      - "scripts/source-line-ratchet.py --self-test"
+      - "scripts/source-whitespace-check.py --self-test"
+      - "scripts/source-line-ratchet.py --json"
+      - "scripts/source-whitespace-check.py"
+      - "scripts/ios-physical-harness.py self-test"
+      - "git diff --check"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-hard-hygiene-gates-v2/state.yaml"
+    stop_if:
+      - "Need files outside the Judge-approved `allowed_files`."
+      - "The change weakens simulator-safe, repo hygiene, CodeQL, generated-project drift, or max-lines coverage."
+      - "The line-cap policy would require unrelated refactors not approved by Judge."
+      - "Self-tests require broad dependencies or network access."
+      - "Local verification fails twice for the same reason."
+    receipt:
+      result: done
+      changed_files:
+        - "scripts/source-line-ratchet.py"
+        - "scripts/source-whitespace-check.py"
+        - ".github/workflows/ios-simulator-sanity.yml"
+        - "docs/ci-workflow-development-plan.md"
+        - "docs/ios-simulator-sanity-runbook.md"
+        - "docs/goals/foil-ios-hard-hygiene-gates-v2/state.yaml"
+      changes:
+        - "Added `scripts/source-line-ratchet.py --self-test` fixture checks for clean files, over-limit files, allowlisted baseline pass/fail behavior, and missing allowlisted files."
+        - "Added `scripts/source-whitespace-check.py --self-test` fixture checks for clean text, binary files, trailing spaces, trailing tabs, and CRLF line bodies with trailing whitespace."
+        - "Added a required workflow step in `Repo hygiene ratchet` to run both hygiene script self-tests before physical harness self-test and real checkout scans."
+        - "Documented that the active required-check contract lives in repository ruleset `main-protection`, with required contexts `Hosted simulator sanity` and `Repo hygiene ratchet`."
+      commands:
+        - cmd: "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --self-test"
+          status: pass
+          evidence: "Fixture report passed over-limit, allowlist baseline, over-baseline, and missing allowlisted-file fail-closed checks."
+        - cmd: "scripts/source-whitespace-check.py --self-test"
+          status: pass
+          evidence: "Fixture report passed clean/binary pass checks and trailing space/tab/CRLF failure checks."
+        - cmd: "scripts/source-line-ratchet.py --json"
+          status: pass
+          evidence: "`max_lines`: 500; `allowlist_baselines`: {}; `violations`: []; largest file remains 480 lines."
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "scripts/ios-physical-harness.py self-test"
+          status: pass
+          evidence: "Fixture-only redaction checks passed and raw transcript remains omitted from summaries."
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"workflow yaml ok\"' .github/workflows/ios-simulator-sanity.yml"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-hard-hygiene-gates-v2/state.yaml"
+          status: pass
+      strongest_failure_mode:
+        risk: "The hard max-lines or whitespace gates could appear green while their own fail-closed logic is broken or not run by required CI."
+        disproof: "Both scripts now have fixture self-tests that intentionally create failing cases, the required `Repo hygiene ratchet` workflow invokes those self-tests, and the real repo scan still reports no violations."
+      summary: "Hardened the existing required hygiene gate by proving the hygiene scripts' own fail-closed behavior and documenting the current ruleset-required check contract without changing simulator-safe coverage."
+
+  - id: T004
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: medium
+    objective: "Publish the verified hardening slice and collect PR/merge-queue evidence."
+    inputs:
+      - "Done Worker receipt."
+      - "Local verification output."
+      - "GitHub PR checks and merge-group result."
+    constraints:
+      - "Do not push if the worktree contains unrelated changes."
+      - "Use PR and merge queue."
+      - "Do not mark complete if only PR-level checks pass."
+    expected_output:
+      - "Branch, commit, PR URL."
+      - "PR-level check rollup."
+      - "Merge-group run URL and result."
+      - "Any required branch-protection update or external settings follow-up."
+    receipt: null
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Final audit for the hard hygiene gates v2 tranche."
+    inputs:
+      - "All done task receipts."
+      - "Local verification."
+      - "GitHub PR and merge-group evidence."
+      - "Current `origin/main` state."
+    constraints:
+      - "Do not implement."
+      - "Reject completion if max-lines remains aspirational rather than enforced or explicitly staged."
+      - "Reject completion if required-check evidence is missing and not recorded as a concrete external blocker."
+      - "Reject completion if any hosted CI proof boundary is overclaimed."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Strongest realistic failure mode and disproof."
+      - "Next task or blocker if not complete."
+    receipt: null
+
+checks:
+  dirty_fingerprint: "worker diff ready for publish"
+  last_verification:
+    result: pass
+    task: T003
+    commands:
+      - cmd: "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+        status: pass
+      - cmd: "scripts/source-line-ratchet.py --self-test"
+        status: pass
+      - cmd: "scripts/source-whitespace-check.py --self-test"
+        status: pass
+      - cmd: "scripts/source-line-ratchet.py --json"
+        status: pass
+      - cmd: "scripts/source-whitespace-check.py"
+        status: pass
+      - cmd: "scripts/ios-physical-harness.py self-test"
+        status: pass
+      - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"workflow yaml ok\"' .github/workflows/ios-simulator-sanity.yml"
+        status: pass
+      - cmd: "git diff --check"
+        status: pass
+      - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-hard-hygiene-gates-v2/state.yaml"
+        status: pass

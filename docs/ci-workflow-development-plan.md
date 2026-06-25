@@ -17,11 +17,15 @@ The first required GitHub Actions layer should be named
 - `scripts/ios-physical-harness.py self-test`.
 - `scripts/ios-simulator-sanity.sh`.
 
-The hosted workflow is split into two job names. After the first GitHub Actions
-run, the required-status-check API contexts were confirmed as:
+The hosted workflow is split into two job names. The current repository ruleset
+`main-protection` applies to `~DEFAULT_BRANCH`, requires pull requests, uses the
+merge queue, and has strict required status checks for these contexts:
 
 - `Hosted simulator sanity`
 - `Repo hygiene ratchet`
+
+Classic branch protection for `main` is not the source of truth here; GitHub's
+repository ruleset API is.
 
 This lane proves project visibility, deterministic simulator tests, helper
 syntax, redaction fixture behavior, and unsigned device-SDK compilation. It
@@ -56,12 +60,17 @@ It counts only `FoiliOS/**/*.swift`, `scripts/**/*.py`, `scripts/**/*.sh`,
 `.github/workflows/**/*.yml`, and `.github/workflows/**/*.yaml`. The current
 per-file threshold is 500 lines. The temporary oversized allowlist has been
 removed; required CI now enforces the hard max-lines rule with no historical
-baselines.
+baselines. The repo-hygiene job also runs
+`scripts/source-line-ratchet.py --self-test` so the fail-closed behavior for
+over-limit files, allowlisted baselines, and missing allowlisted files is covered
+by a deterministic fixture before the real checkout is scanned.
 
 Board 1 also uses `scripts/source-whitespace-check.py` instead of relying on
 `git diff --check` in hosted CI. A clean GitHub Actions checkout has no local
 diff, so the scanner checks tracked text files directly for trailing spaces or
-tabs.
+tabs. The repo-hygiene job runs `scripts/source-whitespace-check.py --self-test`
+to prove clean text and binary files pass while trailing spaces, tabs, and CRLF
+line bodies with trailing whitespace fail.
 
 The initial migration allowlist was:
 
