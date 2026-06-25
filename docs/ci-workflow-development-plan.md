@@ -56,10 +56,10 @@ per file limit for source and script files. Existing oversized files are a
 temporary migration concern, not a permanent exception.
 
 Board 1 established this ratchet with `scripts/source-line-ratchet.py`; Boards 2
-and 3 ratcheted it down further.
+through 4 ratcheted it down further.
 It counts only `FoiliOS/**/*.swift`, `scripts/**/*.py`, `scripts/**/*.sh`,
 `.github/workflows/**/*.yml`, and `.github/workflows/**/*.yaml`. The current
-per-file threshold is 400 lines. The temporary oversized allowlist has been
+per-file threshold is 350 lines. The temporary oversized allowlist has been
 removed; required CI now enforces the hard max-lines rule with no historical
 baselines. The repo-hygiene job also runs
 `scripts/source-line-ratchet.py --self-test` so the fail-closed behavior for
@@ -81,7 +81,7 @@ The initial migration allowlist was:
 - `scripts/ios-physical-harness.py`: 699 lines
 
 That migration is now complete: `scripts/source-line-ratchet.py --json` reports
-an empty `allowlist_baselines` object, a 400-line threshold, and no violations.
+an empty `allowlist_baselines` object, a 350-line threshold, and no violations.
 
 Failure artifacts are intentionally narrow: hosted-CI text logs, generated
 drift diffs, and sanitized JSON reports only. The workflow does not upload

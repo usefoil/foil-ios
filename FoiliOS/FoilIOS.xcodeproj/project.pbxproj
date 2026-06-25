@@ -40,6 +40,7 @@
 		A60AD427484709AEBFCB6EBF /* FoilTranscriptReviewPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915020B5593337A0839E0332 /* FoilTranscriptReviewPanel.swift */; };
 		A78ADCBA8BD6F9DF880AB45C /* FoilDictationLoopAppPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0EA7F4171E7F7D187B0CB0 /* FoilDictationLoopAppPresenter.swift */; };
 		AE87C44C0B1CEB1982243284 /* FoilContentCommandRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52848B5FBF30423E92DD3CB6 /* FoilContentCommandRouter.swift */; };
+		AEC44868F3E143AF5DDA63E1 /* FoilContentPresentationSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C897279BC7AD03085E5203 /* FoilContentPresentationSupport.swift */; };
 		C360AA8B6DF57D039F3506CE /* FoilRecoverySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4789D040E444FD1FF8FFE86 /* FoilRecoverySection.swift */; };
 		C47170AC0B354D358E34B071 /* FoilKeyboardBridgeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EEC3F482742F0397DDED270 /* FoilKeyboardBridgeModels.swift */; };
 		C76E1E5E9E23E1D937E48677 /* FoilSetupRoutePresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4258D5D2DEF6617356605D1 /* FoilSetupRoutePresentationTests.swift */; };
@@ -88,6 +89,7 @@
 /* Begin PBXFileReference section */
 		05AB1E43AB37AAF5071F28CE /* FoilHealthPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilHealthPresentationTests.swift; sourceTree = "<group>"; };
 		0EEC3F482742F0397DDED270 /* FoilKeyboardBridgeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilKeyboardBridgeModels.swift; sourceTree = "<group>"; };
+		11C897279BC7AD03085E5203 /* FoilContentPresentationSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilContentPresentationSupport.swift; sourceTree = "<group>"; };
 		158AE50CF5C09E560A6C13A2 /* FoilDictationLoopKeyboardPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilDictationLoopKeyboardPresenter.swift; sourceTree = "<group>"; };
 		1C101F2BCE2DE49E0CF59FE9 /* FoilDictationLoopPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilDictationLoopPresenter.swift; sourceTree = "<group>"; };
 		1CF921C0034784102049E070 /* FoilTranscriptionClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilTranscriptionClient.swift; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 				DB8151110A5BBA22679F90B0 /* ContentViewPreview.swift */,
 				C636A5C86BDAB9F681A9D76E /* FoilAdvancedSupportDisclosure.swift */,
 				52848B5FBF30423E92DD3CB6 /* FoilContentCommandRouter.swift */,
+				11C897279BC7AD03085E5203 /* FoilContentPresentationSupport.swift */,
 				83964545F4D98BE890E4B79D /* FoilContentRows.swift */,
 				59E66C051F406E089F849D00 /* FoilCredentialStore.swift */,
 				22B0D12DBCF692CEC110C764 /* FoilDictationConsoleView.swift */,
@@ -360,6 +363,7 @@
 				1ECD1857F35F5F870F278CD8 /* ContentViewPreview.swift in Sources */,
 				FB039D024A16D984248BA205 /* FoilAdvancedSupportDisclosure.swift in Sources */,
 				AE87C44C0B1CEB1982243284 /* FoilContentCommandRouter.swift in Sources */,
+				AEC44868F3E143AF5DDA63E1 /* FoilContentPresentationSupport.swift in Sources */,
 				43FEF9B62D005DAA23E2AED0 /* FoilContentRows.swift in Sources */,
 				CDF2025B3CC90DEF9172B171 /* FoilCredentialStore.swift in Sources */,
 				218D1538A0D6557D5FB3B9B0 /* FoilDictationConsoleView.swift in Sources */,

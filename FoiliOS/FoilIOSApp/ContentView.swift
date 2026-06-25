@@ -220,54 +220,22 @@ struct ContentView: View {
     }
 
     private var storageReportSummary: String {
-        let file = storageReport.canonicalWriteSucceeded ? "file ok" : "file failed"
-        let verifiedPhase = storageReport.canonicalVerificationPhase?.displayName ?? "unverified"
-        let verifiedTranscript = storageReport.canonicalVerificationHasTranscript == true ? "has transcript" : "no transcript"
-        let defaults = storageReport.defaultsWriteAttempted ? "defaults written" : "defaults not written"
-        return "Storage \(storageReport.operation): \(file), \(defaults), verified \(verifiedPhase) \(verifiedTranscript)"
+        FoilContentPresentationSupport.storageReportSummary(storageReport)
     }
 
     private var recoveryMessage: String? {
-        if keyboardHealth.fullAccessState == .disabled,
-           let keyboardRecovery = keyboardHealthPresentation.recoveryMessage {
-            return keyboardRecovery
-        }
-        if snapshot.transcript?.isEmpty == false {
-            return "Transcript waiting. Insert it once from Foil Keyboard, or reset shared state."
-        }
-        if let message = audioCapture.recoveryMessage {
-            return message
-        }
-        if let message = transcription.recoveryMessage {
-            return message
-        }
-        if snapshot.phase == .failed {
-            return snapshot.message
-        }
-        if let storageRecovery = storageHealthPresentation.recoveryMessage {
-            return storageRecovery
-        }
-        if let keyboardRecovery = keyboardHealthPresentation.recoveryMessage {
-            return keyboardRecovery
-        }
-        return nil
+        FoilContentPresentationSupport.recoveryMessage(
+            keyboardFullAccessState: keyboardHealth.fullAccessState,
+            keyboardHealthPresentation: keyboardHealthPresentation,
+            snapshot: snapshot,
+            audioRecoveryMessage: audioCapture.recoveryMessage,
+            transcriptionRecoveryMessage: transcription.recoveryMessage,
+            storageHealthPresentation: storageHealthPresentation
+        )
     }
 
     private var handoffGuidance: String? {
-        switch snapshot.phase {
-        case .handoffRequested:
-            return "Foil is open for dictation."
-        case .listening:
-            return "Recording is active."
-        case .processing:
-            return "Transcript creation is underway."
-        case .complete:
-            return "Transcript is ready for the keyboard."
-        case .failed:
-            return "Recovery needed before keyboard insertion."
-        case .idle:
-            return nil
-        }
+        FoilContentPresentationSupport.handoffGuidance(for: snapshot.phase)
     }
 
     private var canRetryTranscription: Bool {
@@ -278,16 +246,7 @@ struct ContentView: View {
     }
 
     private var microphonePermissionSummary: String {
-        switch AVAudioApplication.shared.recordPermission {
-        case .granted:
-            "Microphone allowed"
-        case .denied:
-            "Microphone blocked in Settings"
-        case .undetermined:
-            "Microphone will be requested"
-        @unknown default:
-            "Microphone status unavailable"
-        }
+        FoilContentPresentationSupport.microphonePermissionSummary
     }
 
     private var microphoneAllowed: Bool {
@@ -295,16 +254,7 @@ struct ContentView: View {
     }
 
     private var microphoneSetupState: FoilMicrophoneSetupState {
-        switch AVAudioApplication.shared.recordPermission {
-        case .granted:
-            .allowed
-        case .denied:
-            .blocked
-        case .undetermined:
-            .needsPrompt
-        @unknown default:
-            .unavailable
-        }
+        FoilContentPresentationSupport.microphoneSetupState
     }
 
     private var keyboardHealthSummary: String {
