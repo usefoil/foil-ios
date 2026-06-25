@@ -59,7 +59,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/foil-ios-max-lines-ratchet-400/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-max-lines-ratchet-400"
 
-active_task: T004
+active_task: T006
 
 tasks:
   - id: T001
@@ -273,7 +273,7 @@ tasks:
   - id: T004
     type: pm
     assignee: PM
-    status: active
+    status: blocked
     reasoning_hint: medium
     objective: "Publish the verified 400-line ratchet slice and collect PR/merge-queue evidence."
     inputs:
@@ -286,6 +286,72 @@ tasks:
       - "Do not mark complete if only local or PR-level checks pass."
     expected_output:
       - "Branch, commit, PR URL."
+      - "PR-level check rollup."
+      - "Merge-group run URL and result."
+      - "`origin/main` merge commit if landed."
+    receipt:
+      result: blocked
+      summary: "Published PR #71 and started hosted evidence collection. PR-level repo hygiene passed, but Hosted simulator sanity failed before tests during the optional simulator reset bootstatus wait."
+      evidence:
+        - "PR: https://github.com/usefoil/foil-ios/pull/71"
+        - "`Repo hygiene ratchet` passed."
+        - "`Hosted simulator sanity` failed in `simulator-reset-bootstatus` with exit 124 after `project-scheme-visibility` passed; simulator tests and unsigned build did not start."
+      spawned_tasks:
+        - T005
+
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Recover hosted simulator sanity by making the optional pre-test simulator reset bootstatus wait non-fatal while keeping simulator tests and unsigned generic iOS build hard gates."
+    allowed_files:
+      - "scripts/ios-simulator-sanity.sh"
+      - "docs/goals/foil-ios-max-lines-ratchet-400/state.yaml"
+    verify:
+      - "IOS_SIMULATOR_SANITY_RESET_BEFORE_TESTS=1 scripts/ios-simulator-sanity.sh"
+      - "scripts/source-line-ratchet.py --json"
+      - "git diff --check"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-400/state.yaml"
+    stop_if:
+      - "The fix would weaken simulator test failure handling or unsigned generic iOS build failure handling."
+      - "Hosted logs show an app/test/build failure rather than simulator reset bootstatus flakiness."
+      - "The change needs files outside allowed_files."
+    receipt:
+      result: done
+      changed_files:
+        - "scripts/ios-simulator-sanity.sh"
+        - "docs/goals/foil-ios-max-lines-ratchet-400/state.yaml"
+      summary: "Made the optional reset bootstatus wait tolerant of timeout exit 124 while preserving hard failures for reset erase, reset boot, simulator tests, and unsigned generic iOS build."
+      strongest_failure_mode: "The recovery could accidentally weaken the actual simulator test or unsigned build gates instead of only tolerating a pre-test bootstatus timeout."
+      disproof:
+        - "The patch only wraps `simulator-reset-bootstatus`; `run_phase_with_timeout_retry simulator-tests` and `run_phase unsigned-generic-ios-build` remain unchanged hard gates."
+        - "Reset-enabled local sanity completed project visibility, reset, simulator tests, and unsigned generic iOS build."
+      commands:
+        - cmd: "IOS_SIMULATOR_DESTINATION='platform=iOS Simulator,id=8C27AB74-4C3D-4E95-8D5F-837BC8FE4CEF' IOS_SIMULATOR_SANITY_RESET_BEFORE_TESTS=1 scripts/ios-simulator-sanity.sh"
+          status: pass
+          result: "project-scheme-visibility pass; simulator-reset pass; simulator-tests pass; unsigned-generic-ios-build pass"
+        - cmd: "scripts/source-line-ratchet.py --json"
+          status: pass
+          result: "`max_lines` 400, empty allowlist, no violations; `scripts/ios-simulator-sanity.sh` is 189 lines"
+        - cmd: "git diff --check"
+          status: pass
+
+  - id: T006
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: medium
+    objective: "Push the CI recovery commit, rerun PR checks, enqueue the PR, and collect merge-queue evidence."
+    inputs:
+      - "Done T005 receipt."
+      - "PR #71."
+      - "GitHub PR checks and merge-group result."
+    constraints:
+      - "Use PR and merge queue."
+      - "Do not mark complete if only local checks pass."
+    expected_output:
+      - "Recovery commit."
       - "PR-level check rollup."
       - "Merge-group run URL and result."
       - "`origin/main` merge commit if landed."
@@ -319,7 +385,7 @@ checks:
   dirty_fingerprint: "T003 implementation complete; publish/evidence step active"
   last_verification:
     result: pass
-    task: T003
+    task: T005
     commands:
       - "scripts/source-line-ratchet.py --json: max_lines 400, empty allowlist, no violations"
-      - "scripts/ios-simulator-sanity.sh: project visibility, simulator tests, and unsigned generic iOS build passed"
+      - "IOS_SIMULATOR_SANITY_RESET_BEFORE_TESTS=1 scripts/ios-simulator-sanity.sh: reset-enabled project visibility, simulator tests, and unsigned generic iOS build passed"
