@@ -37,6 +37,7 @@
 		A45D5112259C81FF8B809D7A /* FoilTranscriptQualityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268ED96A1069398E9D573385 /* FoilTranscriptQualityTests.swift */; };
 		A60AD427484709AEBFCB6EBF /* FoilTranscriptReviewPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915020B5593337A0839E0332 /* FoilTranscriptReviewPanel.swift */; };
 		A78ADCBA8BD6F9DF880AB45C /* FoilDictationLoopAppPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0EA7F4171E7F7D187B0CB0 /* FoilDictationLoopAppPresenter.swift */; };
+		C360AA8B6DF57D039F3506CE /* FoilRecoverySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4789D040E444FD1FF8FFE86 /* FoilRecoverySection.swift */; };
 		C76E1E5E9E23E1D937E48677 /* FoilSetupRoutePresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4258D5D2DEF6617356605D1 /* FoilSetupRoutePresentationTests.swift */; };
 		CDF2025B3CC90DEF9172B171 /* FoilCredentialStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E66C051F406E089F849D00 /* FoilCredentialStore.swift */; };
 		CEF221C874A713CB0AF6B31F /* FoilKeyboardBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80A5EC71E0768BC7DCDB9C6 /* FoilKeyboardBridgeTests.swift */; };
@@ -113,6 +114,7 @@
 		B8DED6D0B2DB4D4A56CBCC4C /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		BD61F96F53F4913F25FECC39 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C119BA898AD6CD7C311041EA /* FoilDictationLoopSetupPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilDictationLoopSetupPresenter.swift; sourceTree = "<group>"; };
+		C4789D040E444FD1FF8FFE86 /* FoilRecoverySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilRecoverySection.swift; sourceTree = "<group>"; };
 		C49D88CD1A599656C067DEE9 /* FoilDictationLoopPresentationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilDictationLoopPresentationModels.swift; sourceTree = "<group>"; };
 		C636A5C86BDAB9F681A9D76E /* FoilAdvancedSupportDisclosure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilAdvancedSupportDisclosure.swift; sourceTree = "<group>"; };
 		E80A5EC71E0768BC7DCDB9C6 /* FoilKeyboardBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoilKeyboardBridgeTests.swift; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 				22B0D12DBCF692CEC110C764 /* FoilDictationConsoleView.swift */,
 				F5C18A113AB57751309B185D /* FoilIOSApp.swift */,
 				3F3C555C02FDEC00DF04C2A5 /* FoilOnboardingPanels.swift */,
+				C4789D040E444FD1FF8FFE86 /* FoilRecoverySection.swift */,
 				1CF921C0034784102049E070 /* FoilTranscriptionClient.swift */,
 				930D52E4BE65516E2E689846 /* FoilTranscriptQuality.swift */,
 				915020B5593337A0839E0332 /* FoilTranscriptReviewPanel.swift */,
@@ -357,6 +360,7 @@
 				D22B502FB8F13DD32544442E /* FoilIOSConstants.swift in Sources */,
 				2CDF09B597678B083CCCF602 /* FoilKeyboardBridge.swift in Sources */,
 				778C9617E267AD04F337E2F3 /* FoilOnboardingPanels.swift in Sources */,
+				C360AA8B6DF57D039F3506CE /* FoilRecoverySection.swift in Sources */,
 				D44A413BDDCA7DE55C3E5A54 /* FoilTranscriptQuality.swift in Sources */,
 				A60AD427484709AEBFCB6EBF /* FoilTranscriptReviewPanel.swift in Sources */,
 				0487CA500F0109EBC53F8710 /* FoilTranscriptionClient.swift in Sources */,

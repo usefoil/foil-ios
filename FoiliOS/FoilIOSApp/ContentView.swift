@@ -3,10 +3,6 @@ import SwiftUI
 
 struct ContentView: View {
     private let bridge = FoilKeyboardBridge()
-    private let actionColumns = [
-        GridItem(.flexible(minimum: 118), spacing: 10),
-        GridItem(.flexible(minimum: 118), spacing: 10)
-    ]
 
     @StateObject private var audioCapture = AudioCaptureController()
     @StateObject private var transcription = TranscriptionController()
@@ -42,46 +38,22 @@ struct ContentView: View {
                     }
 
                     if let recoveryMessage {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Recovery")
-                                .font(.headline)
-                            FoilStatusRow(recoveryMessage, systemImage: "exclamationmark.arrow.triangle.2.circlepath")
-                                .font(.callout)
-                            if transcription.providerRecoveryRequiresKeyUpdate {
-                                FoilSetupRow(
-                                    title: "Update provider key",
-                                    detail: "A saved key is not provider-verified until transcription succeeds.",
-                                    systemImage: "key.fill"
-                                )
+                        FoilRecoverySection(
+                            message: recoveryMessage,
+                            showsProviderKeyRecovery: transcription.providerRecoveryRequiresKeyUpdate,
+                            keyboardRecoverySteps: keyboardHealthPresentation.recoverySteps,
+                            canRetryTranscription: canRetryTranscription,
+                            retryTranscription: {
+                                Task { await transcription.transcribeLatestRecording(audioCapture.lastRecordingURL) }
+                            },
+                            resetSharedState: {
+                                bridge.reset()
+                                refresh()
+                            },
+                            providerCredentialEditor: {
                                 providerCredentialEditor
                             }
-                            keyboardRecoveryChecklist
-                            testedTargetsPanel
-
-                            LazyVGrid(columns: actionColumns, alignment: .leading, spacing: 10) {
-                                if canRetryTranscription {
-                                    Button {
-                                        Task { await transcription.transcribeLatestRecording(audioCapture.lastRecordingURL) }
-                                    } label: {
-                                        Label("Retry transcription", systemImage: "arrow.clockwise")
-                                    }
-                                    .buttonStyle(.borderedProminent)
-                                    .accessibilityIdentifier("retry-transcription-button")
-                                }
-
-                                Button {
-                                    bridge.reset()
-                                    refresh()
-                                } label: {
-                                    Label("Reset shared state", systemImage: "arrow.counterclockwise")
-                                }
-                                .buttonStyle(.bordered)
-                                .accessibilityIdentifier("recovery-reset-shared-state-button")
-                            }
-                            .controlSize(.large)
-                            .labelStyle(.titleAndIcon)
-                            .buttonBorderShape(.roundedRectangle(radius: 8))
-                        }
+                        )
                     }
 
                     FoilAdvancedSupportDisclosure(
@@ -225,15 +197,6 @@ struct ContentView: View {
                 providerCredentialEditor
             }
         )
-    }
-
-    private var testedTargetsPanel: some View {
-        FoilTestedTargetsPanel()
-    }
-
-    @ViewBuilder
-    private var keyboardRecoveryChecklist: some View {
-        FoilKeyboardRecoveryChecklist(steps: keyboardHealthPresentation.recoverySteps)
     }
 
     private func refresh() {
