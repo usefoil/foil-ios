@@ -1,0 +1,325 @@
+version: 2
+
+goal:
+  title: "Foil iOS Max Lines Ratchet to 400"
+  slug: "foil-ios-max-lines-ratchet-400"
+  kind: specific
+  tranche: "Lower the hard max-lines gate from 450 to 400 by safely refactoring the current blockers."
+  status: active
+  oracle:
+    signal: "A merge-queued PR lands with `scripts/source-line-ratchet.py --json` reporting `max_lines` 400, empty allowlist, no violations, and required simulator-safe CI contexts passing."
+    cadence: "after Scout evidence, after Judge selection, after Worker verification, after PR checks, after merge-group evidence, and at final audit"
+    final_proof: "Local verification, PR-level checks, merge-group result, and `origin/main` containing the stricter 400-line gate without allowlist or violations."
+  intake:
+    original_request: "ok do this"
+    interpreted_outcome: "Create and execute Board 3: safely ratchet Foil iOS's hard source max-lines rule from 450 down to 400."
+    input_shape: specific
+    audience: "Foil iOS maintainers using hard repo hygiene gates and merge queue protection"
+    authority: requested
+    proof_type: artifact
+    completion_proof: "A merged PR proves the hard 400-line gate on `main` with no allowlist and no violations."
+    likely_misfire: "Lowering docs or constants without enforcing the gate, adding an allowlist to dodge the refactor, or changing SwiftUI app-shell/shared keyboard bridge behavior while only checking line counts."
+    blind_spots_considered:
+      - "`FoiliOS/Shared/FoilKeyboardBridge.swift` and `FoiliOS/FoilIOSApp/ContentView.swift` are the expected blockers and both are behavior-sensitive."
+      - "The bridge touches shared App Group state used by the app and keyboard extension."
+      - "`ContentView.swift` remains the app shell even after the 450-line recovery extraction."
+      - "The CI proof remains simulator-safe only; physical iPhone/TestFlight/WDA proof stays separate."
+    existing_plan_facts:
+      - "Board 2 landed a 450-line hard gate with no allowlist."
+      - "`scripts/source-line-ratchet.py --json` on the merged tree reports `max_lines` 450, empty allowlist, and no violations."
+      - "The current largest counted files are `FoiliOS/Shared/FoilKeyboardBridge.swift` at 445 and `FoiliOS/FoilIOSApp/ContentView.swift` at 443."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  preserve_and_validate_existing_plan: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/foil-ios-max-lines-ratchet-400/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-max-lines-ratchet-400"
+
+active_task: T004
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Map the current 400-line blockers, safest extraction points, relevant tests, and the largest safe implementation slice."
+    inputs:
+      - "scripts/source-line-ratchet.py --json"
+      - "FoiliOS/Shared/FoilKeyboardBridge.swift"
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/FoilIOSTests/"
+      - "FoiliOS/project.yml"
+      - "docs/acceptance-evidence.md"
+      - "Recent 450-line ratchet receipts."
+    constraints:
+      - "Read-only."
+      - "Do not edit implementation files."
+      - "Prefer concrete symbols, line counts, tests, and file-path evidence."
+      - "Do not inspect or record private physical-device receipts."
+    expected_output:
+      - "Current blockers for a 400-line cap."
+      - "Recommended extraction(s), with risk and verification mapping."
+      - "Relevant tests and commands."
+      - "Exact Worker package with allowed_files, verify, and stop_if."
+    receipt:
+      result: done
+      note: "notes/T001-scout.md"
+      summary: "400-line Scout found exactly two blockers: `FoiliOS/Shared/FoilKeyboardBridge.swift` at 445 lines and `FoiliOS/FoilIOSApp/ContentView.swift` at 443 lines. Recommended moving bridge models to `FoilKeyboardBridgeModels.swift`, extracting URL/pending-command routing to `FoilContentCommandRouter.swift`, then lowering `MAX_LINES` to 400 with no allowlist."
+      evidence:
+        - "`scripts/source-line-ratchet.py --json`: `max_lines` 450, empty allowlist, no violations; only two files exceed 400."
+        - "`FoilKeyboardBridge.swift` lines 3-147 are shared model declarations; implementation begins at `struct FoilKeyboardBridge` line 149."
+        - "`ContentView.swift` command routing is concentrated in `.onOpenURL` lines 87-109 and `handlePendingCommand()` lines 208-233."
+        - "`FoiliOS/project.yml` uses folder sources for `FoilIOSApp` and `Shared`, so new Swift files should be picked up by XcodeGen."
+      recommended_worker:
+        objective: "Extract bridge model declarations and ContentView command routing into new files, lower the hard line-count cap to 400, update docs, regenerate the project, and verify the stricter gate."
+        allowed_files:
+          - "FoiliOS/Shared/FoilKeyboardBridge.swift"
+          - "FoiliOS/Shared/FoilKeyboardBridgeModels.swift"
+          - "FoiliOS/FoilIOSApp/ContentView.swift"
+          - "FoiliOS/FoilIOSApp/FoilContentCommandRouter.swift"
+          - "FoiliOS/FoilIOSApp/ContentViewPreview.swift"
+          - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+          - "scripts/source-line-ratchet.py"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-max-lines-ratchet-400/state.yaml"
+        verify:
+          - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          - "scripts/source-line-ratchet.py --self-test"
+          - "scripts/source-whitespace-check.py --self-test"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-whitespace-check.py"
+          - "cd FoiliOS && xcodegen generate --spec project.yml"
+          - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests"
+          - "git diff --check"
+          - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-400/state.yaml"
+        stop_if:
+          - "The cap change needs an allowlist."
+          - "The new files are not included in the expected targets after XcodeGen."
+          - "The router extraction requires broadening `ContentView` state access or changing command semantics."
+          - "Focused tests fail twice for the same reason."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Choose whether and how to lower the hard cap to 400 based on Scout evidence."
+    inputs:
+      - "T001 Scout receipt."
+    constraints:
+      - "Read-only."
+      - "Reject any slice that uses an allowlist to avoid the intended ratchet."
+      - "Reject any slice that weakens CI or overclaims physical-device proof."
+      - "Pick the largest safe useful Worker package with explicit allowed files and verification."
+    expected_output:
+      - "approved | blocked | needs_more_scout"
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if conditions."
+      - "Rejected options and why."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Scout identified exactly two 400-line blockers and a bounded implementation that avoids allowlists: move bridge model declarations out of the bridge implementation file, and move command routing out of `ContentView` without changing presenter semantics. This is the largest safe useful slice because it should put both files under 400 while keeping shared bridge behavior and app-shell presentation verifiable with focused tests."
+      worker:
+        objective: "Extract bridge model declarations and ContentView command routing into new files, lower the hard line-count cap to 400, update docs, regenerate the project, and verify the stricter gate."
+        allowed_files:
+          - "FoiliOS/Shared/FoilKeyboardBridge.swift"
+          - "FoiliOS/Shared/FoilKeyboardBridgeModels.swift"
+          - "FoiliOS/FoilIOSApp/ContentView.swift"
+          - "FoiliOS/FoilIOSApp/FoilContentCommandRouter.swift"
+          - "FoiliOS/FoilIOSApp/ContentViewPreview.swift"
+          - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+          - "scripts/source-line-ratchet.py"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-max-lines-ratchet-400/state.yaml"
+        verify:
+          - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          - "scripts/source-line-ratchet.py --self-test"
+          - "scripts/source-whitespace-check.py --self-test"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-whitespace-check.py"
+          - "cd FoiliOS && xcodegen generate --spec project.yml"
+          - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests"
+          - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests"
+          - "git diff --check"
+          - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-400/state.yaml"
+        stop_if:
+          - "The cap change needs an allowlist."
+          - "The new files are not included in the expected targets after XcodeGen."
+          - "The router extraction requires broadening `ContentView` state access or changing command semantics."
+          - "Focused tests fail twice for the same reason."
+      rejected_options:
+        - "Only lowering `MAX_LINES`: would fail immediately because two files exceed 400."
+        - "Using an allowlist for the two blockers: contradicts the tranche objective."
+        - "Moving `ContentView` computed presentation properties to a cross-file extension: would require broadening private state access or a larger presenter rewrite."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Extract bridge model declarations and ContentView command routing into new files, lower the hard line-count cap to 400, update docs, regenerate the project, and verify the stricter gate."
+    allowed_files:
+      - "FoiliOS/Shared/FoilKeyboardBridge.swift"
+      - "FoiliOS/Shared/FoilKeyboardBridgeModels.swift"
+      - "FoiliOS/FoilIOSApp/ContentView.swift"
+      - "FoiliOS/FoilIOSApp/FoilContentCommandRouter.swift"
+      - "FoiliOS/FoilIOSApp/ContentViewPreview.swift"
+      - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+      - "scripts/source-line-ratchet.py"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/foil-ios-max-lines-ratchet-400/state.yaml"
+    verify:
+      - "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+      - "scripts/source-line-ratchet.py --self-test"
+      - "scripts/source-whitespace-check.py --self-test"
+      - "scripts/source-line-ratchet.py --json"
+      - "scripts/source-whitespace-check.py"
+      - "cd FoiliOS && xcodegen generate --spec project.yml"
+      - "git diff --exit-code -- FoiliOS/FoilIOSApp/Generated FoiliOS/FoilKeyboard/Generated"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests"
+      - "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests"
+      - "git diff --check"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-max-lines-ratchet-400/state.yaml"
+    stop_if:
+      - "Need files outside Judge-approved `allowed_files`."
+      - "The implementation would require an allowlist or weaken the hard gate."
+      - "App-shell or shared keyboard bridge behavior becomes ambiguous."
+      - "Verification fails twice for the same reason."
+    receipt:
+      result: done
+      changed_files:
+        - "FoiliOS/Shared/FoilKeyboardBridge.swift"
+        - "FoiliOS/Shared/FoilKeyboardBridgeModels.swift"
+        - "FoiliOS/FoilIOSApp/ContentView.swift"
+        - "FoiliOS/FoilIOSApp/FoilContentCommandRouter.swift"
+        - "FoiliOS/FoilIOSApp/ContentViewPreview.swift"
+        - "FoiliOS/FoilIOS.xcodeproj/project.pbxproj"
+        - "scripts/source-line-ratchet.py"
+        - "docs/ci-workflow-development-plan.md"
+        - "docs/ios-simulator-sanity-runbook.md"
+        - "docs/goals/foil-ios-max-lines-ratchet-400/state.yaml"
+      summary: "Moved shared keyboard bridge model declarations into `FoilKeyboardBridgeModels.swift`, moved app URL/pending-command routing into `FoilContentCommandRouter.swift`, kept the SwiftUI preview in a small dedicated file, lowered the hard source-line cap to 400, refreshed docs, and regenerated the Xcode project."
+      strongest_failure_mode: "The split could pass line counts while omitting new Swift files from the generated project or changing app-shell/shared-bridge behavior."
+      disproof:
+        - "`cd FoiliOS && xcodegen generate --spec project.yml` regenerated the project with the new Swift files."
+        - "`scripts/source-line-ratchet.py --json` reported `max_lines` 400, `{}` allowlist, 48 counted files, and no violations; largest file is `FoiliOS/FoilIOSApp/ContentView.swift` at exactly 400 lines."
+        - "`scripts/ios-simulator-sanity.sh` passed project/scheme visibility, all simulator tests, and unsigned generic iOS build."
+      boundary_evidence:
+        - "`xcodebuild test ... -only-testing:FoilIOSTests/FoilKeyboardBridgeTests CODE_SIGNING_ALLOWED=NO` failed because simulator tests then lack simulated App Group entitlements; this confirms unsigned proof belongs to the generic iOS build phase, matching `scripts/ios-simulator-sanity.sh`."
+      commands:
+        - cmd: "python3 -m py_compile scripts/source-line-ratchet.py scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --self-test"
+          status: pass
+        - cmd: "scripts/source-whitespace-check.py --self-test"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --json"
+          status: pass
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "cd FoiliOS && xcodegen generate --spec project.yml"
+          status: pass
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilKeyboardBridgeTests"
+          status: pass
+          result: "8 tests, 0 failures"
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilAppLoopPresentationTests"
+          status: pass
+          result: "10 tests, 0 failures"
+        - cmd: "xcodebuild test -project FoiliOS/FoilIOS.xcodeproj -scheme FoilIOS -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:FoilIOSTests/FoilOnboardingReadinessPresentationTests"
+          status: pass
+          result: "4 tests, 0 failures"
+        - cmd: "scripts/ios-simulator-sanity.sh"
+          status: pass
+          result: "project-scheme-visibility pass; simulator-tests pass; unsigned-generic-ios-build pass"
+
+  - id: T004
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: medium
+    objective: "Publish the verified 400-line ratchet slice and collect PR/merge-queue evidence."
+    inputs:
+      - "Done Worker receipt."
+      - "Local verification output."
+      - "GitHub PR checks and merge-group result."
+    constraints:
+      - "Do not push if the worktree contains unrelated changes."
+      - "Use PR and merge queue."
+      - "Do not mark complete if only local or PR-level checks pass."
+    expected_output:
+      - "Branch, commit, PR URL."
+      - "PR-level check rollup."
+      - "Merge-group run URL and result."
+      - "`origin/main` merge commit if landed."
+    receipt: null
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Final audit for the 400-line ratchet tranche."
+    inputs:
+      - "All done task receipts."
+      - "Local verification."
+      - "GitHub PR and merge-group evidence."
+      - "Current `origin/main` state."
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the 400-line cap is not enforced on `main`."
+      - "Reject completion if any counted file violates the cap or an allowlist is used to bypass it."
+      - "Reject completion if required-check evidence is missing."
+      - "Reject completion if hosted CI proof boundaries are overclaimed."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Strongest realistic failure mode and disproof."
+      - "Next task or blocker if not complete."
+    receipt: null
+
+checks:
+  dirty_fingerprint: "T003 implementation complete; publish/evidence step active"
+  last_verification:
+    result: pass
+    task: T003
+    commands:
+      - "scripts/source-line-ratchet.py --json: max_lines 400, empty allowlist, no violations"
+      - "scripts/ios-simulator-sanity.sh: project visibility, simulator tests, and unsigned generic iOS build passed"

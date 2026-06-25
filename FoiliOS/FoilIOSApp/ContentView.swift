@@ -84,29 +84,7 @@ struct ContentView: View {
             .navigationTitle("Foil")
             .onAppear(perform: refresh)
             .onReceive(refreshTimer) { _ in refresh() }
-            .onOpenURL { url in
-                guard url.scheme == FoilIOSConstants.appURLScheme else { return }
-                switch url.host {
-                case "keyboard-health":
-                    let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-                    let fullAccessValue = components?.queryItems?.first { $0.name == "fullAccess" }?.value
-                    bridge.recordKeyboardHealth(fullAccessEnabled: fullAccessValue == "on", snapshot: bridge.load())
-                case "complete":
-                    bridge.completeFakeTranscript()
-                case "reset":
-                    bridge.reset()
-                case "start":
-                    bridge.markListening()
-                    Task { await audioCapture.startRecording() }
-                case "stop":
-                    audioCapture.stopRecording()
-                case "transcribe":
-                    Task { await transcription.transcribeLatestRecording(audioCapture.lastRecordingURL) }
-                default:
-                    bridge.markListening()
-                }
-                refresh()
-            }
+            .onOpenURL(perform: handleOpenURL)
         }
         .onAppear(perform: handlePendingCommand)
         .onReceive(refreshTimer) { _ in handlePendingCommand() }
@@ -137,8 +115,8 @@ struct ContentView: View {
             transcriptionStatus: transcription.status,
             isRecording: audioCapture.isRecording,
             hasSavedRecording: audioCapture.lastRecordingURL != nil,
-            performPrimary: perform,
-            performSecondary: perform,
+            performPrimary: performPrimary,
+            performSecondary: performSecondary,
             startRecording: {
                 Task { await audioCapture.startRecording() }
             },
@@ -206,30 +184,13 @@ struct ContentView: View {
     }
 
     private func handlePendingCommand() {
-        guard let command = bridge.loadCommand(),
-              command.id != lastHandledCommandID else {
-            return
-        }
-
-        lastHandledCommandID = command.id
-        bridge.clearCommand()
-
-        switch command.action {
-        case .startRecording:
-            bridge.markListening()
-            Task { await audioCapture.startRecording() }
-        case .stopRecording:
-            audioCapture.stopRecording()
-            refresh()
-        case .transcribeLatest:
-            Task { await transcription.transcribeLatestRecording(audioCapture.lastRecordingURL) }
-        case .resetSharedState:
-            bridge.reset()
-            refresh()
-        case .completeFakeTranscript:
-            bridge.completeFakeTranscript()
-            refresh()
-        }
+        FoilContentCommandRouter.handlePendingCommand(
+            bridge: bridge,
+            lastHandledCommandID: &lastHandledCommandID,
+            audioCapture: audioCapture,
+            transcription: transcription,
+            refresh: refresh
+        )
     }
 
     private func retryRecordingFromTranscriptReview() {
@@ -413,31 +374,27 @@ struct ContentView: View {
         )
     }
 
-    private func perform(_ action: FoilAppPrimaryAction) {
-        switch action {
-        case .record:
-            Task { await audioCapture.startRecording() }
-        case .stopRecording:
-            audioCapture.stopRecording()
-            refresh()
-        case .createTranscript, .retryTranscript:
-            Task { await transcription.transcribeLatestRecording(audioCapture.lastRecordingURL) }
-        case .reset:
-            bridge.reset()
-            refresh()
-        }
+    private func handleOpenURL(_ url: URL) {
+        FoilContentCommandRouter.handleOpenURL(
+            url,
+            bridge: bridge,
+            audioCapture: audioCapture,
+            transcription: transcription,
+            refresh: refresh
+        )
     }
 
-    private func perform(_ action: FoilAppSecondaryAction) {
-        switch action {
-        case .cancelRecording:
-            audioCapture.cancelRecording()
-            refresh()
-        }
+    private func performPrimary(_ action: FoilAppPrimaryAction) {
+        FoilContentCommandRouter.perform(
+            action,
+            bridge: bridge,
+            audioCapture: audioCapture,
+            transcription: transcription,
+            refresh: refresh
+        )
     }
 
-}
-
-#Preview {
-    ContentView()
+    private func performSecondary(_ action: FoilAppSecondaryAction) {
+        FoilContentCommandRouter.perform(action, audioCapture: audioCapture, refresh: refresh)
+    }
 }
