@@ -1,0 +1,276 @@
+version: 2
+
+goal:
+  title: "Foil iOS Shellcheck Hygiene Gate"
+  slug: "foil-ios-shellcheck-hygiene-gate"
+  kind: specific
+  tranche: "Decide whether ShellCheck can honestly become the next required repo hygiene gate after the bash syntax gate."
+  status: active
+  oracle:
+    signal: "A merge-queued PR lands with a deterministic ShellCheck gate in required CI, or Judge records that ShellCheck must remain advisory with source-backed reasons."
+    cadence: "after Scout install/prototype evidence, after Judge decision, after Worker verification, after hosted PR checks, and after merge-queue proof"
+    final_proof: "GoalBuddy checker passes, 350-line ratchet remains green with an empty allowlist, and the required/advisory ShellCheck outcome lands through the merge queue."
+  intake:
+    original_request: "great do that"
+    interpreted_outcome: "Run the next hygiene-board slice: pin/prove ShellCheck enough to promote it from local advisory evidence to a required hosted CI gate, if honest."
+    input_shape: specific
+    audience: "Foil iOS maintainers who want TypeScript-style lint confidence without overclaiming unstable hosted dependencies."
+    authority: requested
+    proof_type: test
+    completion_proof: "A merged PR with Scout/Judge/Worker receipts, hosted checks, merge-queue proof, and the 350-line ratchet still passing with no allowlist."
+    likely_misfire: "Adding `brew install shellcheck` as required CI without proving version determinism or warning-surface stability."
+    blind_spots_considered:
+      - "GitHub-hosted macOS images can change preinstalled tools and Homebrew formula versions over time."
+      - "ShellCheck version drift can introduce or remove warnings."
+      - "The repo currently has one shell script, so a broad shell lint gate should not pretend to cover more surface than exists."
+      - "Physical iPhone/TestFlight/WDA evidence remains separate from hosted CI."
+    existing_plan_facts:
+      - "Board 5 merged `bash -n scripts/ios-simulator-sanity.sh` into the required `Repo hygiene ratchet` job."
+      - "Board 5 local Scout evidence showed ShellCheck 0.11.0 passes locally for `scripts/ios-simulator-sanity.sh`."
+      - "Board 5 deferred ShellCheck as required until the hosted install/checksum path was pinned or otherwise deterministic."
+      - "The current hard max-lines gate is 350 with an empty allowlist."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  preserve_and_validate_existing_plan: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/foil-ios-shellcheck-hygiene-gate/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-shellcheck-hygiene-gate"
+
+active_task: T004
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Map ShellCheck install/proof options for GitHub-hosted macOS and prototype the current repo warning surface."
+    inputs:
+      - ".github/workflows/ios-simulator-sanity.yml"
+      - "scripts/ios-simulator-sanity.sh"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/foil-ios-hygiene-gates-analog/state.yaml"
+    constraints:
+      - "Read-only except notes and state receipts."
+      - "Do not install global tools or mutate package state."
+      - "Prefer primary hosted runner documentation or direct hosted-run evidence over assumptions."
+      - "Do not inspect private physical-device artifacts."
+    expected_output:
+      - "Current shell script inventory."
+      - "Local ShellCheck version and command output."
+      - "Hosted install/proof options and their determinism tradeoffs."
+      - "Recommended required-now or advisory-only decision input."
+    receipt:
+      result: done
+      note: "notes/T001-scout.md"
+      summary: "The repo has one shell script and local ShellCheck 0.11.0 passes cleanly. Official `macos-15` runner image documentation lists SwiftLint but not ShellCheck, so relying on a preinstalled binary is not honest. ShellCheck v0.11.0 provides official Darwin `aarch64` and `x86_64` release archives; both were downloaded, SHA-256 values were recorded, archive layout was inspected, and the exact install pattern was dry-run locally."
+      evidence:
+        - "`find . -path './.git' -prune -o -type f -name '*.sh'`: exactly `./scripts/ios-simulator-sanity.sh`."
+        - "`shellcheck --version`: local ShellCheck 0.11.0."
+        - "`shellcheck scripts/ios-simulator-sanity.sh`: pass, no diagnostics."
+        - "Official `actions/runner-images` `macos-15` README lists image version `20260622.0255.1`, Homebrew, and SwiftLint, but not ShellCheck."
+        - "`gh api repos/koalaman/shellcheck/releases/tags/v0.11.0`: official Darwin `aarch64` and `x86_64` release assets exist."
+        - "Downloaded SHA-256: `56affdd8de5527894dca6dc3d7e0a99a873b0f004d7aabc30ae407d3f48b0a79` for Darwin aarch64 tar.xz."
+        - "Downloaded SHA-256: `3c89db4edcab7cf1c27bff178882e0f6f27f7afdf54e859fa041fca10febe4c6` for Darwin x86_64 tar.xz."
+        - "Local dry-run of pinned download, SHA verification, extraction, `shellcheck --version`, and lint command passed."
+      recommendation:
+        decision_input: "Required ShellCheck is honest if installed from the pinned v0.11.0 release archives with architecture-specific SHA checks in the existing `Repo hygiene ratchet` job."
+        reject:
+          - "Do not rely on preinstalled ShellCheck."
+          - "Do not use floating `brew install shellcheck` for a required gate."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Decide whether ShellCheck is honest as a required CI gate now, and define the Worker package."
+    inputs:
+      - "T001 Scout receipt."
+    constraints:
+      - "Read-only."
+      - "Reject required ShellCheck if hosted version/pinning is not deterministic enough."
+      - "Reject broad lint gates that would mask the fact that only one shell script currently exists."
+      - "Do not add physical-device evidence or new status contexts unless required."
+    expected_output:
+      - "approved | advisory_only | blocked | needs_more_scout"
+      - "Exact Worker objective."
+      - "Allowed files."
+      - "Verify commands."
+      - "Stop conditions."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "ShellCheck can honestly become required now if it is installed from the official v0.11.0 Darwin release archives with SHA-256 verification. This avoids relying on undocumented preinstalled tools or floating Homebrew formula state, keeps the gate inside the existing required `Repo hygiene ratchet` context, and has a clean current warning surface over the repo's only shell script."
+      worker:
+        objective: "Add a pinned ShellCheck install plus `shellcheck scripts/ios-simulator-sanity.sh` to the existing `Repo hygiene ratchet` job, document the pinned-release rationale, and record Worker proof."
+        allowed_files:
+          - ".github/workflows/ios-simulator-sanity.yml"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-shellcheck-hygiene-gate/state.yaml"
+        verify:
+          - "bash -n scripts/ios-simulator-sanity.sh"
+          - "shellcheck scripts/ios-simulator-sanity.sh"
+          - "scripts/source-whitespace-check.py"
+          - "scripts/source-whitespace-check.py --self-test"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-line-ratchet.py --self-test"
+          - "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py scripts/ios_physical_wda_evidence_core.py scripts/source-whitespace-check.py scripts/source-line-ratchet.py"
+          - "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"workflow yaml ok\"' .github/workflows/ios-simulator-sanity.yml"
+          - "git diff --check"
+          - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-shellcheck-hygiene-gate/state.yaml"
+        stop_if:
+          - "Need files outside allowed_files."
+          - "The workflow uses floating Homebrew or an undocumented preinstalled ShellCheck."
+          - "The workflow adds a new required status context instead of extending `Repo hygiene ratchet`."
+          - "The change weakens existing required coverage."
+          - "Verification fails twice for the same reason."
+      rejected_options:
+        - "Rely on preinstalled ShellCheck: official `macos-15` image docs do not list it."
+        - "Use floating `brew install shellcheck`: simpler but version-drifting for a required gate."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Execute the Judge-approved ShellCheck CI/documentation package."
+    allowed_files:
+      - ".github/workflows/ios-simulator-sanity.yml"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/foil-ios-shellcheck-hygiene-gate/state.yaml"
+    verify:
+      - "bash -n scripts/ios-simulator-sanity.sh"
+      - "shellcheck scripts/ios-simulator-sanity.sh"
+      - "scripts/source-whitespace-check.py"
+      - "scripts/source-whitespace-check.py --self-test"
+      - "scripts/source-line-ratchet.py --json"
+      - "scripts/source-line-ratchet.py --self-test"
+      - "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py scripts/ios_physical_wda_evidence_core.py scripts/source-whitespace-check.py scripts/source-line-ratchet.py"
+      - "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"workflow yaml ok\"' .github/workflows/ios-simulator-sanity.yml"
+      - "git diff --check"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-shellcheck-hygiene-gate/state.yaml"
+    stop_if:
+      - "Need files outside Judge-approved `allowed_files`."
+      - "Hosted CI determinism is ambiguous."
+      - "ShellCheck output is noisy or version-sensitive without a pinned baseline."
+      - "The change weakens existing required coverage."
+      - "Verification fails twice for the same reason."
+    receipt:
+      result: done
+      changed_files:
+        - ".github/workflows/ios-simulator-sanity.yml"
+        - "docs/ci-workflow-development-plan.md"
+        - "docs/ios-simulator-sanity-runbook.md"
+        - "docs/goals/foil-ios-shellcheck-hygiene-gate/state.yaml"
+      summary: "Added a pinned ShellCheck v0.11.0 install to the existing required `Repo hygiene ratchet` job, verified architecture-specific Darwin release archives by SHA-256, ran `shellcheck scripts/ios-simulator-sanity.sh`, and documented the promoted gate."
+      strongest_failure_mode: "The required hosted gate could look deterministic in YAML but fail because the pinned release install, architecture selection, checksum, or archive layout is wrong."
+      disproof:
+        - "A local dry-run of the exact install flow selected the current architecture, downloaded the v0.11.0 Darwin archive, verified the SHA-256, extracted `shellcheck`, printed version 0.11.0, and linted `scripts/ios-simulator-sanity.sh` successfully."
+        - "`shellcheck scripts/ios-simulator-sanity.sh`: pass, no diagnostics."
+        - "`ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"workflow yaml ok\"' .github/workflows/ios-simulator-sanity.yml`: pass."
+        - "`scripts/source-line-ratchet.py --json`: `max_lines` 350, empty allowlist, 51 counted files, no violations; workflow is 231 lines."
+        - "Whitespace scan, hygiene self-tests, Python compile, and `git diff --check` passed."
+      commands:
+        - cmd: "bash -n scripts/ios-simulator-sanity.sh"
+          status: pass
+        - cmd: "shellcheck scripts/ios-simulator-sanity.sh"
+          status: pass
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "scripts/source-whitespace-check.py --self-test"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --json"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --self-test"
+          status: pass
+        - cmd: "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py scripts/ios_physical_wda_evidence_core.py scripts/source-whitespace-check.py scripts/source-line-ratchet.py"
+          status: pass
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"workflow yaml ok\"' .github/workflows/ios-simulator-sanity.yml"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "Pinned ShellCheck v0.11.0 release install dry-run with SHA verification and lint command"
+          status: pass
+
+  - id: T004
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: medium
+    objective: "Publish the verified ShellCheck outcome through a protected PR, watch hosted checks, enqueue it, and record merge-queue evidence."
+    inputs:
+      - "T003 Worker receipt, or T002 advisory-only decision."
+      - "Current branch changes."
+      - "GitHub branch protection and merge queue."
+    constraints:
+      - "Do not claim completion on local checks alone."
+      - "Preserve simulator-safe CI as CI proof and physical iPhone/TestFlight/WDA as receipt-based evidence only."
+      - "Do not add private physical-device artifacts, raw WDA trees, provider keys, archives, or IPAs."
+    expected_output:
+      - "Implementation/advisory commit and PR."
+      - "Hosted CI results."
+      - "Merge-queue result or explicit blocker."
+      - "Next board state for final audit."
+    receipt: null
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Audit whether the ShellCheck hygiene-gate tranche satisfies the oracle and has merge-queue proof."
+    inputs:
+      - "All done task receipts."
+      - "GoalBuddy checker result."
+      - "Final `scripts/source-line-ratchet.py --json` output."
+    constraints:
+      - "Do not implement."
+      - "Reject completion if required CI/advisory outcome is not merged through the queue."
+      - "Reject completion if the 350-line ratchet is no longer green with an empty allowlist."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Strongest realistic failure mode and disproof."
+      - "Next task or blocker if not complete."
+    receipt: null
+
+checks:
+  dirty_fingerprint: "T003 Worker verified locally; publishing active"
+  last_verification:
+    result: pass
+    task: T003
+    commands:
+      - "bash -n scripts/ios-simulator-sanity.sh"
+      - "shellcheck scripts/ios-simulator-sanity.sh"
+      - "scripts/source-line-ratchet.py --json"
+      - "git diff --check"
+      - "Pinned ShellCheck v0.11.0 release install dry-run"
