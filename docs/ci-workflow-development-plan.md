@@ -15,6 +15,7 @@ The first required GitHub Actions layer should be named
   checkout.
 - Python syntax checks for repo scripts.
 - Shell syntax checks for repo shell scripts.
+- Pinned ShellCheck linting for repo shell scripts.
 - `scripts/ios-physical-harness.py self-test`.
 - `scripts/ios-simulator-sanity.sh`.
 
@@ -77,9 +78,13 @@ line bodies with trailing whitespace fail.
 Board 5 added the first low-noise script-lint analog: `Repo hygiene ratchet`
 runs `bash -n scripts/ios-simulator-sanity.sh` so the required hygiene job
 proves the simulator sanity shell lane is parseable before running heavier
-fixtures and real checkout scans. `shellcheck` passed locally and remains the
-next script-lint candidate, but it should not become required until the hosted
-install path is pinned or otherwise made deterministic.
+fixtures and real checkout scans.
+
+Board 6 promoted ShellCheck to required CI using official ShellCheck v0.11.0
+Darwin release archives, selected by runner architecture and verified with
+SHA-256 before adding the binary to `GITHUB_PATH`. This avoids relying on an
+undocumented preinstalled binary or floating Homebrew formula state while
+keeping the check inside the existing required `Repo hygiene ratchet` context.
 
 The initial migration allowlist was:
 

@@ -14,6 +14,9 @@ permissions:
 env:
   XCODEGEN_VERSION: "2.45.4"
   XCODEGEN_SHA256: "090ec29491aad50aec10631bf6e62253fed733c50f3aab0f5ffc86bc170bdbef"
+  SHELLCHECK_VERSION: "0.11.0"
+  SHELLCHECK_DARWIN_AARCH64_SHA256: "56affdd8de5527894dca6dc3d7e0a99a873b0f004d7aabc30ae407d3f48b0a79"
+  SHELLCHECK_DARWIN_X86_64_SHA256: "3c89db4edcab7cf1c27bff178882e0f6f27f7afdf54e859fa041fca10febe4c6"
 
 jobs:
   hosted-simulator-sanity:
@@ -155,10 +158,43 @@ jobs:
             scripts/source-whitespace-check.py \
             scripts/source-line-ratchet.py
 
+      - name: Install pinned ShellCheck
+        run: |
+          set -euo pipefail
+          case "$(uname -m)" in
+            arm64)
+              shellcheck_arch="aarch64"
+              shellcheck_sha="${SHELLCHECK_DARWIN_AARCH64_SHA256}"
+              ;;
+            x86_64)
+              shellcheck_arch="x86_64"
+              shellcheck_sha="${SHELLCHECK_DARWIN_X86_64_SHA256}"
+              ;;
+            *)
+              echo "Unsupported ShellCheck runner architecture: $(uname -m)"
+              exit 1
+              ;;
+          esac
+          install_dir="$RUNNER_TEMP/shellcheck-${SHELLCHECK_VERSION}"
+          archive_path="$RUNNER_TEMP/shellcheck-${SHELLCHECK_VERSION}.tar.xz"
+          curl -fsSL \
+            "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.darwin.${shellcheck_arch}.tar.xz" \
+            -o "$archive_path"
+          echo "${shellcheck_sha}  $archive_path" | shasum -a 256 -c -
+          mkdir -p "$install_dir"
+          tar -xJf "$archive_path" -C "$install_dir" --strip-components 1
+          echo "$install_dir" >> "$GITHUB_PATH"
+          "$install_dir/shellcheck" --version | tee ci-artifacts/shellcheck-version.txt
+
       - name: Check shell syntax
         run: |
           set -euo pipefail
           bash -n scripts/ios-simulator-sanity.sh
+
+      - name: Run ShellCheck
+        run: |
+          set -euo pipefail
+          shellcheck scripts/ios-simulator-sanity.sh 2>&1 | tee ci-artifacts/shellcheck.txt
 
       - name: Run hygiene script self-tests
         run: |
@@ -184,6 +220,8 @@ jobs:
           name: repo-hygiene-ratchet-text
           path: |
             ci-artifacts/source-whitespace-check.txt
+            ci-artifacts/shellcheck-version.txt
+            ci-artifacts/shellcheck.txt
             ci-artifacts/source-whitespace-self-test.json
             ci-artifacts/source-line-ratchet-self-test.json
             ci-artifacts/physical-harness-self-test.txt

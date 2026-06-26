@@ -27,9 +27,10 @@ classic branch protection. The required job contexts are:
 and max-lines ratchet before scanning the real checkout, so those required gates
 prove both their own fail-closed behavior and the current repo contents.
 It also runs `bash -n scripts/ios-simulator-sanity.sh` as the first required
-shell-script hygiene check. Stronger shell linting with `shellcheck` is a
-candidate follow-up once the hosted install path is pinned or otherwise made
-deterministic.
+shell-script hygiene check. It then installs ShellCheck v0.11.0 from the
+official Darwin release archive for the current runner architecture, verifies
+the pinned SHA-256, and runs
+`shellcheck scripts/ios-simulator-sanity.sh` inside the same required job.
 
 The lane runs:
 
