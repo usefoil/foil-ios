@@ -5,7 +5,7 @@ goal:
   slug: "foil-ios-shellcheck-hygiene-gate"
   kind: specific
   tranche: "Decide whether ShellCheck can honestly become the next required repo hygiene gate after the bash syntax gate."
-  status: active
+  status: done
   oracle:
     signal: "A merge-queued PR lands with a deterministic ShellCheck gate in required CI, or Judge records that ShellCheck must remain advisory with source-backed reasons."
     cadence: "after Scout install/prototype evidence, after Judge decision, after Worker verification, after hosted PR checks, and after merge-queue proof"
@@ -60,7 +60,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/foil-ios-shellcheck-hygiene-gate/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-shellcheck-hygiene-gate"
 
-active_task: T004
+active_task: null
 
 tasks:
   - id: T001
@@ -224,7 +224,7 @@ tasks:
   - id: T004
     type: pm
     assignee: PM
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Publish the verified ShellCheck outcome through a protected PR, watch hosted checks, enqueue it, and record merge-queue evidence."
     inputs:
@@ -240,12 +240,39 @@ tasks:
       - "Hosted CI results."
       - "Merge-queue result or explicit blocker."
       - "Next board state for final audit."
-    receipt: null
+    receipt:
+      result: done
+      pr: "https://github.com/usefoil/foil-ios/pull/78"
+      branch: "codex/foil-ios-shellcheck-hygiene-gate"
+      commit: "1aacb23fa050100b354b09a46889afdd15333573"
+      merge_commit: "a35b5b55100f6c072c18d14beaeae9d38c2c594c"
+      merged_at: "2026-06-26T19:05:43Z"
+      summary: "Published the pinned ShellCheck hygiene gate through PR #78 and the protected merge queue. The PR-head `Repo hygiene ratchet` passed with the new pinned install and ShellCheck run, and the merge-group run passed the same required context before GitHub merged the queue SHA to main."
+      hosted_pr_checks:
+        - "Repo hygiene ratchet: pass in 9s; included `Install pinned ShellCheck` and `Run ShellCheck`."
+        - "Hosted simulator sanity: pass in 6m31s."
+        - "Analyze (actions): pass in 38s."
+        - "Analyze (python): pass in 48s."
+        - "Analyze (swift): pass in 30m29s."
+        - "CodeQL aggregate check: pass."
+      merge_queue:
+        entry: "MQE_lQDOSz2SH87rF053zgADVBHOAiwoEw"
+        position: 1
+        run: "https://github.com/usefoil/foil-ios/actions/runs/28259062634"
+        head_branch: "gh-readonly-queue/main/pr-78-bcbcf45e9ed4787e59a4d4d434b92a5ea1cc4e0b"
+        head_sha: "a35b5b55100f6c072c18d14beaeae9d38c2c594c"
+        result: pass
+        evidence:
+          - "Merge-group `Repo hygiene ratchet`: pass in 9s; `Install pinned ShellCheck` and `Run ShellCheck` succeeded."
+          - "Merge-group `Hosted simulator sanity`: pass in 6m15s."
+      boundary:
+        - "No physical iPhone, TestFlight, WDA, provider-key, IPA, archive, or private-device evidence was added or claimed."
+        - "Physical proof remains separate receipt-based evidence unless a trusted self-hosted Mac + device lane is explicitly available."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Audit whether the ShellCheck hygiene-gate tranche satisfies the oracle and has merge-queue proof."
     inputs:
@@ -261,16 +288,30 @@ tasks:
       - "full_outcome_complete: true | false"
       - "Strongest realistic failure mode and disproof."
       - "Next task or blocker if not complete."
-    receipt: null
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      summary: "Board 6 satisfied the oracle: ShellCheck is now required inside the existing `Repo hygiene ratchet` context via official v0.11.0 Darwin release archives, architecture-specific SHA verification, and a clean lint run over the repo's only shell script. The implementation landed through the protected merge queue with hosted proof."
+      strongest_failure_mode: "ShellCheck could have been promoted based on local proof only, or through a floating hosted dependency that later changes under branch protection."
+      disproof:
+        - "The workflow uses ShellCheck v0.11.0 official Darwin release archives with pinned SHA-256 values for both `aarch64` and `x86_64`."
+        - "PR #78 `Repo hygiene ratchet` passed on GitHub-hosted macOS in 9s, including `Install pinned ShellCheck` and `Run ShellCheck`."
+        - "Merge-group run `28259062634` passed `Repo hygiene ratchet` in 9s with the same ShellCheck steps and `Hosted simulator sanity` in 6m15s."
+        - "PR #78 merged through the queue at `2026-06-26T19:05:43Z` with merge commit `a35b5b55100f6c072c18d14beaeae9d38c2c594c`."
+        - "Worker verification kept the hard line ratchet at `max_lines` 350 with an empty allowlist and no violations."
+      residual_followups:
+        - "Swift formatting/linting should remain advisory until repo-local config and warning noise are reduced."
+        - "Periphery remains the closest Knip analog but needs a dedicated SwiftUI/test/XcodeGen/extension false-positive board."
 
 checks:
-  dirty_fingerprint: "T003 Worker verified locally; publishing active"
+  dirty_fingerprint: "closeout audit after PR #78 merge"
   last_verification:
     result: pass
-    task: T003
+    task: T999
     commands:
-      - "bash -n scripts/ios-simulator-sanity.sh"
-      - "shellcheck scripts/ios-simulator-sanity.sh"
+      - "gh pr view 78 --json state,mergedAt,mergeCommit"
+      - "gh run watch 28259062634 --interval 30"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-shellcheck-hygiene-gate/state.yaml"
       - "scripts/source-line-ratchet.py --json"
       - "git diff --check"
-      - "Pinned ShellCheck v0.11.0 release install dry-run"
