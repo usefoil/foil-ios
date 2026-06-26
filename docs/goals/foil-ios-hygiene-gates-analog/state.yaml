@@ -5,7 +5,7 @@ goal:
   slug: "foil-ios-hygiene-gates-analog"
   kind: specific
   tranche: "Identify and implement the first honest Swift/iOS analog of the repo's TypeScript lint/knip/max-lines hygiene stack."
-  status: active
+  status: done
   oracle:
     signal: "A merge-queued PR lands with a safe new deterministic iOS hygiene gate, or Judge proves that only advisory follow-up is honest for this tranche."
     cadence: "after Scout evidence, after Judge decision, after Worker verification, after hosted PR checks, and after merge-queue proof"
@@ -60,7 +60,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/foil-ios-hygiene-gates-analog/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-hygiene-gates-analog"
 
-active_task: T005
+active_task: null
 
 tasks:
   - id: T001
@@ -264,7 +264,7 @@ tasks:
   - id: T005
     type: pm
     assignee: PM
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Publish the verified hygiene-gate change through a protected PR, watch hosted checks, enqueue it, and record merge-queue evidence."
     inputs:
@@ -280,12 +280,39 @@ tasks:
       - "Hosted CI results."
       - "Merge-queue result or explicit blocker."
       - "Next board state for final audit."
-    receipt: null
+    receipt:
+      result: done
+      pr: "https://github.com/usefoil/foil-ios/pull/76"
+      branch: "codex/foil-ios-hygiene-gates-analog"
+      commit: "d2d9fbe54d5b4fa5eb82a5a5fc88b199629d1131"
+      merge_commit: "0f7ce4a5e890392c675226c7d32e28fe11e1b918"
+      merged_at: "2026-06-26T17:32:50Z"
+      summary: "Published the shell syntax hygiene gate through PR #76 and the protected merge queue. The PR checks passed, including `Repo hygiene ratchet` with the new `Check shell syntax` step, `Hosted simulator sanity`, CodeQL actions/python/swift, and the aggregate CodeQL check. The merge-group run also passed the required non-physical simulator workflow before GitHub merged the queue SHA to main."
+      hosted_pr_checks:
+        - "Repo hygiene ratchet: pass in 10s; `Check shell syntax` step completed successfully."
+        - "Hosted simulator sanity: pass in 6m46s."
+        - "Analyze (actions): pass in 37s."
+        - "Analyze (python): pass in 47s."
+        - "Analyze (swift): pass in 24m20s."
+        - "CodeQL aggregate check: pass."
+      merge_queue:
+        entry: "MQE_lQDOSz2SH87rEFWHzgADVBHOAiv6BA"
+        position: 1
+        run: "https://github.com/usefoil/foil-ios/actions/runs/28254266057"
+        head_branch: "gh-readonly-queue/main/pr-76-f3083075046290920269e8c9f4e0a03e38f9e17d"
+        head_sha: "0f7ce4a5e890392c675226c7d32e28fe11e1b918"
+        result: pass
+        evidence:
+          - "Merge-group `Repo hygiene ratchet`: pass in 18s, including the new `Check shell syntax` step."
+          - "Merge-group `Hosted simulator sanity`: pass in 6m20s."
+      boundary:
+        - "No physical iPhone, TestFlight, WDA, provider-key, IPA, archive, or private-device evidence was added or claimed."
+        - "Physical proof remains separate receipt-based evidence unless a trusted self-hosted Mac + device lane is explicitly available."
 
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Audit whether the iOS hygiene-gates analog tranche satisfies the original outcome and has merge-queue proof."
     inputs:
@@ -301,14 +328,30 @@ tasks:
       - "full_outcome_complete: true | false"
       - "Strongest realistic failure mode and disproof."
       - "Next task or blocker if not complete."
-    receipt: null
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      summary: "Board 5 satisfied the tranche: Foil iOS now has the first required low-noise Swift/iOS hygiene analog beyond the existing 350-line ratchet, implemented as a deterministic shell syntax check in the already-required `Repo hygiene ratchet` job. No noisy SwiftLint/swift-format/Periphery gate was overclaimed; those remain advisory/deferred with Scout evidence."
+      strongest_failure_mode: "The board could appear complete while the new gate was only locally proven, not actually required or merge-queue proven on the protected branch."
+      disproof:
+        - "PR #76 merged through the merge queue at `2026-06-26T17:32:50Z` with merge commit `0f7ce4a5e890392c675226c7d32e28fe11e1b918`."
+        - "PR checks passed: `Repo hygiene ratchet`, `Hosted simulator sanity`, CodeQL actions/python/swift, and aggregate CodeQL."
+        - "Merge-group run `28254266057` passed; `Repo hygiene ratchet` included the new `Check shell syntax` step and `Hosted simulator sanity` passed."
+        - "`scripts/source-line-ratchet.py --json` remained at `max_lines` 350 with an empty allowlist and no violations during local Worker verification."
+      residual_followups:
+        - "Shellcheck can become a candidate required gate after the hosted install/checksum path is pinned."
+        - "swift-format/SwiftLint need repo-local config and noise reduction before any required gate."
+        - "Periphery remains the closest Knip analog but needs a dedicated SwiftUI/test/XcodeGen/extension false-positive board."
 
 checks:
-  dirty_fingerprint: "worker verified locally; publishing active"
+  dirty_fingerprint: "closeout audit after PR #76 merge"
   last_verification:
     result: pass
-    task: T004
+    task: T999
     commands:
-      - "bash -n scripts/ios-simulator-sanity.sh"
+      - "gh pr view 76 --json state,mergedAt,mergeCommit"
+      - "gh run watch 28254266057 --interval 30"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-hygiene-gates-analog/state.yaml"
       - "scripts/source-line-ratchet.py --json"
       - "git diff --check"
