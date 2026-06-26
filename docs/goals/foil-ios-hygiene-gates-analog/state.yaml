@@ -1,0 +1,314 @@
+version: 2
+
+goal:
+  title: "Foil iOS Hygiene Gates Analog"
+  slug: "foil-ios-hygiene-gates-analog"
+  kind: specific
+  tranche: "Identify and implement the first honest Swift/iOS analog of the repo's TypeScript lint/knip/max-lines hygiene stack."
+  status: active
+  oracle:
+    signal: "A merge-queued PR lands with a safe new deterministic iOS hygiene gate, or Judge proves that only advisory follow-up is honest for this tranche."
+    cadence: "after Scout evidence, after Judge decision, after Worker verification, after hosted PR checks, and after merge-queue proof"
+    final_proof: "GoalBuddy checker passes, existing 350-line ratchet remains green, and the implementation/advisory PR lands through the merge queue."
+  intake:
+    original_request: "ok continue"
+    interpreted_outcome: "Continue from the 350-line ratchet by creating Board 5 for the Swift/iOS analog of TypeScript linting, knip-ing, max-lines, and deterministic hygiene gates."
+    input_shape: specific
+    audience: "Foil iOS maintainers who want CI to prove honest simulator-safe and static repo hygiene without overclaiming physical-device behavior."
+    authority: requested
+    proof_type: test
+    completion_proof: "A merged PR with Scout/Judge/Worker receipts, hosted checks, merge-queue proof, and the 350-line ratchet still passing with no allowlist."
+    likely_misfire: "Adding a noisy or fashionable Swift tool as required CI without proving it is deterministic, low-noise, and compatible with XcodeGen targets and generated files."
+    blind_spots_considered:
+      - "SwiftLint, SwiftFormat, swift-format, and Periphery have different install, config, and signal-quality tradeoffs than TypeScript ESLint/Prettier/Knip."
+      - "Generated files, app extensions, tests, previews, and XcodeGen project generation can create false positives."
+      - "GitHub-hosted CI can prove static/simulator-safe checks but not physical iPhone insertion or TestFlight behavior."
+      - "The hard max-lines rule is already required at 350 with an empty allowlist; further ratchets should be a separate Scout/Judge tranche."
+    existing_plan_facts:
+      - "PR #74 landed the 350-line max source/script/workflow ratchet."
+      - "PR #75 closed out Board 4 with merge-queue proof."
+      - "Current `scripts/source-line-ratchet.py --json` reports `max_lines` 350, empty allowlist, and no violations."
+      - "The user wants an analog of the standard TypeScript lint/knip/max-lines stack, eventually including hard max-lines enforcement."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  preserve_and_validate_existing_plan: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/foil-ios-hygiene-gates-analog/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/Foil Project/foil-ios/docs/goals/foil-ios-hygiene-gates-analog"
+
+active_task: T005
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Map the current Foil iOS hygiene surface and identify candidate Swift/iOS analogs for linting, formatting, dead-code detection, script hygiene, and max-lines enforcement."
+    inputs:
+      - "README.md"
+      - ".github/workflows/"
+      - "scripts/"
+      - "FoiliOS/project.yml"
+      - "FoiliOS/FoilIOS.xcodeproj"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/acceptance-evidence.md"
+      - "Current GoalBuddy receipts for Boards 3 and 4."
+    constraints:
+      - "Read-only."
+      - "Do not install tools, mutate package state, or edit implementation files."
+      - "Do not inspect private physical-device artifacts."
+      - "Prefer commands and file evidence over tool popularity."
+    expected_output:
+      - "Current enforced gates and their workflows."
+      - "Candidate Swift/iOS hygiene analogs with install/config/proof tradeoffs."
+      - "False-positive and generated-file risk map."
+      - "Recommended Scout prototype commands for the safest candidates."
+      - "Stop conditions or blockers."
+    receipt:
+      result: done
+      note: "notes/T001-scout.md"
+      summary: "Mapped the current required CI gates and hygiene surface. Foil iOS already has hard max-lines at 350, tracked-file whitespace scanning, Python syntax checks, fixture self-tests, physical-harness fixture checks, XcodeGen drift detection, simulator sanity, and CodeQL. No SwiftLint/SwiftFormat/swift-format/Periphery config exists. Local tools available are `swift-format` 602.0.0 and `shellcheck` 0.11.0; SwiftLint, SwiftFormat, and Periphery are missing locally."
+      evidence:
+        - "`.github/workflows/ios-simulator-sanity.yml`: required job names are `Hosted simulator sanity` and `Repo hygiene ratchet`; repo hygiene already runs whitespace, Python syntax, script self-tests, physical harness fixture, and max-lines."
+        - "`scripts/source-line-ratchet.py --json`: `max_lines` 350, empty allowlist, 51 counted files, no violations."
+        - "`rg --files ...`: no repo-local SwiftLint, SwiftFormat, swift-format, Periphery, Mint, Brewfile, Package.swift, shellcheck, ruff, mypy, or pyright config found."
+        - "`command -v`: `swift-format` and `shellcheck` are available locally; `swiftformat`, `swiftlint`, `periphery`, `ruff`, `mypy`, and `pyright` are missing locally."
+        - "`docs/goals/foil-ios-hard-hygiene-gates/state.yaml`: prior Judge deferred SwiftLint/SwiftFormat/Periphery as required checks until configs and false positives are understood."
+      recommended_next:
+        objective: "Prototype shellcheck and swift-format lint in read-only/advisory mode, then decide whether shellcheck can be required now and whether swift-format should remain advisory first."
+        prototype_commands:
+          - "shellcheck scripts/ios-simulator-sanity.sh"
+          - "swift-format lint --recursive FoiliOS --no-color-diagnostics"
+        likely_required_now:
+          - "shellcheck, if CI install/pinning and current output are clean"
+        likely_advisory_first:
+          - "swift-format lint"
+        likely_defer:
+          - "Periphery until a dedicated false-positive/config board"
+
+  - id: T002
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: medium
+    objective: "Prototype candidate hygiene checks in read-only/advisory mode and report which checks can be required now versus advisory first."
+    inputs:
+      - "T001 Scout receipt."
+      - "Candidate tools and scripts selected by T001."
+    constraints:
+      - "Read-only except temporary files outside the repo if required."
+      - "Do not commit or modify dependency state."
+      - "Do not make network-installed tools part of the plan unless pinning and hosted CI feasibility are explicit."
+      - "Do not treat noisy dead-code output as a required gate."
+    expected_output:
+      - "Prototype command results."
+      - "Required-now candidates."
+      - "Advisory-first candidates."
+      - "Rejected candidates and rationale."
+      - "Exact Worker package proposal with allowed_files, verify, and stop_if."
+    receipt:
+      result: done
+      note: "notes/T002-prototype.md"
+      summary: "Prototyped `bash -n`, shellcheck, and swift-format lint. `bash -n scripts/ios-simulator-sanity.sh` passed and has no external dependency, making it the safest required-now script hygiene gate. `shellcheck` passed locally but needs a pinned hosted install story before it becomes required. `swift-format lint --recursive FoiliOS --no-color-diagnostics` exited 0 but emitted 4,379 warning lines, mostly indentation, so it is advisory-first. Periphery remains deferred."
+      evidence:
+        - "`bash -n scripts/ios-simulator-sanity.sh`: pass."
+        - "`find . -path './.git' -prune -o -type f -name '*.sh'`: one shell script, `./scripts/ios-simulator-sanity.sh`."
+        - "`shellcheck scripts/ios-simulator-sanity.sh`: pass locally with ShellCheck 0.11.0."
+        - "`swift-format lint --recursive FoiliOS --no-color-diagnostics`: exit 0, 4,379 output lines; top warnings were 4,119 `Indentation`, 211 `LineLength`, and 22 `TrailingComma`."
+      required_now:
+        - "Repo-local shell syntax gate with `bash -n scripts/ios-simulator-sanity.sh`."
+      advisory_first:
+        - "shellcheck, until a pinned hosted install/checksum plan is chosen."
+        - "swift-format lint, until a repo-local config and warning-reduction plan exist."
+      deferred:
+        - "Periphery, until a dedicated SwiftUI/test/XcodeGen/app-extension false-positive board exists."
+
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Choose the first safe required hygiene gate, or explicitly choose advisory-only if no candidate is honest yet."
+    inputs:
+      - "T001 and T002 Scout receipts."
+    constraints:
+      - "Read-only."
+      - "Reject required gates that depend on unpinned external state, noisy baselines, or physical-device proof."
+      - "Reject broad auto-format rewrites unless the Worker package and proof make them obviously safe."
+      - "Preserve the 350-line ratchet as required CI."
+    expected_output:
+      - "approved | blocked | advisory_only | needs_more_scout"
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if conditions."
+      - "Rejected options and why."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The first honest required gate is a deterministic shell syntax check in the existing `Repo hygiene ratchet` job. It is narrower than shellcheck but requires no unpinned hosted install path and directly protects the repo's simulator sanity shell lane. Swift-format is too noisy to require now, shellcheck should wait for pinning, and Periphery needs a dedicated false-positive/config pass."
+      worker:
+        objective: "Add a required `bash -n` shell syntax check to the repo hygiene job, document it as the first safe script-hygiene analog, and preserve shellcheck/swift-format/Periphery as advisory or deferred follow-ups."
+        allowed_files:
+          - ".github/workflows/ios-simulator-sanity.yml"
+          - "docs/ci-workflow-development-plan.md"
+          - "docs/ios-simulator-sanity-runbook.md"
+          - "docs/goals/foil-ios-hygiene-gates-analog/state.yaml"
+        verify:
+          - "bash -n scripts/ios-simulator-sanity.sh"
+          - "scripts/source-whitespace-check.py"
+          - "scripts/source-whitespace-check.py --self-test"
+          - "scripts/source-line-ratchet.py --json"
+          - "scripts/source-line-ratchet.py --self-test"
+          - "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py scripts/ios_physical_wda_evidence_core.py scripts/source-whitespace-check.py scripts/source-line-ratchet.py"
+          - "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"workflow yaml ok\"' .github/workflows/ios-simulator-sanity.yml"
+          - "git diff --check"
+          - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-hygiene-gates-analog/state.yaml"
+        stop_if:
+          - "Need files outside allowed_files."
+          - "The workflow would add a new required status context instead of extending `Repo hygiene ratchet`."
+          - "The change weakens existing simulator-safe, CodeQL, generated drift, whitespace, Python syntax, physical fixture, or max-lines coverage."
+          - "Verification fails twice for the same reason."
+      rejected_options:
+        - "Require shellcheck now: clean locally, but no pinned hosted install/checksum path has been selected."
+        - "Require swift-format lint now: default lint emitted 4,379 warning lines and should be advisory/config-first."
+        - "Require Periphery now: missing locally and still high false-positive risk around SwiftUI, tests, XcodeGen, and keyboard extension entry points."
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Execute the first safe hygiene-gate Worker package selected by Judge."
+    allowed_files:
+      - ".github/workflows/ios-simulator-sanity.yml"
+      - "docs/ci-workflow-development-plan.md"
+      - "docs/ios-simulator-sanity-runbook.md"
+      - "docs/goals/foil-ios-hygiene-gates-analog/state.yaml"
+    verify:
+      - "bash -n scripts/ios-simulator-sanity.sh"
+      - "scripts/source-whitespace-check.py"
+      - "scripts/source-whitespace-check.py --self-test"
+      - "scripts/source-line-ratchet.py --json"
+      - "scripts/source-line-ratchet.py --self-test"
+      - "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py scripts/ios_physical_wda_evidence_core.py scripts/source-whitespace-check.py scripts/source-line-ratchet.py"
+      - "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"workflow yaml ok\"' .github/workflows/ios-simulator-sanity.yml"
+      - "git diff --check"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/foil-ios-hygiene-gates-analog/state.yaml"
+    stop_if:
+      - "Need files outside Judge-approved `allowed_files`."
+      - "The candidate gate is noisy or non-deterministic."
+      - "The candidate gate requires physical-device/TestFlight/WDA proof."
+      - "Hosted CI feasibility is ambiguous."
+      - "Verification fails twice for the same reason."
+    receipt:
+      result: done
+      changed_files:
+        - ".github/workflows/ios-simulator-sanity.yml"
+        - "docs/ci-workflow-development-plan.md"
+        - "docs/ios-simulator-sanity-runbook.md"
+        - "docs/goals/foil-ios-hygiene-gates-analog/state.yaml"
+      summary: "Added a required `bash -n scripts/ios-simulator-sanity.sh` shell syntax check to the existing `Repo hygiene ratchet` job, documented it as the first safe script-hygiene analog, and kept shellcheck, swift-format, and Periphery as advisory/deferred until pinning and false-positive evidence are stronger."
+      strongest_failure_mode: "The new gate could be cosmetic only, fail to run in the required job, or weaken the existing 350-line/repo-hygiene coverage."
+      disproof:
+        - "`.github/workflows/ios-simulator-sanity.yml` now runs `Check shell syntax` inside the existing required `Repo hygiene ratchet` job, not as a new unrequired context."
+        - "`bash -n scripts/ios-simulator-sanity.sh`: pass."
+        - "`scripts/source-line-ratchet.py --json`: `max_lines` 350, empty allowlist, 51 counted files, no violations; workflow is 193 lines."
+        - "`scripts/source-whitespace-check.py` and both hygiene script self-tests passed."
+        - "Python script compilation and workflow YAML parse checks passed."
+      commands:
+        - cmd: "bash -n scripts/ios-simulator-sanity.sh"
+          status: pass
+        - cmd: "scripts/source-whitespace-check.py"
+          status: pass
+        - cmd: "scripts/source-whitespace-check.py --self-test"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --json"
+          status: pass
+        - cmd: "scripts/source-line-ratchet.py --self-test"
+          status: pass
+        - cmd: "python3 -m py_compile scripts/ios-physical-harness.py scripts/ios_physical_harness/*.py scripts/ios-physical-wda-evidence.py scripts/ios_physical_wda_evidence_core.py scripts/source-whitespace-check.py scripts/source-line-ratchet.py"
+          status: pass
+        - cmd: "ruby -e 'require \"yaml\"; YAML.load_file(ARGV.fetch(0)); puts \"workflow yaml ok\"' .github/workflows/ios-simulator-sanity.yml"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+
+  - id: T005
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: medium
+    objective: "Publish the verified hygiene-gate change through a protected PR, watch hosted checks, enqueue it, and record merge-queue evidence."
+    inputs:
+      - "T004 Worker receipt, or T003 advisory-only decision."
+      - "Current branch changes."
+      - "GitHub branch protection and merge queue."
+    constraints:
+      - "Do not claim completion on local checks alone."
+      - "Preserve simulator-safe CI as CI proof and physical iPhone/TestFlight/WDA as receipt-based evidence only."
+      - "Do not add private physical-device artifacts, raw WDA trees, provider keys, archives, or IPAs."
+    expected_output:
+      - "Implementation/advisory commit and PR."
+      - "Hosted CI results."
+      - "Merge-queue result or explicit blocker."
+      - "Next board state for final audit."
+    receipt: null
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Audit whether the iOS hygiene-gates analog tranche satisfies the original outcome and has merge-queue proof."
+    inputs:
+      - "All done task receipts."
+      - "GoalBuddy checker result."
+      - "Final `scripts/source-line-ratchet.py --json` output."
+    constraints:
+      - "Do not implement."
+      - "Reject completion if required CI/advisory outcome is not merged through the queue."
+      - "Reject completion if the 350-line ratchet is no longer green with an empty allowlist."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Strongest realistic failure mode and disproof."
+      - "Next task or blocker if not complete."
+    receipt: null
+
+checks:
+  dirty_fingerprint: "worker verified locally; publishing active"
+  last_verification:
+    result: pass
+    task: T004
+    commands:
+      - "bash -n scripts/ios-simulator-sanity.sh"
+      - "scripts/source-line-ratchet.py --json"
+      - "git diff --check"

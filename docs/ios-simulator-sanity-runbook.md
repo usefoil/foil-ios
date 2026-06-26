@@ -26,6 +26,10 @@ classic branch protection. The required job contexts are:
 `Repo hygiene ratchet` runs fixture self-tests for the source whitespace scanner
 and max-lines ratchet before scanning the real checkout, so those required gates
 prove both their own fail-closed behavior and the current repo contents.
+It also runs `bash -n scripts/ios-simulator-sanity.sh` as the first required
+shell-script hygiene check. Stronger shell linting with `shellcheck` is a
+candidate follow-up once the hosted install path is pinned or otherwise made
+deterministic.
 
 The lane runs:
 

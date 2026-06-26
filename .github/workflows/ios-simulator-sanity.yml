@@ -155,6 +155,11 @@ jobs:
             scripts/source-whitespace-check.py \
             scripts/source-line-ratchet.py
 
+      - name: Check shell syntax
+        run: |
+          set -euo pipefail
+          bash -n scripts/ios-simulator-sanity.sh
+
       - name: Run hygiene script self-tests
         run: |
           set -euo pipefail

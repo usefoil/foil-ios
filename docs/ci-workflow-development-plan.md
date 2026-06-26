@@ -14,6 +14,7 @@ The first required GitHub Actions layer should be named
 - A tracked-file trailing-whitespace check that works on a clean hosted
   checkout.
 - Python syntax checks for repo scripts.
+- Shell syntax checks for repo shell scripts.
 - `scripts/ios-physical-harness.py self-test`.
 - `scripts/ios-simulator-sanity.sh`.
 
@@ -73,6 +74,13 @@ tabs. The repo-hygiene job runs `scripts/source-whitespace-check.py --self-test`
 to prove clean text and binary files pass while trailing spaces, tabs, and CRLF
 line bodies with trailing whitespace fail.
 
+Board 5 added the first low-noise script-lint analog: `Repo hygiene ratchet`
+runs `bash -n scripts/ios-simulator-sanity.sh` so the required hygiene job
+proves the simulator sanity shell lane is parseable before running heavier
+fixtures and real checkout scans. `shellcheck` passed locally and remains the
+next script-lint candidate, but it should not become required until the hosted
+install path is pinned or otherwise made deterministic.
+
 The initial migration allowlist was:
 
 - `FoiliOS/FoilIOSApp/ContentView.swift`: 967 lines
@@ -91,10 +99,13 @@ artifacts.
 
 ## Future Static Analysis
 
-Consider SwiftLint, SwiftFormat, and Periphery only after the simulator sanity
-workflow is stable. Periphery is the closest Swift analog to Knip, but it needs
-careful configuration around SwiftUI, tests, XcodeGen-generated projects, and
-extension entry points before it can be trusted as a required gate.
+Consider SwiftLint, SwiftFormat, `swift-format`, and Periphery only after a
+repo-local configuration and warning surface are understood. Board 5's
+`swift-format lint --recursive FoiliOS --no-color-diagnostics` prototype emitted
+thousands of warnings, mostly formatting/indentation, so it is advisory-first
+rather than required. Periphery is the closest Swift analog to Knip, but it
+needs careful configuration around SwiftUI, tests, XcodeGen-generated projects,
+and extension entry points before it can be trusted as a required gate.
 
 ## Physical Device Lane
 
